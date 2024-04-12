@@ -1,32 +1,33 @@
 <template>
   <div
-    class="relative flex justify-center flex-col items-center h-[100vh] bg-[#262D34]"
+    class="relative flex flex-col items-center h-[100vh]"
   >
-    <div class="absolute w-full h-full bg-[#2C353D]"></div>
-    <div class="z-10">
+    <TopNavBar/>
+    <!-- <div class="absolute w-full h-full border-2"></div> -->
+    <div class="z-10 flex justify-start gap-[80px]">
       <form
         action=""
-        class="flex flex-col form gap-7 py-[60px] justify-center items-center w-[400px] rounded-md bg-[#1E252B] px-10"
+        class="flex flex-col form gap-7 py-[60px] justify-center items-center w-[400px] rounded-md px-10"
         @keydown.enter="userLogin"
       >
-        <div class="text-3xl font-bold text-white">Sign in</div>
+        <div class="text-3xl font-bold text-gray-700">Sign in</div>
         <div class="w-full flex flex-col gap-2">
-          <label for="" class="text-sm text-white font-medium">Email</label>
+          <label for="" class="text-sm text-gray-700 font-medium">Email</label>
           <input
             v-model="login.email"
             type="text"
-            class="focus:outline-0 text-white h-[50px] w-full rounded-md pl-5 bg-[#2C353D]"
+            class="focus:outline-0 text-gray-700 h-[50px] w-full rounded-md pl-5 border-2"
             placeholder="Email"
             :class="{ invalid: !validateEmail }"
             required
           />
         </div>
         <div class="w-full relative flex flex-col gap-2">
-          <label for="" class="text-sm text-white font-medium">Password</label>
+          <label for="" class="text-sm text-gray-700 font-medium">Password</label>
           <input
             v-model="login.password"
             :type="isShowPassword ? 'text' : 'password'"
-            class="focus:outline-0 text-white h-[50px] w-full rounded-md pl-5 pr-8 bg-[#2C353D]"
+            class="focus:outline-0 text-gray-700 h-[50px] w-full rounded-md pl-5 pr-8 border-2"
             placeholder="Password"
             required
           />
@@ -48,18 +49,18 @@
         <hr />
         <div class="flex justify-between w-full">
           <button
-            class="text-sm text-white"
+            class="text-sm text-gray-700"
             type="button"
             @click.prevent="toSignup"
           >
-            Create new account?
+            Đăng ký
           </button>
           <button
             class="text-sm text-[#FF4B26] font-medium"
             type="button"
             @click.prevent="toFogotPassword"
           >
-            Forgot password
+            Quên mật khẩu?
           </button>
         </div>
         <div class="flex justify-center items-center w-full">
@@ -68,10 +69,11 @@
             class="text-[16px] font-bold text-white bg-[#FF4401] rounded-[25px] py-[8px] px-[40px]"
             @click="userLogin()"
           >
-            Sign In
+            Đăng nhập
           </button>
         </div>
       </form>
+      <img src="~/assets/icon/login-decor.svg" class="w-[40vw] ">
     </div>
     <modal-alert
       v-if="alert.isShowModal"
@@ -84,8 +86,9 @@
 
 <script>
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
+import TopNavBar from '~/components/TopNaviBar.vue'
 export default {
-  components: { ModalAlert },
+  components: { ModalAlert, TopNavBar },
   layout: 'empty',
   data() {
     return {

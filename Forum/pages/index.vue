@@ -1,6 +1,6 @@
 <template>
   <div class="main relative">
-    <div v-if="isCreatingPost" class="post-creator" @click="cancel">
+    <!-- <div v-if="isCreatingPost" class="post-creator" @click="cancel">
       <div class="post-creator__container custom-scroll" @click.stop="cancel">
         <PostCreator
           class=" custom-scroll"
@@ -10,113 +10,119 @@
           @doneLoading="isLoading = false"
         />
       </div>
-    </div>
-    <div class="container">
-      <div class="w-full px-4 flex flex-col items-center">
-        <div
-          class="flex bg-[#262D34] gap-5 w-full px-5 items-center h-[80px] rounded-md mb-5"
-        >
-          <div class="search flex gap-5 w-full p-5 my-5 rounded-lg">
-            <input
-              id=""
-              v-model="searchValue"
-              type="text"
-              name=""
-              class="text-white"
-              placeholder="Type title blog to search..."
-              @keydown.enter="searchBlog"
-            />
-            <img
-              src="~assets/icon/search.svg"
-              class="cursor-pointer"
-              alt=""
-              @click="searchBlog"
-            />
-          </div>
-          <button
-            class="text-white py-2 px-6 rounded-[10px] bg-[#FF571A]"
-            @click="isCreatingPost = true"
-          >
-            Create Post
+    </div> -->
+    <TopNaviBarGuest />
+    <div class="section__1">
+      <div class="section__1__left">
+        <div>Welcome to Pages</div>
+        <div class="text-[45px]">Books are uniquely portable magic</div>
+        <div class="text-[#B4C7E7]">
+          There are many variations of passages of Lorem Ipsum available, but
+          the majority have suffered alteration in some form.
+        </div>
+        <div class="flex gap-10 items-center">
+          <button class="bg-[#ffca42]">
+            <div class="text-[16px] font-[500] text-[#1B3764] px-5 py-3">Đặt ngay</div>
+          </button>
+          <button class="underline underline-offset-2">
+            Đọc bản thử miễn phí
           </button>
         </div>
-        <div
-          v-if="isLoading"
-          class="loading w-full h-[100px] flex items-center justify-center"
-        >
-          <LoadingSpinner />
-        </div>
-        <div v-else class="main-content w-full">
-          <div
-            v-for="n in news"
-            :key="n._id"
-            class="blog"
-            @click="GoToDetails(n._id)"
-          >
-            <BlogCard
-              :image-link="n.blogImage ?? null"
-              :author="`${n.userId?.firstName ?? ''} ${
-                n.userId?.lastName ?? ''
-              }`"
-              :comments="n.comments"
-              :like="
-                n.reaction?.filter((e) => {
-                  return e.reaction === 'like'
-                }).length
-              "
-              :dislike="
-                n.reaction?.filter((e) => {
-                  return e.reaction === 'dislike'
-                }).length
-              "
-              :title="n.title"
-              :time="n.createdAt"
-              :category="n.category?.name ?? ''"
-            />
+        <div class="flex gap-8">
+          <div class="flex gap-3">
+            <div class="bg-[#FFCA42] rounded-full w-4 h-4 mt-1"></div>
+            <div>
+              <div class="text-[16px]">Trang :</div>
+              <div class="text-[#B4C7E7]">586 trang</div>
+            </div>
           </div>
-          <div
-            v-if="totalBlogs === 0"
-            class="empty-data flex flex-col gap-[20px] items-center"
-          >
-            <img
-              src="~/assets/icon/warning.svg"
-              class="w-[100px] h-[100px]"
-              alt=""
-            />
-            <p class="text-white">Không có dữ liệu</p>
+          <div class="flex gap-3">
+            <div class="bg-[#FFCA42] rounded-full w-4 h-4 mt-1"></div>
+            <div>
+              <div class="text-[16px]">Đánh giá :</div>
+              <div class="text-[#B4C7E7]">4.5/5 (300 đánh giá)</div>
+            </div>
           </div>
         </div>
-        <Pagination
-          v-show="!isLoading && totalBlogs != 0"
-          :count="totalBlogs"
-          :records-per-page="recordsPerPage"
-          class="bg-[#fafcfe] px-[40px] py-2 rounded-[10px]"
-          @changePage="changePage"
-        />
+      </div>
+      <img class="section__1__image" src="~/assets/img/Book.png" />
+    </div>
+    <div class="section__2">
+      <div class="section__2__author__img">
+        <img class="w-[100%]" src="~/assets/img/Author-Background.png" alt="">
+        <div class="w-[100%] aspect-square absolute bg-white z-10 drop-shadow-md top-[0px] left-[-20px]"></div>
+      </div>
+      <div class="section__2__main w-full">
+        <div class="text-[#1B3764] text-[35px] font-bold">About author</div>
+        <div class="h-1 w-20 bg-[#FFCA42]"></div>
+        <div class="text-[#969AA0] text-[15px]">All the Lorem Ipsum generators on the Internet tend to repeated predefined chunks as necessary, making this the first true value generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful.</div>
+        <div class="flex gap-5 items-center">
+          <div>
+            <div class="text-[#1B3764] text-[45px] font-semibold">02</div>
+            <div class="text-[#969AA0] text-[15px]">Books Published</div>
+          </div>
+          <div class="w-[1px] h-[60px] bg-[#FFCA42]"></div>
+          <div>
+            <div class="text-[#1B3764] text-[45px] font-semibold">4.5</div>
+            <div class="text-[#969AA0] text-[15px]">User Review</div>
+          </div>
+          <div class="w-[1px] h-[60px] bg-[#FFCA42]"></div>
+          <div>
+            <div class="text-[#1B3764] text-[45px] font-semibold">04</div>
+            <div class="text-[#969AA0] text-[15px]">Best Seller Awards</div>
+          </div>
+        </div>
       </div>
     </div>
-    <modal-alert
+    <div class="section__3">
+      <div class="section__3__main">
+        <div class="text-[35px] font-semibold">Get Book Copy Today</div>
+        <div class="w-[60px] h-[1px] bg-[#FFCA42]"></div>
+        <div class="text-[#B4C7E7] text-[15px]">This the first true value generator on the Internet. It uses alphas dictionary of over 200 Latin words.</div>
+        <button class="border-[1px] border-[#FFCA42] py-3 px-5 w-auto self-start text-[15px]">
+          Đặt ngay
+        </button>
+      </div>
+      <img class="w-[40%]" src="~/assets/img/Photo.png">
+    </div>
+    <div class="section__4">
+      <div>Những sách khác cùng tác giả</div>
+      <div class="w-[60px] h-[1px] bg-[#FFCA42]"></div>
+      <div>
+        <BookCard />
+        <BookCard />
+        <BookCard />
+      </div>
+    </div>
+    <!-- <modal-alert
       v-if="alert.isShowModal"
       :width="480"
       v-bind="alert"
       @close="onCloseModal"
-    />
+    /> -->
   </div>
 </template>
 
 <script>
-import BlogCard from '~/components/Card/BlogCard.vue'
-import PostCreator from '~/components/Blog/PostCreator.vue'
-import ModalAlert from '~/components/Modal/ModalAlert.vue'
-import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
+// import BlogCard from '~/components/Card/BlogCard.vue'
+// import PostCreator from '~/components/Blog/PostCreator.vue'
+// import ModalAlert from '~/components/Modal/ModalAlert.vue'
+// import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
+// import TopNaviBar from '~/components/TopNaviBar.vue'
+import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
+import BookCard from '~/components/Book/BookCard.vue'
 
 export default {
   name: 'IndexPage',
+  layout: 'empty',
   components: {
-    BlogCard,
-    PostCreator,
-    ModalAlert,
-    LoadingSpinner,
+    // BlogCard,
+    // PostCreator,
+    // ModalAlert,
+    // LoadingSpinner,
+    // TopNaviBar,
+    TopNaviBarGuest,
+    BookCard
   },
   data() {
     return {
@@ -137,11 +143,11 @@ export default {
       },
     }
   },
-  async created() {
-    await this.getListBlog()
-    this.isLoading = false
-    // await this.modifyListBlog()
-  },
+  // async created() {
+  //   await this.getListBlog()
+  //   this.isLoading = false
+  //   // await this.modifyListBlog()
+  // },
   methods: {
     ScrollToTop() {
       this.$scrollToTop()
@@ -301,89 +307,69 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
-.main {
-  .post-creator {
-    position: fixed;
-    inset: 0;
-    background: rgba(71, 79, 98, 0.8);
+.section {
+  
+  &__1 {
+    background-color: #1b3764;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 30;
-    padding: 20px 0;
-    &__container {
-      height: 100%;
-      overflow-y: auto;
-      width: 100%;
+    padding: 40px 0 40px 0;
+    gap: 50px;
+
+    &__left {
+      width: 40%;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      flex-direction: column;
+      gap: 20px;
     }
-    &__form {
-      width: 100%;
-      max-width: 800px;
-      padding: 40px 20px;
-      border-radius: 10px;
-      margin: auto;
-      // height: 100%;
+
+    &__image {
+      width: 40%;
+      
     }
   }
-  .container {
+
+  &__2 {
     display: flex;
-    width: 100%;
-    max-width: 750px;
-    height: 100%;
-    .blog {
-      width: 100%;
-    }
-
-    .search {
-      position: relative;
-      flex: 1;
-      width: 100%;
-
-      input {
-        display: flex;
-        width: 100%;
-        padding: 9px 20px;
-        padding-right: 40px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        border-radius: 10px;
-        outline: none;
-        color: #fff;
-        /* Regular 14 */
-        font-family: 'Montserrat', sans-serif;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 22px; /* 157.143% */
-        background: $dark-4;
-        ::placeholder {
-          color: #858ead;
-        }
-      }
-
-      img {
-        position: absolute;
-        display: flex;
-        width: 20px;
-        height: 20px;
-        padding: 0px 0.5px 0.5px 1px;
-        justify-content: center;
-        align-items: center;
-        top: 50%;
-        right: 40px;
-        transform: translateY(-50%);
-      }
-    }
-  }
-  .main-content {
-    height: calc(100% - 100px);
-    display: flex;
-    flex-direction: column;
+    gap: 50px;
+    padding: 100px;
+    justify-content: center;
     align-items: center;
+    gap: 80px;
+    background-color: #F4F8FF;
+
+    &__author__img {
+      position: relative;
+      width: 30%;
+    }
+
+    &__main{
+      width: 40%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+
+  &__3 {
+    background-color: #1B3764;
+    padding: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+
+    &__main {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 40%;
+      color: white;
+    }
   }
 }
 </style>

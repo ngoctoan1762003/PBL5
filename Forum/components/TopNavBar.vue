@@ -2,7 +2,7 @@
   <div class="top-nav">
     <div class="top-nav__logo" @click="$router.push('/')">
       <img src="~assets/img/logosgroup.png" alt="" />
-      <div class="name-web">S-Forum</div>
+      <div class="name-web">BOOK</div>
     </div>
     <div class="top-nav__main">
       <div class="top-nav__main__left">
