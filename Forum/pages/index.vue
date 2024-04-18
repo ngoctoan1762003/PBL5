@@ -86,13 +86,25 @@
       <img class="w-[40%]" src="~/assets/img/Photo.png">
     </div>
     <div class="section__4">
-      <div>Những sách khác cùng tác giả</div>
-      <div class="w-[60px] h-[1px] bg-[#FFCA42]"></div>
-      <div>
-        <BookCard />
-        <BookCard />
-        <BookCard />
+      <div class="flex justify-center items-center flex-col gap-5">
+        <div class="text-[#1B3764] text-[30px] font-semibold">Những sách khác cùng tác giả</div>
+        <div class="w-[160px] h-[4px] bg-[#FFCA42]"></div>
       </div>
+      <div class="flex gap-10 justify-center items-center">
+        <BookCard  />
+        <BookCard  />
+        <BookCard  />
+      </div>
+    </div>
+    <div class="section__5">
+      <div class="text-[#1B3764] text-[30px] font-semibold">Bình luận</div>
+      <div class="w-[100px] h-[2px] bg-[#FFCA42]"></div>
+      <div class="flex flex-col gap-3 p-[30px]">
+        <CommentCard />
+        <CommentCard />
+        <CommentCard />
+      </div>
+      <CommentBox />
     </div>
     <!-- <modal-alert
       v-if="alert.isShowModal"
@@ -100,6 +112,7 @@
       v-bind="alert"
       @close="onCloseModal"
     /> -->
+    <FooterBar />
   </div>
 </template>
 
@@ -111,6 +124,9 @@
 // import TopNaviBar from '~/components/TopNaviBar.vue'
 import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
 import BookCard from '~/components/Book/BookCard.vue'
+import CommentCard from '~/components/Book/CommentCard.vue'
+import CommentBox from '~/components/Blog/CommentBox.vue'
+import FooterBar from '~/components/FooterBar.vue'
 
 export default {
   name: 'IndexPage',
@@ -122,7 +138,10 @@ export default {
     // LoadingSpinner,
     // TopNaviBar,
     TopNaviBarGuest,
-    BookCard
+    BookCard,
+    CommentCard,
+    CommentBox,
+    FooterBar
   },
   data() {
     return {
@@ -370,6 +389,23 @@ export default {
       width: 40%;
       color: white;
     }
+  }
+
+  &__4
+  {
+    background-color: white;
+    padding: 80px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+  }
+
+  &__5
+  {
+    background-color: #F4F8FF;
+    padding: 80px; 
   }
 }
 </style>

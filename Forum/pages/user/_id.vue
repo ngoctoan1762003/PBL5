@@ -331,7 +331,7 @@ export default {
 
 <style lang="scss" scoped>
 .bg-cover {
-  background-image: url('~/assets/img/anhsgroup.jpg');
+  background-image: url('~/assets/img/Book.png');
 }
 .relative {
   img {

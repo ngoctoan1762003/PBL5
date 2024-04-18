@@ -1,113 +1,114 @@
 <template>
-  <div class="main px-4 divide-y dark:bg-gray-800 dark:text-gray-100">
-    <div
-      class="container flex flex-col justify-between py-10 mx-auto space-y-8 lg:flex-row lg:space-y-0"
-    >
-      <div
-        class="grid grid-cols-2 text-sm gap-x-3 gap-y-8 w-full sm:grid-cols-4"
-      >
-        <div class="col-span-2 flex flex-col justify-center items-center">
-          <a
-            rel="noopener noreferrer"
-            class="flex justify-center space-x-3 lg:justify-start gap-[14px] mb-[20px]"
-          >
-            <div
-              class="flex items-center justify-center w-12 h-12 rounded-full dark:bg-violet-400"
-            >
-              <img src="~/assets/img/logosgroup.png" />
-            </div>
-          </a>
-          <h3 class="uppercase text-center text-[#FF571A]">Sgroup</h3>
-          <h3 class="uppercase text-center text-[#FF571A]">
-            Think different - Make different
-          </h3>
+  <div class="bg-[#1B3764] pt-[50px] pb-[10px] flex flex-col gap-4 justify-center">
+    <div class="flex gap-20 justify-center items-start mb-[80px]">
+      <div>
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-5">
+            <img class="w-[20px]" src="~/assets/icon/Logo.svg" alt="" />
+            <div class="text-white text-[25px] font-semibold">LOGO</div>
+          </div>
+          <div class="flex gap-3">
+            <img
+              class="w-[40px] border-[1px] border-[#FFCA42]"
+              src="~assets/icon/facebook-blue.svg"
+              alt=""
+            />
+            <img
+              class="w-[40px] border-[1px] border-[#FFCA42]"
+              src="~assets/icon/twitter-blue.svg"
+              alt=""
+            />
+            <img
+              class="w-[40px] border-[1px] border-[#FFCA42]"
+              src="~assets/icon/linkedin-blue.svg"
+              alt=""
+            />
+            <img
+              class="w-[40px] border-[1px] border-[#FFCA42]"
+              src="~assets/icon/insta-blue.svg"
+              alt=""
+            />
+          </div>
         </div>
-        <div class="space-y-3">
-          <h3 class="uppercase text-[#F4F6F8]">Specialization</h3>
-          <ul class="space-y-1 text-[#F4F6F8]">
-            <li class="py-[4px]">
-              <a rel="noopener noreferrer" href="#">Programming </a>
-            </li>
-            <li class="py-[4px]">
-              <a rel="noopener noreferrer" href="#">Online marketing</a>
-            </li>
-            <li class="py-[4px]">
-              <a rel="noopener noreferrer" href="#">Design </a>
-            </li>
-          </ul>
+      </div>
+      <div class="footer__section">
+        <div class="footer__section__header">Khám phá</div>
+        <div class="footer__section__element__container">
+          <div class="footer__section__element">Trang chủ</div>
+          <div class="footer__section__element">Về chúng tôi</div>
+          <div class="footer__section__element">Dịch vụ</div>
+          <div class="footer__section__element">Blog</div>
+          <div class="footer__section__element">Liên hệ</div>
         </div>
-        <div class="space-y-3">
-          <h3 class="uppercase text-[#F4F6F8]">Social Media</h3>
-          <ul class="space-y-1 text-[#F4F6F8]">
-            <li>
-              <a
-                rel="noopener noreferrer"
-                href="https://www.facebook.com/sgroupvn.org"
-                title="Facebook"
-                target="_blank"
-                class="flex items-center p-1"
-              >
-			  <img src="~assets/icon/facebook.svg" class="w-[20px] h-[20px]" alt="">
-
-                <span class="ml-[8px]">Facebook</span>
-              </a>
-            </li>
-            <li>
-              <a
-                rel="noopener noreferrer"
-                href="https://www.linkedin.com/company/sgroupvn"
-                target="_blank"
-                title="Linkedin"
-                class="flex items-center p-1"
-              >
-                <img
-                  src="~assets/icon/linkedin.svg"
-                  class="w-[20px] h-[20px]"
-                  alt=""
-                />
-                <span class="ml-[8px]">Linkedin</span>
-              </a>
-            </li>
-            <li>
-              <a
-                rel="noopener noreferrer"
-                href="https://sgroupvn.org/"
-                target="_blank"
-                title="Website"
-                class="flex items-center p-1"
-              >
-                <img
-                  src="~assets/icon/website.svg"
-                  class="w-[20px] h-[20px]"
-                  alt=""
-                />
-                <span class="ml-[8px]">Website</span>
-              </a>
-            </li>
-          </ul>
+      </div>
+      <div class="footer__section">
+        <div class="footer__section__header">Sách</div>
+        <div class="footer__section__element__container">
+          <div class="footer__section__element">Dare to be fearless</div>
+          <div class="footer__section__element">Dare to be healthy</div>
+          <div class="footer__section__element">Dare to be wealthy</div>
+        </div>
+      </div>
+      <div class="footer__section">
+        <div class="footer__section__header">Liên hệ</div>
+        <div class="footer__contact">
+          <div class="footer__contact__header">Địa chỉ</div>
+          <div class="footer__contact__header">:</div>
+          <div class="footer__section__element">
+            24A Kingston St, Los Vegas NC 28202, USA.
+          </div>
+        </div>
+        <div class="footer__contact">
+          <div class="footer__contact__header">Mail</div>
+          <div class="footer__contact__header">:</div>
+          <div class="footer__section__element">myfearlessguide@gmail.com</div>
+        </div>
+        <div class="footer__contact">
+          <div class="footer__contact__header">Số điện thoại</div>
+          <div class="footer__contact__header">:</div>
+          <div class="footer__section__element">(+22) 123 - 4567 - 900</div>
         </div>
       </div>
     </div>
-    <div class="py-6 text-sm text-center text-[#f4f6f8]">
-      © 2023. Sgroup Member.
+    <div class=" flex justify-center">
+        <div class="border-[1px] w-[80%] h-[1px] bg-white"></div>
     </div>
+    <div class="footer__section__element flex justify-center">Web bán sách hàng đầu VN</div>
   </div>
 </template>
-<script></script>
-<style lang="scss" scoped>
-@import '~/assets/scss/variables.scss';
-.main {
-  background: $dark-3;
 
-  .container {
-    .name {
-      color: $orange;
-      font-size: 26px;
-      font-style: normal;
-      font-weight: 700;
-      line-height: 38px;
-      color: $orange;
-      font-family: 'Montserrat', sans-serif;
+<style lang="scss" scoped>
+@import '~assets/scss/variables.scss';
+.footer {
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    &__header {
+      color: white;
+      font-size: 20px;
+      font-weight: 500;
+    }
+    &__element {
+      color: #b4c7e7;
+      font-size: 13px;
+      &__container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  }
+
+  &__contact {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+
+    &__header {
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
     }
   }
 }
