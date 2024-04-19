@@ -100,6 +100,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import constant from '~/constant'
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
 import TopNaviBar from '~/components/TopNaviBar.vue'
 export default {
@@ -168,11 +170,25 @@ export default {
           })
         }
       } else {
-        this.$axios
-          .post('/auth/register', {
+        axios({
+          method: 'post',
+          url: `${constant.base_url}/auth/register`,
+          data: {
             email: this.email.toLowerCase().trim(),
-            password: this.password,
-          })
+            password: this.password,          
+            username: "nonee",
+            name: "nonee",
+            phone: "00000000",
+            address: "none",
+            role: "user",
+            isactive: "1",
+            },
+        })
+          // this.$axios
+          //   .post('/auth/register', {
+          //     email: this.email.toLowerCase().trim(),
+          //     password: this.password,
+          //   })
           .then((res) => {
             this.alert = {
               ...this.alert,

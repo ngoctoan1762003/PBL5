@@ -1,8 +1,6 @@
 <template>
-  <div
-    class="relative flex flex-col items-center h-[100vh]"
-  >
-    <TopNavBar/>
+  <div class="relative flex flex-col items-center h-[100vh]">
+    <TopNavBar />
     <!-- <div class="absolute w-full h-full border-2"></div> -->
     <div class="z-10 flex justify-start gap-[80px]">
       <form
@@ -23,7 +21,9 @@
           />
         </div>
         <div class="w-full relative flex flex-col gap-2">
-          <label for="" class="text-sm text-gray-700 font-medium">Password</label>
+          <label for="" class="text-sm text-gray-700 font-medium"
+            >Password</label
+          >
           <input
             v-model="login.password"
             :type="isShowPassword ? 'text' : 'password'"
@@ -73,7 +73,7 @@
           </button>
         </div>
       </form>
-      <img src="~/assets/icon/login-decor.svg" class="w-[40vw] ">
+      <img src="~/assets/icon/login-decor.svg" class="w-[40vw]" />
     </div>
     <modal-alert
       v-if="alert.isShowModal"
@@ -85,8 +85,10 @@
 </template>
 
 <script>
+import axios from 'axios'
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
 import TopNavBar from '~/components/TopNaviBar.vue'
+import constant from '~/constant'
 export default {
   components: { ModalAlert, TopNavBar },
   layout: 'empty',
@@ -124,7 +126,7 @@ export default {
       this.isShowPassword = !this.isShowPassword
     },
 
-    async userLogin() {
+    userLogin() {
       if (!this.validateEmail || !this.checkData) {
         if (!this.validateEmail)
           this.$notify({
@@ -142,27 +144,30 @@ export default {
           })
       } else
         try {
-          await this.$axios
-            .post('/auth/login', {
+          axios({
+            method: 'post',
+            url: `${constant.base_url}/auth/login`,
+            data: {
               email: this.login.email.toLowerCase().trim(),
               password: this.login.password,
-            })
-            .then(async (res) => {
-              const token = `Bearer ${res.data.token}`
-              await this.$axios
-                .get('/users/me', {
-                  headers: {
-                    Authorization: token,
-                  },
-                })
-                .then((res) => {
-                  localStorage.setItem('user', JSON.stringify(res.data))
-                })
-                .catch((err) => {
-                  console.log(err)
-                })
-                
-              localStorage.setItem('accessToken', token)
+            },
+          })
+            .then( (res) => {
+              // const token = `Bearer ${res.data.token}`
+              // await this.$axios
+              //   .get('/users/me', {
+              //     headers: {
+              //       Authorization: token,
+              //     },
+              //   })
+              //   .then((res) => {
+              //     localStorage.setItem('user', JSON.stringify(res.data))
+              //   })
+              //   .catch((err) => {
+              //     console.log(err)
+              //   })
+
+              // localStorage.setItem('accessToken', token)
               this.$router.push('/')
             })
             .catch((err) => {
@@ -178,7 +183,7 @@ export default {
               }
             })
         } catch (err) {
-          console.log('Lỗi nè ông già')
+          console.log(err)
         }
     },
     toSignup() {

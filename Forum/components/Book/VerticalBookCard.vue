@@ -21,3 +21,25 @@
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  data(){
+    return{
+      book: {
+        bookId: "",
+        title: "",
+        genre: "",
+        description: "",
+        quantity: 0,
+        price: 0,
+        authorId: 0,
+        publisherId: 0
+      }
+    }
+  },
+  mounted() {
+
+  }
+}
+</script>
