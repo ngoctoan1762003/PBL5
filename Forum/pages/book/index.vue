@@ -3,14 +3,9 @@
     <TopNaviBarGuest />
     <SearchBar />
     <div class="flex flex-wrap p-10 gap-10 justify-center">
-      <VerticalBookCard class="w-[20%]" />
-      <VerticalBookCard class="w-[20%]" />
-      <VerticalBookCard class="w-[20%]" />
-      <VerticalBookCard class="w-[20%]" />
-      <VerticalBookCard class="w-[20%]" />
-      <VerticalBookCard class="w-[20%]" />
-      <VerticalBookCard class="w-[20%]" />
-      <VerticalBookCard class="w-[20%]" />
+      <div v-for="book in books" :key="book.BookId" class="w-[20%]">
+        <VerticalBookCard :book="book" />
+      </div>
     </div>
     <FooterBar />
   </div>
@@ -39,13 +34,16 @@ export default {
   mounted() {
     axios({
       method: 'get',
-      url: `${constant.base_url}/books`,
+      url: `${constant.base_url}/book`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
     })
       .then((res) => {
         console.log(res)
         const data = res.data
+        console.log(data)
         this.books = data
-        // console.log(data)
       })
       .catch((err) => {
         console.log(err)

@@ -1,3 +1,3 @@
 module.exports = {
-    base_url: "https://e518-42-116-158-46.ngrok-free.app",
+    base_url: " https://18d0-113-22-229-61.ngrok-free.app",
 }

@@ -3,29 +3,29 @@
         <div>
             <EditRole v-if="isEditProfile" :user="currentUser" @cancel="cancelSave" @save="save" @reload="reload"/>
         </div>
-        <div class="user-list text-white font-medium p-5 w-full bg-[#262d34] rounded-[16px]">
+        <div class="user-list text-white font-medium p-5 w-full bg-[#1B3764] rounded-[16px]">
             <div class="font-semibold user-list-row">
                 <div class="user-list-row-cell avatar"></div>
-                <div class="user-list-row-cell first-name">Name</div>
-                <div class="user-list-row-cell gender">Gender</div>
-                <div class="user-list-row-cell phone">Phone</div>
+                <div class="user-list-row-cell first-name">Tên</div>
+                <!-- <div class="user-list-row-cell gender">Gender</div> -->
+                <div class="user-list-row-cell phone">Số ĐT</div>
                 <div class="user-list-row-cell email">Email</div>
-                <div class="user-list-row-cell birthday">Birthday</div>
+                <div class="user-list-row-cell birthday">Vai trò</div>
                 <!-- <div class="user-list-row-cell role">Role</div> -->
-                <div class="user-list-row-cell status">Status</div>
+                <div class="user-list-row-cell status">Trạng thái</div>
                 <div class="tooltip"></div>
             </div>
             <div v-for="user in users" class="user-list-row user-list-information" :key="user._id">
                 <div class="avatar">
-                    <img :src="user.profileImage" class="p-2 rounded-full">
+                    <img :src="user.image" class="p-2 rounded-full">
                 </div>
-                <div class="user-list-row-cell first-name">{{ getName(user.firstName, user.lastName) }}</div>
-                <div class="user-list-row-cell gender">{{ user.gender?'Male':'Female' }}</div>
-                <div class="user-list-row-cell phone">{{ user.phone }}</div>
-                <div class="user-list-row-cell email">{{ user.email }}</div>
-                <div class="user-list-row-cell birthday">{{ formatBirthday(user.dayOfBirth) }}</div>
+                <div class="user-list-row-cell first-name">{{ getName(user.Name) }}</div>
+                <!-- <div class="user-list-row-cell gender">{{ user.gender?'Male':'Female' }}</div> -->
+                <div class="user-list-row-cell phone">{{ user.Phone }}</div>
+                <div class="user-list-row-cell email">{{ user.Email }}</div>
+                <div class="user-list-row-cell birthday">{{ user.Role }}</div>
                 <!-- <div class="user-list-row-cell role">{{ user.roleName }}</div> -->
-                <div class="user-list-row-cell status">{{ user.isActive }}</div>
+                <div class="user-list-row-cell status" :class="{ 'text-green-500': user.IsActivate === 0, 'text-red-500': user.IsActivate !== 0 }">{{ user.IsActivate == 0 ? "Đang hoạt động" : "Dừng hoạt động" }}</div>
                 <div class="tooltip relative">
                     <img src="~/assets/icon/more.svg" @mouseenter="displayTooltip(user._id)" class="cursor-pointer" />
                     <div :id="'action-' + user._id" class="hidden absolute top-1 right-0 z-10"

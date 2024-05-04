@@ -1,7 +1,8 @@
 <template>
   <div class="default">
     <div class="default__top">
-      <TopNavBar class="top-nav" />
+      <!-- <TopNavBar class="top-nav" /> -->
+      <TopNaviBar />
     </div>
     <div class="px-5 flex gap-5">
       <div class="tableft">
@@ -9,31 +10,56 @@
           <div class="category__item" @click="changeOption(1)">
             <img src="~/assets/icon/person.svg" alt="" />
             <div class="category__item__info">
-              <span class="name">User Manage</span>
+              <span class="name">Quản lý người dùng</span>
+            </div>
+          </div>
+          <div class="category__item" @click="changeOption(2)">
+            <img src="~/assets/icon/person.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Quản lý người bán</span>
             </div>
           </div>
           <div class="category__item" @click="changeOption(2)">
             <img src="~/assets/icon/popular.svg" alt="" />
             <div class="category__item__info">
-              <span class="name">Pending Blog</span>
+              <span class="name">Quản lý sách</span>
             </div>
           </div>
           <div class="category__item" @click="changeOption(3)">
             <img src="~/assets/icon/popular.svg" alt="" />
             <div class="category__item__info">
-              <span class="name">Published Blog</span>
+              <span class="name">Quản lý đơn đặt hàng</span>
             </div>
           </div>
         </div>
       </div>
-      <UserList class="w-full" :users="users" @reload="reload" v-show="manageOption === 1 && !isLoading" @changePage="changeUserPage"
-        :count="userCount" :recordsPerPage="recordsPerPage"/>
-      <BlogList v-show="manageOption === 2 && !isLoading" @reload="reload" :news="pendingNews" class="w-full" @changePage="changePendingPage"
+      <UserList
+        class="w-full"
+        :users="users"
+        @reload="reload"
+        v-show="manageOption === 1 && !isLoading"
+        @changePage="changeUserPage"
+        :count="10"
+        :recordsPerPage="recordsPerPage"
+      />
+      <UserList
+        class="w-full"
+        :users="sellers"
+        @reload="reload"
+        v-show="manageOption === 2 && !isLoading"
+        @changePage="changeUserPage"
+        :count="10"
+        :recordsPerPage="recordsPerPage"
+      />
+      <!-- <BlogList v-show="manageOption === 2 && !isLoading" @reload="reload" :news="pendingNews" class="w-full" @changePage="changePendingPage"
        :count="pendingNewsCount" @setLoading="setLoading" @doneLoading="doneLoading" :recordsPerPage="recordsPerPage"/>
       <BlogList v-show="manageOption === 3 && !isLoading" @reload="reload" :news="news" class="w-full" @changePage="changeNewsPage"
-       :count="newsCount"  @setLoading="setLoading" @doneLoading="doneLoading" :recordsPerPage="recordsPerPage"/>
-      <div v-if="isLoading" class="flex justify-center items-center w-full h-screen-60">
-        <LoadingSpinner/>
+       :count="newsCount"  @setLoading="setLoading" @doneLoading="doneLoading" :recordsPerPage="recordsPerPage"/> -->
+      <div
+        v-if="isLoading"
+        class="flex justify-center items-center w-full h-screen-60"
+      >
+        <LoadingSpinner />
       </div>
     </div>
   </div>
@@ -42,16 +68,19 @@
 <script>
 import axios from 'axios'
 import UserList from '~/components/Manage/UserList.vue'
-import BlogList from '~/components/Manage/BlogList.vue'
+// import BlogList from '~/components/Manage/BlogList.vue'
 import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
-// import constant from '~/constant'
+import constant from '~/constant'
+import TopNaviBar from '~/components/TopNaviBar.vue'
+
 export default {
   components: {
     UserList,
-    BlogList,
-    LoadingSpinner
+    // BlogList,
+    LoadingSpinner,
+    TopNaviBar,
   },
-  layout: 'admin',
+  layout: 'empty',
   data() {
     return {
       title: '',
@@ -59,12 +88,13 @@ export default {
       pendingNews: [],
       news: [],
       users: [],
+      sellers: [],
       manageOption: 1,
       userCount: Number,
       pendingNewsCount: Number,
       newsCount: Number,
-      isLoading: true,
-      recordsPerPage: 5
+      isLoading: false,
+      recordsPerPage: 5,
     }
   },
   created() {
@@ -75,38 +105,67 @@ export default {
       this.$router.push('/auth/login')
   },
   mounted() {
-    this.$axios
-      .get(`/users/?page=1&limit=${this.recordsPerPage}`)
+    // this.$axios
+    //   .get(`/users/?page=1&limit=${this.recordsPerPage}`)
+    const authorization = localStorage.getItem('accessToken')
+    console.log(authorization)
+    axios({
+      method: 'get',
+      withCredentials: false,
+      url: `${constant.base_url}/user/getalluser`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
       .then((res) => {
         console.log(res)
-        this.users = res.data.docs
-        this.userCount = res.data.totalDocs
+        this.users = res.data
+        // this.userCount = res.data.totalDocs
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+      
+    axios({
+      method: 'get',
+      withCredentials: false,
+      url: `${constant.base_url}/user/role/seller`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.users = res.data
+        // this.userCount = res.data.totalDocs
       })
       .catch((err) => {
         console.error(err)
       })
 
-    this.$axios
-      .get(`/blogs/awaiting-approval/?page=1&limit=${this.recordsPerPage}`)
-      .then((res) => {
-        console.log(res)
-        this.pendingNews = res.data.docs
-        this.pendingNewsCount = res.data.totalDocs
-      })
-      .catch((err) => {
-        console.error(err)
-      })
-    this.$axios
-      .get(`/blogs/?page=1&limit=${this.recordsPerPage}`, {})
-      .then((res) => {
-        console.log(res)
-        this.news = res.data.docs
-        this.newsCount = res.data.totalDocs
-      })
-      .catch((err) => {
-        console.error(err)
-      })
-      this.isLoading = false;
+    // this.$axios
+    //   .get(`/blogs/awaiting-approval/?page=1&limit=${this.recordsPerPage}`)
+    //   .then((res) => {
+    //     console.log(res)
+    //     this.pendingNews = res.data.docs
+    //     this.pendingNewsCount = res.data.totalDocs
+    //   })
+    //   .catch((err) => {
+    //     console.error(err)
+    //   })
+    // this.$axios
+    //   .get(`/blogs/?page=1&limit=${this.recordsPerPage}`, {})
+    //   .then((res) => {
+    //     console.log(res)
+    //     this.news = res.data.docs
+    //     this.newsCount = res.data.totalDocs
+    //   })
+    //   .catch((err) => {
+    //     console.error(err)
+    //   })
+    this.isLoading = false
   },
   methods: {
     submit() {
@@ -172,60 +231,63 @@ export default {
         .catch((err) => {
           console.error(err)
         })
-        this.isLoading = false
+      this.isLoading = false
     },
     changeUserPage(page, limit) {
-      console.log("page: " + page + " limit: " + limit)
-      console.log('oke');
-      this.isLoading = true;
-      this.$axios.get(`/users/?page=${page}&limit=${limit}`)
-        .then(res => {
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      this.$axios
+        .get(`/users/?page=${page}&limit=${limit}`)
+        .then((res) => {
           this.users = res.data.docs
           this.userCount = res.data.totalDocs
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
         })
         .finally(() => {
-          this.isLoading = false;
-        }) 
+          this.isLoading = false
+        })
     },
     changePendingPage(page, limit) {
-      console.log("page: " + page + " limit: " + limit)
-      console.log('oke');
-      this.isLoading = true;
-      this.$axios.get(`/blogs/awaiting-approval/?page=${page}&limit=${limit}`)
-        .then(res => {
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      this.$axios
+        .get(`/blogs/awaiting-approval/?page=${page}&limit=${limit}`)
+        .then((res) => {
           this.pendingNews = res.data.docs
           this.pendingNewsCount = res.data.totalDocs
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
         })
         .finally(() => {
-          this.isLoading = false;
+          this.isLoading = false
         })
     },
     changeNewsPage(page, limit) {
-      console.log("page: " + page + " limit: " + limit)
-      console.log('oke');
-      this.isLoading = true;
-      this.$axios.get(`/blogs/?page=${page}&limit=${limit}`)
-        .then(res => {
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      this.$axios
+        .get(`/blogs/?page=${page}&limit=${limit}`)
+        .then((res) => {
           this.news = res.data.docs
           this.newsCount = res.data.totalDocs
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
         })
         .finally(() => {
-          this.isLoading = false;
+          this.isLoading = false
         })
     },
-    setLoading(){
+    setLoading() {
       this.isLoading = true
     },
-    doneLoading(){
+    doneLoading() {
       this.isLoading = false
     },
   },
@@ -246,7 +308,7 @@ export default {
   position: relative;
   height: 100vh;
   overflow: auto;
-  background: $dark-2;
+  // background: $dark-2;
 
   &__top {
     height: 80px;
@@ -280,7 +342,8 @@ export default {
     }
   }
 
-  .footer {}
+  .footer {
+  }
 }
 
 .tableft {
@@ -291,7 +354,7 @@ export default {
 
   &__item {
     border-radius: 16px;
-    background: $dark-3;
+    background: #1b3764; // $dark-3;
     display: flex;
     width: 210px;
     padding: 10px;
@@ -307,7 +370,7 @@ export default {
         padding: 6px 5px;
         gap: 10px;
         border-radius: 6px;
-        background: $dark-3;
+        // background: $dark-3;
         cursor: pointer;
 
         img {

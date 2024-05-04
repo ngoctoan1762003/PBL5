@@ -153,7 +153,7 @@ export default {
             },
           })
             .then( (res) => {
-              // const token = `Bearer ${res.data.token}`
+              const token = `${res.data.token}`
               // await this.$axios
               //   .get('/users/me', {
               //     headers: {
@@ -167,7 +167,8 @@ export default {
               //     console.log(err)
               //   })
 
-              // localStorage.setItem('accessToken', token)
+              localStorage.setItem('accessToken', token)
+              localStorage.setItem('userId', res.data.user.User_id)
               this.$router.push('/')
             })
             .catch((err) => {

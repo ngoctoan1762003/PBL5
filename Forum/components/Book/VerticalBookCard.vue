@@ -1,20 +1,19 @@
 <template>
   <div class="flex flex-col items-center gap-4">
     <div class="w-auto p-[20px] bg-[#F5F8FC]">
-      <img class="aspect-[3/4] shadow-md" src="~assets/img/DemoBook.png" alt="" />
+      <img class="aspect-[3/4] shadow-md" :src=book.image alt="" />
     </div>
     <div class="min-w-[230px] flex flex-col gap-4">
       <div>
-        <div class="text-[#1B3764] text-[18px] font-semibold">Dare To Be Fearless</div>
-        <div class="text-[#FFCA42] text-[12px] font-semibold">30.000 VND</div>
+        <button class="text-[#1B3764] text-[18px] font-semibold" @click="toBookId(book._id)">{{book.title}}</button>
+        <div class="text-[#FFCA42] text-[12px] font-semibold">{{book.price}}</div>
         <div class="text-[#969AA0] text-[12px]">
-          Many variations of passages of Lorem Ipsum willing araise alteration in
-          some form.
+          {{book.description}}
         </div>
       </div>
       
       <button
-        class="border-[1px] border-[#FFCA42] py-3 px-5 w-auto self-start text-[13px] text-[#1B3764] font-semibold" 
+        class="border-[1px] border-[#FFCA42] py-3 px-5 w-auto self-start text-[13px] text-[#1B3764] font-semibold hover:bg-[#FFCA42] transition ease-in-out duration-300" 
       >
         Đặt ngay
       </button>
@@ -24,22 +23,20 @@
 
 <script>
 export default {
+  props:{
+    book: Object,
+  },
   data(){
     return{
-      book: {
-        bookId: "",
-        title: "",
-        genre: "",
-        description: "",
-        quantity: 0,
-        price: 0,
-        authorId: 0,
-        publisherId: 0
-      }
     }
   },
   mounted() {
 
+  },
+  methods: {
+    toBookId(id){
+      this.$router.push(`/book/${id}`)
+    }
   }
 }
 </script>

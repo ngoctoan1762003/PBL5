@@ -87,7 +87,7 @@
         :key="c._id"
         class="pb-[40px] border-b-[1px] border-[#e3e6e8]"
       >
-        <CommentCard :comment="c.content" :user="c.userId" />
+        <CommentCard :comment="c" :user="c.userId" />
         <div
           v-if="c.reply.length > 0"
           class="reply-comment mt-[12px] pl-[45px] flex flex-col gap-[10px]"

@@ -28,15 +28,29 @@
       <div class="top-nav__option__element">Về chúng tôi</div>
       <div class="top-nav__option__element">Dịch vụ</div>
       <div class="top-nav__option__element">Liên hệ</div>
-      <button class="top-nav__button">
+      <button class="top-nav__button" @click="toLogin">
         <div class="text-[14px] font-[500] text-[#1B3764]">Đăng nhập</div>
       </button>
-      <button class="top-nav__button">
+      <button class="top-nav__button" @click="toSignup">
         <div class="text-[13px] font-[500] text-[#1B3764]">Đăng ký</div>
       </button>
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  methods: {
+    toSignup(){
+      this.$router.push('/auth/signup')
+    },
+    toLogin(){
+      this.$router.push('/auth/login')
+      
+    }
+  }
+}
+</script>
 
 <style lang="scss" scoped>
 @import '~assets/scss/variables.scss';

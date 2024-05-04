@@ -1,28 +1,18 @@
 <template>
   <div class="main relative">
-    <!-- <div v-if="isCreatingPost" class="post-creator" @click="cancel">
-      <div class="post-creator__container custom-scroll" @click.stop="cancel">
-        <PostCreator
-          class=" custom-scroll"
-          @cancel="cancel"
-          @save="save"
-          @setLoading="isLoading = true"
-          @doneLoading="isLoading = false"
-        />
-      </div>
-    </div> -->
     <TopNaviBarGuest />
     <div class="section__1">
       <div class="section__1__left">
         <div>Welcome to Pages</div>
-        <div class="text-[45px]">Books are uniquely portable magic</div>
+        <div class="text-[45px]">{{ book.Title }}</div>
         <div class="text-[#B4C7E7]">
-          There are many variations of passages of Lorem Ipsum available, but
-          the majority have suffered alteration in some form.
+          {{ book.Description }}
         </div>
         <div class="flex gap-10 items-center">
           <button class="bg-[#ffca42]">
-            <div class="text-[16px] font-[500] text-[#1B3764] px-5 py-3">Đặt ngay</div>
+            <div class="text-[16px] font-[500] text-[#1B3764] px-5 py-3">
+              Đặt ngay
+            </div>
           </button>
           <button class="underline underline-offset-2">
             Đọc bản thử miễn phí
@@ -45,17 +35,24 @@
           </div>
         </div>
       </div>
-      <img class="section__1__image" src="~/assets/img/Book.png" />
+      <img class="section__1__image" :src="book.image" />
     </div>
     <div class="section__2">
       <div class="section__2__author__img">
-        <img class="w-[100%]" src="~/assets/img/Author-Background.png" alt="">
-        <div class="w-[100%] aspect-square absolute bg-white z-10 drop-shadow-md top-[0px] left-[-20px]"></div>
+        <img class="w-[100%]" src="~/assets/img/Author-Background.png" alt="" />
+        <div
+          class="w-[100%] aspect-square absolute bg-white z-10 drop-shadow-md top-[0px] left-[-20px]"
+        ></div>
       </div>
       <div class="section__2__main w-full">
         <div class="text-[#1B3764] text-[35px] font-bold">About author</div>
         <div class="h-1 w-20 bg-[#FFCA42]"></div>
-        <div class="text-[#969AA0] text-[15px]">All the Lorem Ipsum generators on the Internet tend to repeated predefined chunks as necessary, making this the first true value generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful.</div>
+        <div class="text-[#969AA0] text-[15px]">
+          All the Lorem Ipsum generators on the Internet tend to repeated
+          predefined chunks as necessary, making this the first true value
+          generator on the Internet. It uses a dictionary of over 200 Latin
+          words, combined with a handful.
+        </div>
         <div class="flex gap-5 items-center">
           <div>
             <div class="text-[#1B3764] text-[45px] font-semibold">02</div>
@@ -78,33 +75,44 @@
       <div class="section__3__main">
         <div class="text-[35px] font-semibold">Get Book Copy Today</div>
         <div class="w-[60px] h-[1px] bg-[#FFCA42]"></div>
-        <div class="text-[#B4C7E7] text-[15px]">This the first true value generator on the Internet. It uses alphas dictionary of over 200 Latin words.</div>
-        <button class="border-[1px] border-[#FFCA42] py-3 px-5 w-auto self-start text-[15px]">
+        <div class="text-[#B4C7E7] text-[15px]">
+          This the first true value generator on the Internet. It uses alphas
+          dictionary of over 200 Latin words.
+        </div>
+        <button
+          class="border-[1px] border-[#FFCA42] py-3 px-5 w-auto self-start text-[15px]"
+        >
           Đặt ngay
         </button>
       </div>
-      <img class="w-[40%]" src="~/assets/img/Photo.png">
+      <img class="w-[40%]" src="~/assets/img/Photo.png" />
     </div>
     <div class="section__4">
       <div class="flex justify-center items-center flex-col gap-5">
-        <div class="text-[#1B3764] text-[30px] font-semibold">Những sách khác cùng tác giả</div>
+        <div class="text-[#1B3764] text-[30px] font-semibold">
+          Những sách khác cùng tác giả
+        </div>
         <div class="w-[160px] h-[4px] bg-[#FFCA42]"></div>
       </div>
-      <div class="flex gap-10 justify-center items-center">
-        <BookCard  />
-        <BookCard  />
-        <BookCard  />
+      <div class="flex flex-wrap gap-10 justify-center items-start">
+        <div v-for="book in sameAuthorBook" :key="book._id" class="w-[30%]">
+          <BookCard :book="book" />
+          <!-- <BookCard />
+          <BookCard /> -->
+        </div>
       </div>
     </div>
     <div class="section__5">
       <div class="text-[#1B3764] text-[30px] font-semibold">Bình luận</div>
       <div class="w-[100px] h-[2px] bg-[#FFCA42]"></div>
-      <div class="flex flex-col gap-3 p-[30px]">
-        <CommentCard />
-        <CommentCard />
-        <CommentCard />
+      <div
+        v-for="c in comments"
+        :key="c._id"
+        class="flex flex-col gap-3 p-[30px]"
+      >
+        <CommentCard :comment="c" :user_id="c.user_id" />
       </div>
-      <CommentBox />
+      <CommentBox :bookId="book._id" />
     </div>
     <!-- <modal-alert
       v-if="alert.isShowModal"
@@ -117,11 +125,8 @@
 </template>
 
 <script>
-// import BlogCard from '~/components/Card/BlogCard.vue'
-// import PostCreator from '~/components/Blog/PostCreator.vue'
-// import ModalAlert from '~/components/Modal/ModalAlert.vue'
-// import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
-// import TopNaviBar from '~/components/TopNaviBar.vue'
+import axios from 'axios'
+import constant from '~/constant'
 import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
 import BookCard from '~/components/Book/BookCard.vue'
 import CommentCard from '~/components/Book/CommentCard.vue'
@@ -141,11 +146,14 @@ export default {
     BookCard,
     CommentCard,
     CommentBox,
-    FooterBar
+    FooterBar,
   },
   data() {
     return {
+      book: Object,
       news: [],
+      comments: [],
+      sameAuthorBook: [],
       isLoading: true,
       searchValue: '',
       isCreatingPost: false,
@@ -162,11 +170,89 @@ export default {
       },
     }
   },
-  // async created() {
-  //   await this.getListBlog()
-  //   this.isLoading = false
-  //   // await this.modifyListBlog()
-  // },
+  async created() {
+    const id = this.$route.params.id
+    await // this.$axios
+    //   .get(`${constant.base_url}/book/id/${id}`, {
+    //     headers: {
+    //       'ngrok-skip-browser-warning': 'skip-browser-warning',
+    //     },
+    //   })
+    axios({
+      method: 'get',
+      url: `${constant.base_url}/book/id/${id}`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.book = res.data
+      })
+      .catch((err) => {
+        if (err.response.data.status === 401)
+          this.alert = {
+            ...this.alert,
+            ...{
+              isShowModal: true,
+              title: 'Lỗi',
+              buttonOkContent: 'Đăng nhập lại',
+              content: 'Hết phiên đăng nhập, vui lòng đăng nhập lại',
+              type: 'failed',
+              typeSubmit: 'loginagain',
+            },
+          }
+        else
+          this.alert = {
+            ...this.alert,
+            ...{
+              isShowModal: true,
+              title: 'Lỗi',
+              buttonOkContent: 'Đóng',
+              content: err.response.data.error,
+              type: 'failed',
+            },
+          }
+      })
+    await axios({
+      method: 'get',
+      url: `${constant.base_url}/comment/book/${id}`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res.data)
+        this.comments = res.data
+        // this.comment.forEach((e) => {
+        //   this.listReplyBox.isShow = false
+        // })
+        // console.log(this.listReplyBox)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    await axios({
+      method: 'get',
+      url: `${constant.base_url}/book/author_name/${this.book.AuthorName}`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res.data)
+        this.sameAuthorBook = res.data
+        this.sameAuthorBook = this.sameAuthorBook.filter(book => book._id !== this.book._id)
+        // this.comment.forEach((e) => {
+        //   this.listReplyBox.isShow = false
+        // })
+        // console.log(this.listReplyBox)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    this.isLoading = false
+  },
   methods: {
     ScrollToTop() {
       this.$scrollToTop()
@@ -327,7 +413,6 @@ export default {
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
 .section {
-  
   &__1 {
     background-color: #1b3764;
     color: white;
@@ -348,7 +433,6 @@ export default {
 
     &__image {
       width: 40%;
-      
     }
   }
 
@@ -359,14 +443,14 @@ export default {
     justify-content: center;
     align-items: center;
     gap: 80px;
-    background-color: #F4F8FF;
+    background-color: #f4f8ff;
 
     &__author__img {
       position: relative;
       width: 30%;
     }
 
-    &__main{
+    &__main {
       width: 40%;
       display: flex;
       flex-direction: column;
@@ -375,7 +459,7 @@ export default {
   }
 
   &__3 {
-    background-color: #1B3764;
+    background-color: #1b3764;
     padding: 100px;
     display: flex;
     justify-content: center;
@@ -391,8 +475,7 @@ export default {
     }
   }
 
-  &__4
-  {
+  &__4 {
     background-color: white;
     padding: 80px 10px;
     display: flex;
@@ -402,10 +485,9 @@ export default {
     gap: 80px;
   }
 
-  &__5
-  {
-    background-color: #F4F8FF;
-    padding: 80px; 
+  &__5 {
+    background-color: #f4f8ff;
+    padding: 80px;
   }
 }
 </style>

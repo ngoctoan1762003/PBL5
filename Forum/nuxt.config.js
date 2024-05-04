@@ -18,6 +18,10 @@ export default {
     '~/assets/css/quill.css',
     'quill/dist/quill.snow.css',
   ],
+  
+  middleware: [
+    'cors'
+  ],
 
   styleResources: {
     scss: [

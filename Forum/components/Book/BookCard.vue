@@ -1,14 +1,13 @@
 <template>
-  <div class="flex items-center gap-4">
+  <div class="flex items-start gap-4">
     <div class="w-auto">
-      <img class="aspect-[3/5] shadow-md" src="~assets/img/DemoBook.png" alt="" />
+      <img class="aspect-[3/5] shadow-md min-w-[130px] h-[200px]" :src="book.image" alt="" />
     </div>
     <div class="min-w-[230px] flex flex-col gap-4">
       <div>
-        <div class="text-[#1B3764] text-[18px] font-semibold">Dare To Be Fearless</div>
+        <div class="text-[#1B3764] text-[18px] font-semibold cursor-pointer" @click="toBookDetail(book._id)">{{book.Title}}</div>
         <div class="text-[#969AA0] text-[12px]">
-          Many variations of passages of Lorem Ipsum willing araise alteration in
-          some form.
+          {{book.Description}}
         </div>
       </div>
       <div>
@@ -37,3 +36,16 @@
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    book: Object
+  },
+  methods: {
+    toBookDetail(id){
+      this.$router.push(`/book/${id}`)
+    }
+  }
+}
+</script>

@@ -1,19 +1,12 @@
 <template>
   <div>
-    <TopNavBar />
-    <main class="profile-page overflow-hidden">
+    <main class="profile-page overflow-hidden rounded-lg">
       <section class="relative block" style="height: 500px">
-        <div
-          class="absolute top-0 w-full h-full bg-center bg-cover"
-          style="
-            background-image: url('https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=2710&amp;q=80');
-          "
-        >
+        <div class="absolute top-0 w-full h-full bg-center bg-cover">
           <span
             id="blackOverlay"
             class="w-full h-full absolute opacity-50 bg-black"
-            >dhfdhdfjfdj</span
-          >
+          ></span>
         </div>
         <div
           class="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden"
@@ -31,7 +24,9 @@
                   <div class="relative">
                     <img
                       alt="..."
-                      :src="user.image ?? require('~/assets/img/avt.png')"
+                      :src="
+                        user.profileImage ?? require('~/assets/img/avt.png')
+                      "
                       class="shadow-xl rounded-full h-[150px] border-none absolute -m-16 -ml-20 lg:-ml-16"
                       style="max-width: 150px"
                     />
@@ -47,23 +42,25 @@
                       <span
                         class="text-4xl font-semibold leading-normal mb-2 text-[#fafcfe] mb-2"
                       >
-                        {{ user.Name }}
+                        {{ user?.firstName }} {{ user?.lastName }}
                       </span>
                       <div
                         class="text-sm leading-normal mt-0 mb-2 text-[#fafcfe] font-semibold uppercase"
                       >
-                        Địa chỉ: {{ user.Address }}
+                        Gender: {{ user.gender ? 'Male' : 'Female' }}
                       </div>
                       <div
                         class="text-sm leading-normal mt-0 mb-2 text-[#fafcfe] font-semibold uppercase"
                       >
-                        Email:
-                        {{ user.Email }}
+                        Birthday:
+                        {{ user.dayOfBirth?.split('T')[0].split('-')[2] }}-{{
+                          user.dayOfBirth?.split('T')[0].split('-')[1]
+                        }}-{{ user.dayOfBirth?.split('T')[0].split('-')[0] }}
                       </div>
                       <div
                         class="text-sm leading-normal mt-0 mb-2 text-[#fafcfe] font-semibold uppercase"
                       >
-                        Số điện thoại: {{ user.Phone }}
+                        Phone number: {{ user.phone }}
                       </div>
                     </div>
                     <div class="button flex items-center">
@@ -72,6 +69,7 @@
                         type="button"
                         style="transition: all 0.15s ease 0s"
                         @click="EditProfile"
+                        v-if="isOwn"
                       >
                         Edit profile
                       </button>
@@ -101,7 +99,13 @@
                 <div class="flex flex-wrap justify-center">
                   <div class="w-full lg:w-9/12 px-4">
                     <div id="main-content">
-                      <div v-for="n in filternews" :key="n.id">
+                      <LoadingSpinner v-show="isLoading" />
+                      <div
+                        v-for="n in filternews"
+                        :key="n.id"
+                        class="blog relative"
+                        @click="GoToDetails(n._id)"
+                      >
                         <BlogCard
                           :image-link="n.blogImage ?? null"
                           :author="`${n.userId?.firstName ?? ''} ${
@@ -123,12 +127,13 @@
                         />
                       </div>
                     </div>
-                    <span
-                      v-if="!compareLength"
-                      class="font-normal text-[#FF571A] cursor-pointer"
-                      @click="showMore()"
-                      >Show more
-                    </span>
+                    <Pagination
+                      v-show="!isLoading && countPost != 0"
+                      class="bg-[#fafcfe] px-[40px] py-2 rounded-[10px]"
+                      :count="countPost"
+                      :records-per-page="recordsPerPage"
+                      @changePage="changePage"
+                    />
                   </div>
                 </div>
               </div>
@@ -137,63 +142,78 @@
         </div>
       </section>
     </main>
-    <EditProfile
-      v-if="isEditProfile"
-      :user="user"
-      @save="save"
-      @cancel="cancelSave"
-      @fetchInfoUser="fetchInfoUser"
-    />
-    <!-- <div v-if="isUpdatingBlog" class="post-creator" @click="cancel">
-      <div class="post-creator__container custom-scroll" @click.stop>
+    <div class="update-container">
+      <!-- <EditProfile
+        v-if="isEditProfile"
+        :user="user"
+        @save="save"
+        @cancel="cancelSave"
+        @fetchInfoUser="fetchInfoUser"
+        @click.stop
+      /> -->
+    </div>
+    <div v-if="isUpdatingBlog" class="post-creator" @click="cancel">
+      <div class="post-creator__container custom-scroll h-full" @click.stop>
         <PostCreator
-          class="post-creator__container custom-scroll"
+          class="post-creator__container custom-scroll h-full"
           @cancel="cancel"
           @setLoading="isLoading = true"
           @doneLoading="isLoading = false"
         />
       </div>
-    </div> -->
-
-    <FooterBar />
+    </div>
+    <modal-alert
+      v-if="alert.isShowModal"
+      v-bind="alert"
+      @close="onCloseModal"
+    />
   </div>
 </template>
 <script>
 import axios from 'axios'
-import EditProfile from '~/components/User/EditProfile.vue'
+import constant from 'constant'
+// import EditProfile from '~/components/User/EditProfile.vue'
 import BlogCard from '~/components/Card/BlogCard.vue'
-import TopNavBar from '~/components/TopNaviBar.vue'
-import FooterBar from '~/components/FooterBar.vue'
-import constant from '~/constant'
-
-// import PostCreator from '~/components/Blog/PostCreator.vue'
+import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
+import PostCreator from '~/components/Blog/PostCreator.vue'
+import ModalAlert from '~/components/Modal/ModalAlert.vue'
 
 export default {
   name: 'Profile',
   components: {
     BlogCard,
-    EditProfile,
-    TopNavBar,
-    FooterBar,
-    // PostCreator,
+    // EditProfile,
+    LoadingSpinner,
+    PostCreator,
+    ModalAlert,
   },
-  layout: 'empty',
+  layout: 'topandfooter',
   data() {
     return {
       user: {},
       news: [],
       filternews: [],
       isEditProfile: false,
-      isUpdatingBlog: true,
+      isLoading: true,
+      isOwn: false,
+      isUpdatingBlog: false,
+      alert: {
+        isShowModal: false,
+        title: '',
+        type: 'confirm',
+        content: '',
+        buttonCancelContent: '',
+        buttonOkContent: 'Ok',
+        typeSubmit: '',
+      },
+      recordsPerPage: 5,
+      countPost: 0,
     }
   },
   computed: {
-    countPost() {
-      return this.filternews.length
-    },
     countLikes() {
       let totalLikes = 0
-      this.filternews.forEach((e) => {
+      this.news.forEach((e) => {
         e.reaction.forEach((r) => {
           if (r.reaction === 'like') {
             totalLikes++
@@ -202,43 +222,65 @@ export default {
       })
       return totalLikes
     },
-    compareLength() {
-      return this.filternews.length === this.news.length
-    },
   },
   created() {
-    // this.getProfile()
-    // this.$axios.get(`/users/${this.user._id}/blogs`).then((res) => {
-    //   this.filternews = res.data.docs
-    // })
-    const userId = localStorage.getItem('userId')
+    this.isLoading = true
+    const userId = this.$router.params.id
     axios({
       method: 'get',
       url: `${constant.base_url}/user/${userId}`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-      },
-    }).then((res) => {
-      console.log(res.data)
-      this.user = res.data
-      localStorage.setItem('user', JSON.stringify(this.user))
     })
-  },
-  beforeMount() {
-    this.filternews = this.news.slice(0, 2)
+    // this.$axios
+    //   .get(`/users/${this.$route.params.id}`)
+      .then((res) => {
+        this.user = res.data
+        console.log(JSON.parse(JSON.stringify(res.data)))
+      })
+      .finally(() => {
+        this.$axios.get(`/users/${this.user._id}/blogs`).then((res) => {
+          this.filternews = res.data.docs
+          this.news = this.filternews
+          this.filternews = this.filternews.slice(0, this.recordsPerPage)
+          this.countPost = this.news.length
+          this.isLoading = false
+        })
+      })
+
+    const id = JSON.parse(localStorage.getItem('user'))._id
+    if (id === this.$route.params.id) this.isOwn = true
   },
   methods: {
     getProfile() {
-      this.user = JSON.parse(localStorage.getItem('user'))
+      this.$axios.get(`/users/${this.$route.params.id}`).then((res) => {
+        this.user = res.data
+        console.log(JSON.parse(JSON.stringify(res.data)))
+      })
     },
-    showMore() {
-      this.filternews = this.news
+    changePage(page, limit) {
+      this.isLoading = true
+      this.filternews = this.news.slice(
+        limit * (page - 1),
+        limit * (page - 1) + this.recordsPerPage
+      )
+      this.isLoading = false
     },
     EditProfile() {
       this.isEditProfile = true
     },
     cancelSave() {
-      this.isEditProfile = false
+      this.alert = {
+        ...this.alert,
+        ...{
+          isShowModal: true,
+          title: 'Xác nhận',
+          buttonCancelContent: 'Hủy',
+          buttonOkContent: 'Xác nhận',
+          content:
+            'Bạn có chưa lưu thông tin cập nhật. Bạn có muốn thoát cập nhật?',
+          type: 'confirm',
+          typeSubmit: 'cancelUpdate',
+        },
+      }
     },
     save(userProp) {
       alert('Luu thanh cong:', JSON.stringify(userProp))
@@ -246,29 +288,58 @@ export default {
       this.isEditProfile = false
     },
     fetchInfoUser(data) {
+      this.alert.isShowModal = false
+      this.isEditProfile = false
       console.log('Fetch user for edit')
-      const userId = localStorage.getItem('userId')
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/user/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-        },
-      })
+      this.$axios
+        .get('/users/me')
         .then((res) => {
-          console.log(res.data)
-
+          console.log(JSON.stringify(data))
           localStorage.setItem('user', JSON.stringify(data))
+          // console.log(JSON.stringify(res.data))
+          this.user = data
+          console.log(JSON.stringify(this.user))
         })
         .catch((err) => {
           console.log(err)
         })
+    },
+    GoToDetails(id) {
+      this.$router.push(`/blog/${id}`)
+    },
+    cancel() {
+      this.isUpdatingBlog = false
+    },
+    onCloseModal(typeSubmit) {
+      switch (typeSubmit) {
+        case 'cancelUpdate':
+          this.resetAlert()
+          this.isEditProfile = false
+          break
+        default:
+          this.resetAlert()
+          break
+      }
+    },
+    resetAlert() {
+      this.alert = {
+        isShowModal: false,
+        title: '',
+        type: 'failed',
+        content: '',
+        buttonCancelContent: '',
+        buttonOkContent: '',
+        typeSubmit: '',
+      }
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.bg-cover {
+  background-image: url('~/assets/img/Book.png');
+}
 .relative {
   img {
     width: 150px;
@@ -276,7 +347,16 @@ export default {
     object-fit: contain;
   }
 }
-
+.post-creator {
+  position: fixed;
+  inset: 0;
+  background: rgba(71, 79, 98, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 30;
+  padding: 20px 0;
+}
 @media screen and (max-width: 1024px) {
   .info_user {
     margin-top: 80px;

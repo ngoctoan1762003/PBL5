@@ -16,10 +16,10 @@
           <div class="name-avt flex gap-[30px]">
             <div class="name flex-[2]">
               <div class="mb-[20px]">
-                <label class="label" for="name">First Name</label>
+                <label class="label" for="name">Tên người dùng</label>
                 <input
                   id="name"
-                  v-model="userProfile.firstName"
+                  v-model="userProfile.Name"
                   type="text"
                   name="name"
                   class="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
@@ -27,14 +27,14 @@
                 />
               </div>
               <div class="mb-[20px]">
-                <label class="label" for="name">Last Name</label>
+                <label class="label" for="name">Số điện thoại</label>
                 <input
-                  id="name"
-                  v-model="userProfile.lastName"
+                  id="phone"
+                  v-model="userProfile.Phone"
                   type="text"
-                  name="lastName"
+                  name="phone"
                   class="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
-                  placeholder="Enter your last name"
+                  placeholder="Enter your phone number"
                 />
               </div>
             </div>
@@ -69,7 +69,7 @@
               />
             </div>
           </div>
-          <div class="mb-[20px]">
+          <!-- <div class="mb-[20px]">
             <label class="label" for="name">Birthday</label>
             <input
               id="year"
@@ -79,19 +79,19 @@
               class="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
               placeholder="Enter year"
             />
-          </div>
+          </div> -->
           <div class="mb-[20px]">
-            <label class="label" for="name">Phone number</label>
+            <label class="label" for="name">Địa chỉ</label>
             <input
               id="phone"
-              v-model="userProfile.phone"
+              v-model="userProfile.Address"
               type="text"
               name="phone"
               class="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
               placeholder="Enter your phone number"
             />
           </div>
-          <div class="flex items-center gap-[60px]">
+          <!-- <div class="flex items-center gap-[60px]">
             <label for="name">Gender: </label>
             <div class="radio-group flex items-center gap-[30px]">
               <div
@@ -119,7 +119,7 @@
                 <label class="mb-0 cursor-pointer" for="female">Female</label>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="button-group space-x-4 mt-8">
             <button
               class="cancel py-2 px-4 bg-white border border-gray-200 text-gray-600 rounded hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50"
@@ -142,7 +142,9 @@
   </div>
 </template>
 <script>
+import axios from 'axios'
 import UploadImage from '~/api/uploadImage.js'
+import constant from '~/constant'
 export default {
   props: {
     user: {
@@ -172,19 +174,34 @@ export default {
   },
   created() {
     this.userProfile = JSON.parse(JSON.stringify(this.user))
-    this.previewImage = this.userProfile?.profileImage ?? ''
+    this.previewImage = this.userProfile?.image ?? ''
   },
   methods: {
     save() {
-      this.$axios
-        .put(`/users/${this.userProfile._id}`, {
-          firstName: this.userProfile.firstName,
-          lastName: this.userProfile.lastName,
-          gender: this.userProfile.gender,
-          dayOfBirth: this.formattedDate,
-          phone: this.userProfile.phone,
-          profileImage: this.userProfile.profileImage,
-        })
+      // this.$axios
+      //   .put(`/users/${this.userProfile._id}`, {
+      //     firstName: this.userProfile.firstName,
+      //     lastName: this.userProfile.lastName,
+      //     gender: this.userProfile.gender,
+      //     dayOfBirth: this.formattedDate,
+      //     phone: this.userProfile.phone,
+      //     profileImage: this.userProfile.profileImage,
+      //   })
+      const authorization = localStorage.getItem('accessToken')
+
+      axios({
+        method: 'put',
+        url: `${constant.base_url}/user/${this.user._id}`,
+        data: {
+          Name: this.userProfile.Name,
+          Address: this.userProfile.Address,
+          Phone: this.userProfile.Phone,
+          image: this.previewImage,
+        },
+        headers: {
+          Authorization: authorization
+        }
+      })
         .then((res) => {
           console.log(res)
           this.$notify({
@@ -210,19 +227,22 @@ export default {
     },
     fetchInfoUser() {
       console.log('Fetch user')
+      const userId = localStorage.getItem('userId')
+      console.log(userId)
       const authorization = localStorage.getItem('accessToken')
-      this.$axios
-        .get('/users/me', {
-          headers: {
-            Authorization: authorization,
-          },
-        })
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/user/${userId}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          Authorization: authorization
+        },
+      })
         .then((res) => {
-          localStorage.setItem('user', JSON.stringify(res.data))
           console.log(res.data)
-          console.log(JSON.stringify(this.userProfile))
           this.userProfile = res.data
-          console.log(JSON.stringify(this.userProfile))
+
+          localStorage.setItem('user', JSON.stringify(res.data))
         })
         .catch((err) => {
           console.log(err)
