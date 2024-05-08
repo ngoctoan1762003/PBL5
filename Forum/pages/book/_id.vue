@@ -1,6 +1,7 @@
 <template>
   <div class="main relative">
-    <TopNaviBarGuest />
+    <TopNaviBarGuest v-if="isLogedIn === false" />
+    <TopNaviBar v-else />
     <div class="section__1">
       <div class="section__1__left">
         <div>Welcome to Pages</div>
@@ -9,7 +10,7 @@
           {{ book.Description }}
         </div>
         <div class="flex gap-10 items-center">
-          <button class="bg-[#ffca42]">
+          <button class="bg-[#ffca42]" @click="toBookOrder()">
             <div class="text-[16px] font-[500] text-[#1B3764] px-5 py-3">
               Đặt ngay
             </div>
@@ -97,8 +98,6 @@
       <div class="flex flex-wrap gap-10 justify-center items-start">
         <div v-for="book in sameAuthorBook" :key="book._id" class="w-[30%]">
           <BookCard :book="book" />
-          <!-- <BookCard />
-          <BookCard /> -->
         </div>
       </div>
     </div>
@@ -110,9 +109,13 @@
         :key="c._id"
         class="flex flex-col gap-3 p-[30px]"
       >
-        <CommentCard :comment="c" :user_id="c.user_id" />
+        <CommentCard
+          :comment="c"
+          :user_id="c.user_id"
+          @showCommentBox="showCommentBox"
+        />
       </div>
-      <CommentBox :bookId="book._id" />
+      <CommentBox :bookId="book._id" @send="getListComment()" />
     </div>
     <!-- <modal-alert
       v-if="alert.isShowModal"
@@ -132,6 +135,7 @@ import BookCard from '~/components/Book/BookCard.vue'
 import CommentCard from '~/components/Book/CommentCard.vue'
 import CommentBox from '~/components/Blog/CommentBox.vue'
 import FooterBar from '~/components/FooterBar.vue'
+import TopNaviBar from '~/components/TopNaviBar.vue'
 
 export default {
   name: 'IndexPage',
@@ -141,7 +145,7 @@ export default {
     // PostCreator,
     // ModalAlert,
     // LoadingSpinner,
-    // TopNaviBar,
+    TopNaviBar,
     TopNaviBarGuest,
     BookCard,
     CommentCard,
@@ -168,19 +172,19 @@ export default {
         buttonOkContent: '',
         typeSubmit: '',
       },
+      isLogedIn: false,
     }
   },
   async created() {
+    if (localStorage.getItem('accessToken')) {
+      this.isLogedIn = true
+    } else {
+      this.isLogedIn = false
+    }
     const id = this.$route.params.id
-    await // this.$axios
-    //   .get(`${constant.base_url}/book/id/${id}`, {
-    //     headers: {
-    //       'ngrok-skip-browser-warning': 'skip-browser-warning',
-    //     },
-    //   })
-    axios({
+    await axios({
       method: 'get',
-      url: `${constant.base_url}/book/id/${id}`,
+      url: `${constant.base_url}/book/${id}`,
       headers: {
         'ngrok-skip-browser-warning': 'skip-browser-warning',
       },
@@ -223,11 +227,10 @@ export default {
     })
       .then((res) => {
         console.log(res.data)
-        this.comments = res.data
-        // this.comment.forEach((e) => {
-        //   this.listReplyBox.isShow = false
-        // })
-        // console.log(this.listReplyBox)
+        this.comments = res.data.map((comment) => ({
+          ...comment,
+          isVisible: false, // Set isVisible to true for each comment
+        }))
       })
       .catch((err) => {
         console.log(err)
@@ -242,11 +245,9 @@ export default {
       .then((res) => {
         console.log(res.data)
         this.sameAuthorBook = res.data
-        this.sameAuthorBook = this.sameAuthorBook.filter(book => book._id !== this.book._id)
-        // this.comment.forEach((e) => {
-        //   this.listReplyBox.isShow = false
-        // })
-        // console.log(this.listReplyBox)
+        this.sameAuthorBook = this.sameAuthorBook.filter(
+          (book) => book._id !== this.book._id
+        )
       })
       .catch((err) => {
         console.log(err)
@@ -271,8 +272,34 @@ export default {
         },
       }
     },
+    toBookOrder() {
+      const id = this.$route.params.id
+      this.$router.push(`/order/${id}`)
+    },
     GoToDetails(id) {
       this.$router.push(`/blog/${id}`)
+    },
+    async getListComment() {
+      const id = this.$route.params.id
+
+      await axios({
+        method: 'get',
+        url: `${constant.base_url}/comment/book/${id}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
+        .then((res) => {
+          console.log(res.data)
+          this.comments = res.data
+          // this.comment.forEach((e) => {
+          //   this.listReplyBox.isShow = false
+          // })
+          // console.log(this.listReplyBox)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     async getListBlog() {
       await this.$axios
@@ -406,6 +433,19 @@ export default {
               },
             }
         })
+    },
+    showCommentBox(evt, id) {
+      console.log(id);
+      this.comments.forEach((comment) => {
+        if (comment._id !== id) {
+          // Logic to hide the comment box
+          // You might need to add a property to your comment objects to track visibility
+          comment.isVisible = false // for example
+        }
+        else{
+          comment.isVisible = true
+        }
+      })
     },
   },
 }

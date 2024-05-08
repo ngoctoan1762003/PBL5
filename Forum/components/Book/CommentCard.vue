@@ -18,7 +18,7 @@
           <button class="text-[13px] font-semibold text-[#969AA0]">
             Thích
           </button>
-          <button class="text-[13px] font-semibold text-[#969AA0]">
+          <button class="text-[13px] font-semibold text-[#969AA0]" @click="showCommentBox($event)">
             Bình luận
           </button>
         </div>
@@ -27,6 +27,7 @@
     <div v-for="c in comment.replies" :key="c._id" class="ml-20">
       <ReplyCard :comment="c" :user_id="c.user_id" />
     </div>
+    <CommentBox :bookId="comment.book_id" :parentCommentId="comment._id"  v-show="comment.isVisible"/>
   </div>
 </template>
 
@@ -34,10 +35,12 @@
 import axios from 'axios'
 import ReplyCard from '../Book/ReplyCard.vue'
 import constant from '~/constant'
+import CommentBox from '~/components/Blog/CommentBox.vue'
 
 export default {
   components: {
     ReplyCard,
+    CommentBox,
   },
   props: {
     comment: {
@@ -70,10 +73,13 @@ export default {
       })
   },
   methods: {
-    submitComment() {},
     GoToDetails(id) {
       this.$router.push(`/user/${id}`)
     },
+    showCommentBox(event){
+      console.log(this.comment._id);
+      this.$emit("showCommentBox", event, this.comment._id);
+    }
   },
 }
 </script>

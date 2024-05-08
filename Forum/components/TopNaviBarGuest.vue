@@ -98,6 +98,7 @@ export default {
       color: white;
       font-size: 14px;
       font-weight: 500;
+      cursor: pointer;
     }
   }
 

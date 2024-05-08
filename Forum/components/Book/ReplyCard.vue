@@ -15,9 +15,6 @@
       </div>
       <div class="flex gap-5 pl-3">
         <button class="text-[13px] font-semibold text-[#969AA0]">Thích</button>
-        <button class="text-[13px] font-semibold text-[#969AA0]">
-          Bình luận
-        </button>
       </div>
     </div>
   </div>

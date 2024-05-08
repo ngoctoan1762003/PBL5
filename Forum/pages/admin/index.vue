@@ -19,13 +19,13 @@
               <span class="name">Quản lý người bán</span>
             </div>
           </div>
-          <div class="category__item" @click="changeOption(2)">
+          <div class="category__item" @click="changeOption(3)">
             <img src="~/assets/icon/popular.svg" alt="" />
             <div class="category__item__info">
               <span class="name">Quản lý sách</span>
             </div>
           </div>
-          <div class="category__item" @click="changeOption(3)">
+          <div class="category__item" @click="changeOption(4)">
             <img src="~/assets/icon/popular.svg" alt="" />
             <div class="category__item__info">
               <span class="name">Quản lý đơn đặt hàng</span>
@@ -39,7 +39,7 @@
         @reload="reload"
         v-show="manageOption === 1 && !isLoading"
         @changePage="changeUserPage"
-        :count="10"
+        :count="userCount"
         :recordsPerPage="recordsPerPage"
       />
       <UserList
@@ -47,8 +47,17 @@
         :users="sellers"
         @reload="reload"
         v-show="manageOption === 2 && !isLoading"
-        @changePage="changeUserPage"
-        :count="10"
+        @changePage="changeSellerPage"
+        :count="sellerCount"
+        :recordsPerPage="recordsPerPage"
+      />
+      <BookList
+        class="w-full"
+        :users="books"
+        @reload="reload"
+        v-show="manageOption === 3 && !isLoading"
+        @changePage="changeBookPage"
+        :count="bookCount"
         :recordsPerPage="recordsPerPage"
       />
       <!-- <BlogList v-show="manageOption === 2 && !isLoading" @reload="reload" :news="pendingNews" class="w-full" @changePage="changePendingPage"
@@ -72,10 +81,12 @@ import UserList from '~/components/Manage/UserList.vue'
 import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
 import constant from '~/constant'
 import TopNaviBar from '~/components/TopNaviBar.vue'
+import BookList from '~/components/Manage/BookList.vue'
 
 export default {
   components: {
     UserList,
+    BookList,
     // BlogList,
     LoadingSpinner,
     TopNaviBar,
@@ -89,8 +100,11 @@ export default {
       news: [],
       users: [],
       sellers: [],
+      books: [],
       manageOption: 1,
       userCount: Number,
+      sellerCount: Number,
+      bookCount: Number,
       pendingNewsCount: Number,
       newsCount: Number,
       isLoading: false,
@@ -107,12 +121,12 @@ export default {
   mounted() {
     // this.$axios
     //   .get(`/users/?page=1&limit=${this.recordsPerPage}`)
-    const authorization = localStorage.getItem('accessToken')
+    const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     console.log(authorization)
     axios({
       method: 'get',
       withCredentials: false,
-      url: `${constant.base_url}/user/getalluser`,
+      url: `${constant.base_url}/user/getalluser?page=1&limit=${this.recordsPerPage}`,
       headers: {
         Authorization: authorization,
         'ngrok-skip-browser-warning': 'skip-browser-warning',
@@ -120,51 +134,48 @@ export default {
     })
       .then((res) => {
         console.log(res)
-        this.users = res.data
-        // this.userCount = res.data.totalDocs
-      })
-      .catch((err) => {
-        console.error(err)
-      })
-      
-    axios({
-      method: 'get',
-      withCredentials: false,
-      url: `${constant.base_url}/user/role/seller`,
-      headers: {
-        Authorization: authorization,
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-      },
-    })
-      .then((res) => {
-        console.log(res)
-        this.users = res.data
-        // this.userCount = res.data.totalDocs
+        this.users = res.data.users
+        this.userCount = res.data.count
       })
       .catch((err) => {
         console.error(err)
       })
 
-    // this.$axios
-    //   .get(`/blogs/awaiting-approval/?page=1&limit=${this.recordsPerPage}`)
-    //   .then((res) => {
-    //     console.log(res)
-    //     this.pendingNews = res.data.docs
-    //     this.pendingNewsCount = res.data.totalDocs
-    //   })
-    //   .catch((err) => {
-    //     console.error(err)
-    //   })
-    // this.$axios
-    //   .get(`/blogs/?page=1&limit=${this.recordsPerPage}`, {})
-    //   .then((res) => {
-    //     console.log(res)
-    //     this.news = res.data.docs
-    //     this.newsCount = res.data.totalDocs
-    //   })
-    //   .catch((err) => {
-    //     console.error(err)
-    //   })
+    axios({
+      method: 'get',
+      withCredentials: false,
+      url: `${constant.base_url}/user/role/seller?page=1&limit=${this.recordsPerPage}`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.sellers = res.data.seller
+        this.sellerCount = res.data.count
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+
+    axios({
+      method: 'get',
+      url: `${constant.base_url}/book/books?page=1&limit=${this.recordsPerPage}`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.books = res.data.books
+        this.bookCount = res.data.count
+        // this.userCount = res.data.totalDocs
+      })
+      .catch((err) => {
+        console.error(err)
+      })
     this.isLoading = false
   },
   methods: {
@@ -204,8 +215,8 @@ export default {
         .get(`/users/?page=1&limit=${this.recordsPerPage}`)
         .then((res) => {
           console.log(res)
-          this.users = res.data.docs
-          this.userCount = res.data.totalDocs
+          this.users = res.data.users
+          this.userCount = res.data.count
         })
         .catch((err) => {
           console.error(err)
@@ -237,11 +248,73 @@ export default {
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
       this.isLoading = true
-      this.$axios
-        .get(`/users/?page=${page}&limit=${limit}`)
+      // this.$axios
+      //   .get(`/users/?page=${page}&limit=${limit}`)
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'get',
+        withCredentials: false,
+        url: `${constant.base_url}/user/getalluser?page=${page}&limit=${limit}`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
         .then((res) => {
-          this.users = res.data.docs
-          this.userCount = res.data.totalDocs
+          console.log(res.data)
+          this.users = res.data.users
+          this.userCount = res.data.count
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
+    changeSellerPage(page, limit) {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/user/role/seller?page=${page}&limit=${limit}`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
+        .then((res) => {
+          this.sellers = res.data.sellers
+          this.sellerCount = res.data.count
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+    changeBookPage(page, limit) {
+      const authorization = localStorage.getItem('accessToken')
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/book/books?page=${page}&limit=${limit}`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
+        // this.$axios
+        //   .get(`//?page=${page}&limit=${limit}`)
+        .then((res) => {
+          this.books = res.data.books
+          this.bookCount = res.data.count
         })
         .catch((err) => {
           console.log(err)

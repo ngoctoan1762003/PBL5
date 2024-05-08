@@ -10,15 +10,50 @@
       </div>
     </div>
     
-    <div class="top-nav__option">
+    <div class="top-nav__option items-center">
         <div class="top-nav__option__element">Trang chủ</div>
         <div class="top-nav__option__element">Sách</div>
         <div class="top-nav__option__element">Về chúng tôi</div>
         <div class="top-nav__option__element">Dịch vụ</div>
         <div class="top-nav__option__element">Liên hệ</div>
+        <img :src="user.image" @click="toUserDetail()" class="flex justify-center items-center cursor-pointer w-[40px] h-[40px] rounded-full">
     </div>
   </div>
 </template>
+
+<script>
+  import axios from 'axios'
+  import constant from '~/constant'
+  export default
+  {
+    data(){
+      return{
+        user: Object
+      }
+    },
+    mounted()
+    {
+      const userId = localStorage.getItem('userId')
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/user/${userId}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+
+        }
+      })
+      .then(res => {
+        console.log(res.data)
+        this.user = res.data
+      })
+    },
+    methods: {
+      toUserDetail(){
+        this.$router.push('/user/profile')
+      }
+    }
+  }
+</script>
 
 <style lang="scss" scoped>
 @import '~assets/scss/variables.scss';
@@ -65,6 +100,7 @@
         color: white;
         font-size: 14px;
         font-weight: 500;
+        cursor: pointer;
     }
   }
 

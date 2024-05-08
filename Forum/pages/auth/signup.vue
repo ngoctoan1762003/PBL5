@@ -2,7 +2,7 @@
   <div class="relative flex flex-col items-center h-[100vh]">
     <!-- <img src="~/assets/img/Cool-Background-GIF.gif" alt="" class="absolute w-full h-full"> -->
     <!-- <div class="absolute w-full h-full bg-[#2C353D]"></div> -->
-    <TopNaviBar />
+    <TopNaviBarGuest />
     <div class="z-10 flex gap-[80px]">
       <form
         action=""
@@ -103,9 +103,9 @@
 import axios from 'axios'
 import constant from '~/constant'
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
-import TopNaviBar from '~/components/TopNaviBar.vue'
+import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
 export default {
-  components: { ModalAlert, TopNaviBar },
+  components: { ModalAlert, TopNaviBarGuest },
   layout: 'empty',
   data() {
     return {
@@ -184,11 +184,6 @@ export default {
             isactive: "1",
             },
         })
-          // this.$axios
-          //   .post('/auth/register', {
-          //     email: this.email.toLowerCase().trim(),
-          //     password: this.password,
-          //   })
           .then((res) => {
             this.alert = {
               ...this.alert,

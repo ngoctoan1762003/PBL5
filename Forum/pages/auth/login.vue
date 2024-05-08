@@ -1,6 +1,6 @@
 <template>
   <div class="relative flex flex-col items-center h-[100vh]">
-    <TopNavBar />
+    <TopNaviBarGuest />
     <!-- <div class="absolute w-full h-full border-2"></div> -->
     <div class="z-10 flex justify-start gap-[80px]">
       <form
@@ -87,10 +87,10 @@
 <script>
 import axios from 'axios'
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
-import TopNavBar from '~/components/TopNaviBar.vue'
+import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
 import constant from '~/constant'
 export default {
-  components: { ModalAlert, TopNavBar },
+  components: { ModalAlert, TopNaviBarGuest },
   layout: 'empty',
   data() {
     return {
@@ -154,19 +154,6 @@ export default {
           })
             .then( (res) => {
               const token = `${res.data.token}`
-              // await this.$axios
-              //   .get('/users/me', {
-              //     headers: {
-              //       Authorization: token,
-              //     },
-              //   })
-              //   .then((res) => {
-              //     localStorage.setItem('user', JSON.stringify(res.data))
-              //   })
-              //   .catch((err) => {
-              //     console.log(err)
-              //   })
-
               localStorage.setItem('accessToken', token)
               localStorage.setItem('userId', res.data.user.User_id)
               this.$router.push('/')

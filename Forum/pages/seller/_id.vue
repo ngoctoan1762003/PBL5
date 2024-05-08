@@ -1,365 +1,402 @@
 <template>
-  <div>
-    <main class="profile-page overflow-hidden rounded-lg">
-      <section class="relative block" style="height: 500px">
-        <div class="absolute top-0 w-full h-full bg-center bg-cover">
-          <span
-            id="blackOverlay"
-            class="w-full h-full absolute opacity-50 bg-black"
-          ></span>
-        </div>
-        <div
-          class="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden"
-          style="height: 70px"
-        ></div>
-      </section>
-      <section class="relative py-16 bg-[#2C353D]">
-        <div class="container mx-auto">
-          <div
-            class="relative flex flex-col min-w-0 break-words bg-[#2C353D] w-full mb-6 shadow-xl rounded-lg -mt-64"
-          >
-            <div class="px-6">
-              <div class="flex flex-wrap justify-between w-full">
-                <div class="w-[200px] px-4 flex justify-center">
-                  <div class="relative">
-                    <img
-                      alt="..."
-                      :src="
-                        user.profileImage ?? require('~/assets/img/avt.png')
-                      "
-                      class="shadow-xl rounded-full h-[150px] border-none absolute -m-16 -ml-20 lg:-ml-16"
-                      style="max-width: 150px"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="info_user w-full md:ml-0 lg:ml-[255px] lg:order-3 lg:text-right lg:self-center"
-                >
-                  <div
-                    class="pt-4 px-3 sm:mt-0 flex justify-between gap-[40px]"
-                  >
-                    <div class="text-left">
-                      <span
-                        class="text-4xl font-semibold leading-normal mb-2 text-[#fafcfe] mb-2"
-                      >
-                        {{ user?.firstName }} {{ user?.lastName }}
-                      </span>
-                      <div
-                        class="text-sm leading-normal mt-0 mb-2 text-[#fafcfe] font-semibold uppercase"
-                      >
-                        Gender: {{ user.gender ? 'Male' : 'Female' }}
-                      </div>
-                      <div
-                        class="text-sm leading-normal mt-0 mb-2 text-[#fafcfe] font-semibold uppercase"
-                      >
-                        Birthday:
-                        {{ user.dayOfBirth?.split('T')[0].split('-')[2] }}-{{
-                          user.dayOfBirth?.split('T')[0].split('-')[1]
-                        }}-{{ user.dayOfBirth?.split('T')[0].split('-')[0] }}
-                      </div>
-                      <div
-                        class="text-sm leading-normal mt-0 mb-2 text-[#fafcfe] font-semibold uppercase"
-                      >
-                        Phone number: {{ user.phone }}
-                      </div>
-                    </div>
-                    <div class="button flex items-center">
-                      <button
-                        class="bg-[#FF571A] active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1"
-                        type="button"
-                        style="transition: all 0.15s ease 0s"
-                        @click="EditProfile"
-                        v-if="isOwn"
-                      >
-                        Edit profile
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-8 pb-10 pt-6 border-t border-gray-300 text-center">
-                <div class="w-full w-4/12 px-4 lg:order-1">
-                  <div class="flex justify-center py-4 lg:pt-4 pt-8">
-                    <div class="mr-4 p-3 text-center"></div>
-                    <div class="mr-4 p-3 text-center">
-                      <span
-                        class="text-xl font-bold block uppercase tracking-wide text-[#fafcfe]"
-                        >{{ countPost }}</span
-                      ><span class="text-sm text-[#fafcfe]">Post</span>
-                    </div>
-                    <div class="lg:mr-4 p-3 text-center">
-                      <span
-                        class="text-xl font-bold block uppercase tracking-wide text-[#fafcfe]"
-                        >{{ countLikes }}</span
-                      ><span class="text-sm text-[#fafcfe]">Likes</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex flex-wrap justify-center">
-                  <div class="w-full lg:w-9/12 px-4">
-                    <div id="main-content">
-                      <LoadingSpinner v-show="isLoading" />
-                      <div
-                        v-for="n in filternews"
-                        :key="n.id"
-                        class="blog relative"
-                        @click="GoToDetails(n._id)"
-                      >
-                        <BlogCard
-                          :image-link="n.blogImage ?? null"
-                          :author="`${n.userId?.firstName ?? ''} ${
-                            n.userId?.lastName ?? ''
-                          }`"
-                          :comments="n.comments"
-                          :like="
-                            n.reaction?.filter((e) => {
-                              return e.reaction === 'like'
-                            }).length
-                          "
-                          :dislike="
-                            n.reaction?.filter((e) => {
-                              return e.reaction === 'dislike'
-                            }).length
-                          "
-                          :title="n.title"
-                          :time="n.createdAt"
-                        />
-                      </div>
-                    </div>
-                    <Pagination
-                      v-show="!isLoading && countPost != 0"
-                      class="bg-[#fafcfe] px-[40px] py-2 rounded-[10px]"
-                      :count="countPost"
-                      :records-per-page="recordsPerPage"
-                      @changePage="changePage"
-                    />
-                  </div>
-                </div>
-              </div>
+  <div class="default">
+    <div class="default__top">
+      <!-- <TopNavBar class="top-nav" /> -->
+      <TopNaviBar />
+    </div>
+    <div class="px-5 flex gap-5">
+      <div class="tableft">
+        <div class="tableft__item category">
+          <div class="category__item" @click="changeOption(1)">
+            <img src="~/assets/icon/person.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Quản lý sách</span>
             </div>
           </div>
+          <div class="category__item" @click="changeOption(2)">
+            <img src="~/assets/icon/person.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Thêm sách</span>
+            </div>
+          </div>
+          <!-- <div class="category__item" @click="changeOption(2)">
+            <img src="~/assets/icon/person.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Quản lý người bán</span>
+            </div>
+          </div>
+          <div class="category__item" @click="changeOption(2)">
+            <img src="~/assets/icon/popular.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Quản lý sách</span>
+            </div>
+          </div>
+          <div class="category__item" @click="changeOption(3)">
+            <img src="~/assets/icon/popular.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Quản lý đơn đặt hàng</span>
+            </div>
+          </div> -->
         </div>
-      </section>
-    </main>
-    <div class="update-container">
-      <!-- <EditProfile
-        v-if="isEditProfile"
-        :user="user"
-        @save="save"
-        @cancel="cancelSave"
-        @fetchInfoUser="fetchInfoUser"
-        @click.stop
-      /> -->
-    </div>
-    <div v-if="isUpdatingBlog" class="post-creator" @click="cancel">
-      <div class="post-creator__container custom-scroll h-full" @click.stop>
-        <PostCreator
-          class="post-creator__container custom-scroll h-full"
-          @cancel="cancel"
-          @setLoading="isLoading = true"
-          @doneLoading="isLoading = false"
-        />
+      </div>
+      <BookList
+        class="w-full"
+        :users="books"
+        @reload="reload"
+        v-show="manageOption === 1 && !isLoading"
+        @changePage="changeBookPage"
+        :count="bookCount"
+        :recordsPerPage="recordsPerPage"
+      />
+      <AddBookPanel v-show="manageOption === 2 && !isLoading" />
+      <div
+        v-if="isLoading"
+        class="flex justify-center items-center w-full h-screen-60"
+      >
+        <LoadingSpinner />
       </div>
     </div>
-    <modal-alert
-      v-if="alert.isShowModal"
-      v-bind="alert"
-      @close="onCloseModal"
-    />
   </div>
 </template>
+
 <script>
 import axios from 'axios'
-import constant from 'constant'
-// import EditProfile from '~/components/User/EditProfile.vue'
-import BlogCard from '~/components/Card/BlogCard.vue'
+// import UserList from '~/components/Manage/UserList.vue'
+// import BlogList from '~/components/Manage/BlogList.vue'
 import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
-import PostCreator from '~/components/Blog/PostCreator.vue'
-import ModalAlert from '~/components/Modal/ModalAlert.vue'
+import BookList from '~/components/Manage/BookList.vue'
+import constant from '~/constant'
+import TopNaviBar from '~/components/TopNaviBar.vue'
+import AddBookPanel from '~/components/Book/AddBookPanel.vue'
 
 export default {
-  name: 'Profile',
   components: {
-    BlogCard,
-    // EditProfile,
+    // UserList,
+    // BlogList,
     LoadingSpinner,
-    PostCreator,
-    ModalAlert,
+    TopNaviBar,
+    BookList,
+    AddBookPanel,
   },
-  layout: 'topandfooter',
+  layout: 'empty',
   data() {
     return {
-      user: {},
+      title: '',
+      content: '',
+      pendingNews: [],
       news: [],
-      filternews: [],
-      isEditProfile: false,
-      isLoading: true,
-      isOwn: false,
-      isUpdatingBlog: false,
-      alert: {
-        isShowModal: false,
-        title: '',
-        type: 'confirm',
-        content: '',
-        buttonCancelContent: '',
-        buttonOkContent: 'Ok',
-        typeSubmit: '',
-      },
+      books: [],
+      sellers: [],
+      manageOption: 1,
+      bookCount: Number,
+      pendingNewsCount: Number,
+      newsCount: Number,
+      isLoading: false,
       recordsPerPage: 5,
-      countPost: 0,
     }
   },
-  computed: {
-    countLikes() {
-      let totalLikes = 0
-      this.news.forEach((e) => {
-        e.reaction.forEach((r) => {
-          if (r.reaction === 'like') {
-            totalLikes++
-          }
-        })
-      })
-      return totalLikes
-    },
-  },
   created() {
-    this.isLoading = true
-    const userId = this.$router.params.id
+    // if (
+    //   !localStorage.getItem('accessToken') ||
+    //   localStorage.getItem('accessToken') === 'false'
+    // )
+    //   this.$router.push('/auth/login')
+    const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     axios({
       method: 'get',
-      url: `${constant.base_url}/user/${userId}`,
+      url: `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
     })
-    // this.$axios
-    //   .get(`/users/${this.$route.params.id}`)
       .then((res) => {
-        this.user = res.data
-        console.log(JSON.parse(JSON.stringify(res.data)))
+        console.log(res.data)
+        this.books = res.data.books
+        this.bookCount = res.data.count
+      })
+      .catch((err) => {
+        console.log(err)
       })
       .finally(() => {
-        this.$axios.get(`/users/${this.user._id}/blogs`).then((res) => {
-          this.filternews = res.data.docs
-          this.news = this.filternews
-          this.filternews = this.filternews.slice(0, this.recordsPerPage)
-          this.countPost = this.news.length
-          this.isLoading = false
-        })
+        this.isLoading = false
       })
-
-    const id = JSON.parse(localStorage.getItem('user'))._id
-    if (id === this.$route.params.id) this.isOwn = true
   },
   methods: {
-    getProfile() {
-      this.$axios.get(`/users/${this.$route.params.id}`).then((res) => {
-        this.user = res.data
-        console.log(JSON.parse(JSON.stringify(res.data)))
-      })
-    },
-    changePage(page, limit) {
-      this.isLoading = true
-      this.filternews = this.news.slice(
-        limit * (page - 1),
-        limit * (page - 1) + this.recordsPerPage
-      )
-      this.isLoading = false
-    },
-    EditProfile() {
-      this.isEditProfile = true
-    },
-    cancelSave() {
-      this.alert = {
-        ...this.alert,
-        ...{
-          isShowModal: true,
-          title: 'Xác nhận',
-          buttonCancelContent: 'Hủy',
-          buttonOkContent: 'Xác nhận',
-          content:
-            'Bạn có chưa lưu thông tin cập nhật. Bạn có muốn thoát cập nhật?',
-          type: 'confirm',
-          typeSubmit: 'cancelUpdate',
+    submit() {
+      axios({
+        method: 'post',
+        url: `http://${process.env.BASE_URL}:3000/auth/reset-password`,
+        data: {
+          title: this.title,
+          content: this.content,
+          createdAt: Date.now(),
         },
-      }
+      })
+        .then((response) => {
+          console.log(response)
+          this.$notify({
+            title: 'Success',
+            text: response.data.message,
+            type: 'success',
+          })
+          return response.data
+        })
+        .catch((error) => {
+          console.error('Login error:', error)
+          this.$notify({
+            title: 'Error',
+            text: error.response.data.message,
+            type: 'error',
+          })
+        })
     },
-    save(userProp) {
-      alert('Luu thanh cong:', JSON.stringify(userProp))
-      console.log(userProp)
-      this.isEditProfile = false
-    },
-    fetchInfoUser(data) {
-      this.alert.isShowModal = false
-      this.isEditProfile = false
-      console.log('Fetch user for edit')
-      this.$axios
-        .get('/users/me')
+    changeBookPage(page, limit) {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/user/books?page=${page}&limit=${limit}`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
+        // this.$axios
+        //   .get(`//?page=${page}&limit=${limit}`)
         .then((res) => {
-          console.log(JSON.stringify(data))
-          localStorage.setItem('user', JSON.stringify(data))
-          // console.log(JSON.stringify(res.data))
-          this.user = data
-          console.log(JSON.stringify(this.user))
+          this.books = res.data.books
+          this.bookCount = res.data.count
         })
         .catch((err) => {
           console.log(err)
         })
+        .finally(() => {
+          this.isLoading = false
+        })
     },
-    GoToDetails(id) {
-      this.$router.push(`/blog/${id}`)
+    changeOption(optionNumber) {
+      this.manageOption = optionNumber
     },
-    cancel() {
-      this.isUpdatingBlog = false
+    reload() {
+      this.$axios
+        .get(`/users/?page=1&limit=${this.recordsPerPage}`)
+        .then((res) => {
+          console.log(res)
+          this.users = res.data.docs
+          this.userCount = res.data.totalDocs
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+
+      this.$axios
+        .get(`/blogs/awaiting-approval/?page=1&limit=${this.recordsPerPage}`)
+        .then((res) => {
+          console.log(res)
+          this.pendingNews = res.data.docs
+          this.pendingNewsCount = res.data.totalDocs
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+      this.$axios
+        .get(`/blogs/?page=1&limit=${this.recordsPerPage}`, {})
+        .then((res) => {
+          console.log(res)
+          this.news = res.data.docs
+          this.newsCount = res.data.totalDocs
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+      this.isLoading = false
     },
-    onCloseModal(typeSubmit) {
-      switch (typeSubmit) {
-        case 'cancelUpdate':
-          this.resetAlert()
-          this.isEditProfile = false
-          break
-        default:
-          this.resetAlert()
-          break
-      }
+    changeUserPage(page, limit) {
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      this.$axios
+        .get(`/users/?page=${page}&limit=${limit}`)
+        .then((res) => {
+          this.users = res.data.docs
+          this.userCount = res.data.totalDocs
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
     },
-    resetAlert() {
-      this.alert = {
-        isShowModal: false,
-        title: '',
-        type: 'failed',
-        content: '',
-        buttonCancelContent: '',
-        buttonOkContent: '',
-        typeSubmit: '',
-      }
+    changePendingPage(page, limit) {
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      this.$axios
+        .get(`/blogs/awaiting-approval/?page=${page}&limit=${limit}`)
+        .then((res) => {
+          this.pendingNews = res.data.docs
+          this.pendingNewsCount = res.data.totalDocs
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+    changeNewsPage(page, limit) {
+      console.log('page: ' + page + ' limit: ' + limit)
+      console.log('oke')
+      this.isLoading = true
+      this.$axios
+        .get(`/blogs/?page=${page}&limit=${limit}`)
+        .then((res) => {
+          this.news = res.data.docs
+          this.newsCount = res.data.totalDocs
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+    setLoading() {
+      this.isLoading = true
+    },
+    doneLoading() {
+      this.isLoading = false
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.bg-cover {
-  background-image: url('~/assets/img/Book.png');
-}
-.relative {
-  img {
-    width: 150px;
-    height: 150px;
-    object-fit: contain;
+@import '~/assets/scss/variables.scss';
+
+.default {
+  display: flex;
+  flex-direction: column;
+  background-color: #f3f6ff;
+  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
+  gap: 20px;
+  position: relative;
+  height: 100vh;
+  overflow: auto;
+  // background: $dark-2;
+
+  &__top {
+    height: 80px;
+    position: sticky;
+    width: 100%;
+    left: 0;
+    top: 0;
+    z-index: 10;
+  }
+
+  &__tableft {
+    height: 100%;
+    max-width: 239px;
+  }
+
+  &__tabright {
+    height: 100%;
+    max-width: 239px;
+  }
+
+  &__body {
+    display: inline-flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+    padding: 0 20px;
+
+    &__container {
+      width: 100%;
+    }
+  }
+
+  .footer {
   }
 }
-.post-creator {
-  position: fixed;
-  inset: 0;
-  background: rgba(71, 79, 98, 0.8);
+
+.tableft {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 30;
-  padding: 20px 0;
-}
-@media screen and (max-width: 1024px) {
-  .info_user {
-    margin-top: 80px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+
+  &__item {
+    border-radius: 16px;
+    background: #1b3764; // $dark-3;
+    display: flex;
+    width: 210px;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+
+    .category {
+      &__item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 6px 5px;
+        gap: 10px;
+        border-radius: 6px;
+        // background: $dark-3;
+        cursor: pointer;
+
+        img {
+          display: flex;
+          height: 100%;
+          object-fit: contain;
+          justify-content: center;
+          align-items: center;
+          padding: 4px;
+          gap: 10px;
+        }
+
+        &__info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
+
+          .name {
+            color: $neutral-0;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 18px;
+            /* 150% */
+          }
+
+          .desc {
+            color: #97989d;
+            /* Regular 9 */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 14px;
+            /* 155.556% */
+          }
+        }
+
+        &:hover {
+          background: $dark-4;
+        }
+      }
+    }
   }
 }
 </style>

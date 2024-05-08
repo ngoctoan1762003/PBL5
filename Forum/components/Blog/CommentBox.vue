@@ -14,14 +14,18 @@
 </template>
 <script>
 import axios from 'axios'
-import TextEditor from '../../components/Blog/TextEditor.vue'
+import TextEditor from '~/components/Blog/TextEditor.vue'
 import constant from '~/constant'
 export default {
   components: { TextEditor },
-  props:{
+  props: {
     bookId: {
-      Type: String
-    }
+      type: String,
+    },
+    parentCommentId: {
+      type: String,
+      // default: null,
+    },
   },
   data() {
     return {
@@ -33,23 +37,35 @@ export default {
       this.content = value
     },
     send() {
-      if (this.content === "") return;
-      const authorization =  localStorage.getItem('accessToken');
-      const userId =  localStorage.getItem('userId');
-      axios({
-        method: 'post',
-        url: `${constant.base_url}/comment`,
-        headers: {
-          Authorization: authorization,
-        },
-        data: {
-          content: this.content,
-          book_id: this.bookId,
-          user_id: userId,
-          parent_comment_id: null
-        }
-      })
-      // this.$emit('comment', this.content)
+      if (this.content === '') return
+      const authorization = localStorage.getItem('accessToken')
+      const userId = localStorage.getItem('userId')
+
+      try {
+        axios({
+          method: 'post', // Change method to 'post'
+          url: `${constant.base_url}/comment/create`,
+          headers: {
+            Authorization: authorization,
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
+            'Content-Type': 'application/json', // Specify Content-Type as application/json
+          },
+          data: {
+            // Send data in the request body
+            content: this.content,
+            book_id: this.bookId,
+            user_id: userId,
+            parent_comment_id: this.parentCommentId,
+          },
+        })
+          .then((res) => {})
+          .catch((e) => {
+            console.log(e)
+          })
+      } catch (e) {
+        console.log(e)
+      }
+      this.$emit('send')
       this.content = ''
     },
   },
