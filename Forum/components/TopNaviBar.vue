@@ -4,55 +4,79 @@
       <img src="~assets/icon/Logo.svg" alt="" />
       <div class="name-web">BOOK</div>
       <div class="top-nav__link ml-2">
-        <img class="top-nav__link__icon" src="~assets/icon/Facebook.svg" alt="" />
-        <img class="top-nav__link__icon" src="~assets/icon/Twitter.svg" alt="" />
-        <img class="top-nav__link__icon" src="~assets/icon/LinkedIn.svg" alt="" />
+        <img
+          class="top-nav__link__icon"
+          src="~assets/icon/Facebook.svg"
+          alt=""
+        />
+        <img
+          class="top-nav__link__icon"
+          src="~assets/icon/Twitter.svg"
+          alt=""
+        />
+        <img
+          class="top-nav__link__icon"
+          src="~assets/icon/LinkedIn.svg"
+          alt=""
+        />
+        <img
+          class="top-nav__link__icon"
+          src="~/assets/icon/popular.svg"
+          alt=""
+          v-if="user.Role === 'seller'"
+          @click="toSellerPage"
+        />
       </div>
     </div>
-    
+
     <div class="top-nav__option items-center">
-        <div class="top-nav__option__element">Trang chủ</div>
-        <div class="top-nav__option__element">Sách</div>
-        <div class="top-nav__option__element">Về chúng tôi</div>
-        <div class="top-nav__option__element">Dịch vụ</div>
-        <div class="top-nav__option__element">Liên hệ</div>
-        <img :src="user.image" @click="toUserDetail()" class="flex justify-center items-center cursor-pointer w-[40px] h-[40px] rounded-full">
+      <div class="top-nav__option__element">Trang chủ</div>
+      <div class="top-nav__option__element">Sách</div>
+      <div class="top-nav__option__element">Về chúng tôi</div>
+      <div class="top-nav__option__element">Dịch vụ</div>
+      <div class="top-nav__option__element">Liên hệ</div>
+      <img
+        :src="user.image"
+        @click="toUserDetail()"
+        class="flex justify-center items-center cursor-pointer w-[40px] h-[40px] rounded-full"
+      />
     </div>
   </div>
 </template>
 
 <script>
-  import axios from 'axios'
-  import constant from '~/constant'
-  export default
-  {
-    data(){
-      return{
-        user: Object
-      }
-    },
-    mounted()
-    {
-      const userId = localStorage.getItem('userId')
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/user/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-
-        }
-      })
-      .then(res => {
-        console.log(res.data)
-        this.user = res.data
-      })
-    },
-    methods: {
-      toUserDetail(){
-        this.$router.push('/user/profile')
-      }
+import axios from 'axios'
+import constant from '~/constant'
+export default {
+  data() {
+    return {
+      user: Object,
     }
-  }
+  },
+  mounted() {
+    const userId = localStorage.getItem('userId')
+    axios({
+      method: 'get',
+      url: `${constant.base_url}/user/${userId}`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    }).then((res) => {
+      console.log(res.data)
+      this.user = res.data
+    })
+  },
+
+  methods: {
+    toUserDetail() {
+      this.$router.push('/user/profile')
+    },
+    toSellerPage() {
+      const id = localStorage.getItem('userId')
+      this.$router.push(`/seller/${id}`)
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
@@ -64,7 +88,7 @@
   flex-direction: row;
   align-items: center;
   gap: 84px;
-  background: #1B3764;
+  background: #1b3764;
   height: 80px;
   width: 100%;
   justify-content: space-between;
@@ -97,10 +121,10 @@
     gap: 30px;
 
     &__element {
-        color: white;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
     }
   }
 
@@ -109,133 +133,133 @@
     gap: 10px;
 
     &__icon {
-        width: 35px;
-        height: 35px;
+      width: 35px;
+      height: 35px;
     }
   }
 
-//   &__main {
-//     display: flex;
-//     align-items: flex-start;
-//     justify-content: space-between;
-//     gap: 50px;
-//     height: 100%;
-//     width: 100%;
-//     flex: 1;
+  //   &__main {
+  //     display: flex;
+  //     align-items: flex-start;
+  //     justify-content: space-between;
+  //     gap: 50px;
+  //     height: 100%;
+  //     width: 100%;
+  //     flex: 1;
 
-//     &__left {
-//       display: flex;
-//       justify-content: flex-start;
-//       align-items: center;
-//       flex: 1 0 0;
-//       gap: 17px;
-//     }
+  //     &__left {
+  //       display: flex;
+  //       justify-content: flex-start;
+  //       align-items: center;
+  //       flex: 1 0 0;
+  //       gap: 17px;
+  //     }
 
-//     &__menu {
-//       display: flex;
-//       align-items: flex-start;
-//       gap: 20px;
-//       cursor: pointer;
+  //     &__menu {
+  //       display: flex;
+  //       align-items: flex-start;
+  //       gap: 20px;
+  //       cursor: pointer;
 
-//       .menu__item {
-//         display: flex;
-//         justify-content: center;
-//         align-items: center;
-//         padding: 10px;
-//         border-radius: 8px;
+  //       .menu__item {
+  //         display: flex;
+  //         justify-content: center;
+  //         align-items: center;
+  //         padding: 10px;
+  //         border-radius: 8px;
 
-//         &.isActive {
-//           background: $orange;
-//         }
+  //         &.isActive {
+  //           background: $orange;
+  //         }
 
-//         img {
-//           display: flex;
-//           align-items: flex-start;
-//           gap: 10px;
-//         }
-//       }
-//     }
+  //         img {
+  //           display: flex;
+  //           align-items: flex-start;
+  //           gap: 10px;
+  //         }
+  //       }
+  //     }
 
-//     &__right {
-//       height: 100%;
-//       display: flex;
-//       align-items: center;
+  //     &__right {
+  //       height: 100%;
+  //       display: flex;
+  //       align-items: center;
 
-//       gap: 25px;
+  //       gap: 25px;
 
-//       .notification {
-//         display: flex;
-//         width: 20px;
-//         height: 20px;
-//         justify-content: center;
-//         align-items: center;
+  //       .notification {
+  //         display: flex;
+  //         width: 20px;
+  //         height: 20px;
+  //         justify-content: center;
+  //         align-items: center;
 
-//         img {
-//           width: 100%;
-//           height: 100%;
-//           object-fit: contain;
-//           cursor: pointer;
-//         }
-//       }
+  //         img {
+  //           width: 100%;
+  //           height: 100%;
+  //           object-fit: contain;
+  //           cursor: pointer;
+  //         }
+  //       }
 
-//       .account {
-//         display: flex;
-//         justify-content: center;
-//         align-items: center;
-//         height: 100%;
-//         gap: 10px;
-//         padding-right: 10px;
-//         position: relative;
-//         cursor: pointer;
-//         margin-right: 40px;
+  //       .account {
+  //         display: flex;
+  //         justify-content: center;
+  //         align-items: center;
+  //         height: 100%;
+  //         gap: 10px;
+  //         padding-right: 10px;
+  //         position: relative;
+  //         cursor: pointer;
+  //         margin-right: 40px;
 
-//         img {
-//           height: 100%;
-//           object-fit: contain;
-//         }
+  //         img {
+  //           height: 100%;
+  //           object-fit: contain;
+  //         }
 
-//         .name {
-//           color: #f7f7f7;
-//           font-size: 14px;
-//           font-style: normal;
-//           font-weight: 500;
-//           line-height: 24px;
-//           /* 150% */
-//         }
+  //         .name {
+  //           color: #f7f7f7;
+  //           font-size: 14px;
+  //           font-style: normal;
+  //           font-weight: 500;
+  //           line-height: 24px;
+  //           /* 150% */
+  //         }
 
-//         .icon-drop-down {
-//           position: absolute;
-//           right: -10px;
-//           top: 50%;
-//           transform: translateY(-50%);
-//         }
+  //         .icon-drop-down {
+  //           position: absolute;
+  //           right: -10px;
+  //           top: 50%;
+  //           transform: translateY(-50%);
+  //         }
 
-//         .dropdown-menu {
-//           position: absolute;
-//           display: inline-flex;
-//           right: -20px;
-//           top: 40px;
-//           flex-direction: column;
-//           background: $gray;
-//           padding: 6px 12px;
-//           border-radius: 8px;
-//           width: 100%;
+  //         .dropdown-menu {
+  //           position: absolute;
+  //           display: inline-flex;
+  //           right: -20px;
+  //           top: 40px;
+  //           flex-direction: column;
+  //           background: $gray;
+  //           padding: 6px 12px;
+  //           border-radius: 8px;
+  //           width: 100%;
 
-//           .item {
-//             display: flex;
-//             width: 100%;
-//             padding: 6px 12px;
-//             color: $orange;
-//             border-radius: 8px;
+  //           .item {
+  //             display: flex;
+  //             width: 100%;
+  //             padding: 6px 12px;
+  //             color: $orange;
+  //             border-radius: 8px;
 
-//             &:hover {
-//               color: $gray;
-//               background: $orange;
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
+  //             &:hover {
+  //               color: $gray;
+  //               background: $orange;
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
 }
 </style>

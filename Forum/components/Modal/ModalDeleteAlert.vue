@@ -3,7 +3,7 @@
     <div
       class="relative text-[#1B3764] font-semibold text-[21px] bg-[#FFCA42] py-3 px-5"
     >
-      <div>Giỏ hàng</div>
+      <div>Cảnh báo</div>
       <img
         class="absolute right-5 top-[30%] w-[20px] h-[20px] cursor-pointer"
         @click="cancel()"
@@ -12,7 +12,22 @@
       />
     </div>
     <div class="bg-white p-10 flex flex-col gap-5">
-      <div class="flex gap-5">
+      <div>Bạn có chắc chắn muốn xóa?</div>
+      <div class="flex justify-between">
+        <button
+          class="text-[#1B3764] font-semibold text-[14px] text-center bg-[#FFCA42] py-3 px-5"
+          @click="submit"
+        >
+          Xác nhận
+        </button>
+        <button
+          class="text-[#1B3764] font-semibold text-[14px] text-center bg-[#FFCA42] py-3 px-5"
+          @click="cancel"
+        >
+          Hủy
+        </button>
+      </div>
+      <!-- <div class="flex gap-5">
         <img class="w-[80px]" src="~/assets/img/DemoBook.png" alt="" />
         <div class="flex flex-col justify-between">
           <div>
@@ -47,7 +62,7 @@
         @click="submit"
       >
         Xác nhận
-      </button>
+      </button> -->
     </div>
   </div>
 </template>
@@ -58,13 +73,13 @@ export default {
     book: Object,
     amount: Number,
   },
-  data(){
+  data() {
     return {
-        isLoading: true,
+      isLoading: true,
     }
   },
   created() {
-    this.isLoading = false;
+    this.isLoading = false
   },
   methods: {
     cancel() {
@@ -72,17 +87,15 @@ export default {
     },
     getPriceFormat(price) {
       if (this.amount === 0) return '' // Return empty string if book is not defined
-      const formattedPrice = price.toString().replace(
-        /\B(?=(\d{3})+(?!\d))/g,
-        '.'
-      )
+      const formattedPrice = price
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
       return `${formattedPrice} VND`
     },
-    submit(){
-      this.$emit('addToCart');
-    }
+    submit() {
+      this.$emit('delete')
+    },
   },
-  computed: {
-  },
+  computed: {},
 }
 </script>

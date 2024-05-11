@@ -54,10 +54,13 @@
 </template>
 
 <script>
+// import axios from 'axios'
 import TopNaviBar from '~/components/TopNaviBar.vue'
 import SearchBar from '~/components/SearchBar.vue'
 import FooterBar from '~/components/FooterBar.vue'
 import BookConfirmOrderByShop from '~/components/Book/BookConfirmOrderByShop.vue'
+// import constant from '~/constant'
+
 export default {
   components: {
     TopNaviBar,
@@ -66,6 +69,9 @@ export default {
     BookConfirmOrderByShop,
   },
   layout: 'empty',
+  mounted() {
+    
+  },
 }
 </script>
 

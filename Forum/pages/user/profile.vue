@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div
+      class="fixed w-[100vw] h-[100vh] top-0 z-20 flex justify-center items-center"
+      v-show="isUpRole"
+    >
+      <div class="absolute bg-gray-500 opacity-50 w-full h-full"></div>
+      <ModalUprole @submit="toRoleSeller" @cancel="isUpRole = false" class="relative z-[1]"/>
+    </div>
     <TopNavBar />
     <main class="profile-page overflow-hidden">
       <section class="relative block" style="height: 500px">
@@ -71,9 +78,18 @@
                         class="bg-[#FF571A] active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1"
                         type="button"
                         style="transition: all 0.15s ease 0s"
+                        @click="isUpRole = true"
+                        v-if="user.Role !=='seller'"
+                      >
+                        Trở thành người bán
+                      </button>
+                      <button
+                        class="bg-[#FF571A] active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1"
+                        type="button"
+                        style="transition: all 0.15s ease 0s"
                         @click="EditProfile"
                       >
-                        Edit profile
+                        Chỉnh sửa thông tin
                       </button>
                     </div>
                   </div>
@@ -164,6 +180,7 @@ import EditProfile from '~/components/User/EditProfile.vue'
 import BlogCard from '~/components/Card/BlogCard.vue'
 import TopNavBar from '~/components/TopNaviBar.vue'
 import FooterBar from '~/components/FooterBar.vue'
+import ModalUprole from '~/components/Modal/ModalUprole.vue'
 import constant from '~/constant'
 
 // import PostCreator from '~/components/Blog/PostCreator.vue'
@@ -175,6 +192,7 @@ export default {
     EditProfile,
     TopNavBar,
     FooterBar,
+    ModalUprole,
     // PostCreator,
   },
   layout: 'empty',
@@ -185,6 +203,7 @@ export default {
       filternews: [],
       isEditProfile: false,
       isUpdatingBlog: true,
+      isUpRole: false,
     }
   },
   computed: {
@@ -228,6 +247,37 @@ export default {
     this.filternews = this.news.slice(0, 2)
   },
   methods: {
+    toRoleSeller(shopName) {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      this.isUpRole = false;
+      axios({
+        method: 'post',
+        url: `${constant.base_url}/user/uprole`,
+        headers: {
+          Authorization: authorization,
+        },
+        data: {
+          shopname: shopName,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          this.$notify({
+            title: 'Thành công',
+            text: 'Bạn có thể đăng sách bán thành công',
+            type: 'success',
+            group: 'foo',
+          })
+        })
+        .catch((err) => {
+          this.$notify({
+            title: 'Thất bại',
+            text: err,
+            type: 'error',
+            group: 'foo',
+          })
+        })
+    },
     getProfile() {
       this.user = JSON.parse(localStorage.getItem('user'))
     },

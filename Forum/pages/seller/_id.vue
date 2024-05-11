@@ -48,7 +48,10 @@
         :count="bookCount"
         :recordsPerPage="recordsPerPage"
       />
-      <AddBookPanel v-show="manageOption === 2 && !isLoading" />
+      <AddBookPanel
+        v-show="manageOption === 2 && !isLoading"
+        @reload="reload"
+      />
       <div
         v-if="isLoading"
         class="flex justify-center items-center w-full h-screen-60"
@@ -123,6 +126,28 @@ export default {
       })
   },
   methods: {
+    reload() {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
+        .then((res) => {
+          console.log(res.data)
+          this.books = res.data.books
+          this.bookCount = res.data.count
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
     submit() {
       axios({
         method: 'post',
@@ -180,57 +205,57 @@ export default {
     changeOption(optionNumber) {
       this.manageOption = optionNumber
     },
-    reload() {
-      this.$axios
-        .get(`/users/?page=1&limit=${this.recordsPerPage}`)
-        .then((res) => {
-          console.log(res)
-          this.users = res.data.docs
-          this.userCount = res.data.totalDocs
-        })
-        .catch((err) => {
-          console.error(err)
-        })
+    // reload() {
+    //   this.$axios
+    //     .get(`/users/?page=1&limit=${this.recordsPerPage}`)
+    //     .then((res) => {
+    //       console.log(res)
+    //       this.users = res.data.docs
+    //       this.userCount = res.data.totalDocs
+    //     })
+    //     .catch((err) => {
+    //       console.error(err)
+    //     })
 
-      this.$axios
-        .get(`/blogs/awaiting-approval/?page=1&limit=${this.recordsPerPage}`)
-        .then((res) => {
-          console.log(res)
-          this.pendingNews = res.data.docs
-          this.pendingNewsCount = res.data.totalDocs
-        })
-        .catch((err) => {
-          console.error(err)
-        })
-      this.$axios
-        .get(`/blogs/?page=1&limit=${this.recordsPerPage}`, {})
-        .then((res) => {
-          console.log(res)
-          this.news = res.data.docs
-          this.newsCount = res.data.totalDocs
-        })
-        .catch((err) => {
-          console.error(err)
-        })
-      this.isLoading = false
-    },
-    changeUserPage(page, limit) {
-      console.log('page: ' + page + ' limit: ' + limit)
-      console.log('oke')
-      this.isLoading = true
-      this.$axios
-        .get(`/users/?page=${page}&limit=${limit}`)
-        .then((res) => {
-          this.users = res.data.docs
-          this.userCount = res.data.totalDocs
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-    },
+    //   this.$axios
+    //     .get(`/blogs/awaiting-approval/?page=1&limit=${this.recordsPerPage}`)
+    //     .then((res) => {
+    //       console.log(res)
+    //       this.pendingNews = res.data.docs
+    //       this.pendingNewsCount = res.data.totalDocs
+    //     })
+    //     .catch((err) => {
+    //       console.error(err)
+    //     })
+    //   this.$axios
+    //     .get(`/blogs/?page=1&limit=${this.recordsPerPage}`, {})
+    //     .then((res) => {
+    //       console.log(res)
+    //       this.news = res.data.docs
+    //       this.newsCount = res.data.totalDocs
+    //     })
+    //     .catch((err) => {
+    //       console.error(err)
+    //     })
+    //   this.isLoading = false
+    // },
+    // changeUserPage(page, limit) {
+    //   console.log('page: ' + page + ' limit: ' + limit)
+    //   console.log('oke')
+    //   this.isLoading = true
+    //   this.$axios
+    //     .get(`/users/?page=${page}&limit=${limit}`)
+    //     .then((res) => {
+    //       this.users = res.data.docs
+    //       this.userCount = res.data.totalDocs
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
+    //     .finally(() => {
+    //       this.isLoading = false
+    //     })
+    // },
     changePendingPage(page, limit) {
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')

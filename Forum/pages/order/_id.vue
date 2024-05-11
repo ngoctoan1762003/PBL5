@@ -7,6 +7,7 @@
       <div class="absolute bg-gray-500 opacity-50 w-full h-full"></div>
       <BookOrderPanel
         @cancel="cancel()"
+        @addToCart="submit"
         :book="book"
         :amount="parseInt(amount)"
         class="relative z-[1]"
@@ -128,7 +129,7 @@ export default {
     const id = this.$route.params.id
     await axios({
       method: 'get',
-      url: `${constant.base_url}/book/id/${id}`,
+      url: `${constant.base_url}/book/${id}`,
       headers: {
         'ngrok-skip-browser-warning': 'skip-browser-warning',
       },
@@ -209,6 +210,52 @@ export default {
         'text'
       )
       this.amount = pastedText.replace(/\D/g, '')
+    },
+
+    submit() {
+      const id = this.$route.params.id
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'post',
+        url: `${constant.base_url}/cart/${id}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          Authorization: authorization,
+        },
+        data: {
+          quantity: parseInt(this.amount),
+        },
+      })
+        .then((res) => {
+          this.$notify({
+            title: 'Thành công',
+            text: 'Thêm vào giỏ hàng thành công',
+            type: 'success',
+            group: 'foo',
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+          this.alert = {
+            ...this.alert,
+            ...{
+              isShowModal: true,
+              title: 'Lỗi',
+              buttonOkContent: 'Đóng',
+              content: err,
+              type: 'failed',
+            },
+          }
+          this.$notify({
+            title: 'Thất bại',
+            text: err,
+            type: 'error',
+            group: 'foo',
+          })
+        })
+        .finally(() => {
+          this.isOrdering = false
+        })
     },
   },
 }

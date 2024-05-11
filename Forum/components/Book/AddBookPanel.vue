@@ -54,7 +54,7 @@
     </div>
     <div class="book__component">
       <div class="book__component__label">Miêu tả</div>
-      <textarea class="book__component__content" />
+      <textarea class="book__component__content" v-model="description" />
     </div>
     <div class="book__component">
       <div class="book__component__label">Thể loại</div>
@@ -71,14 +71,35 @@
     <div class="w-full flex justify-center items-center gap-10">
       <div class="book__component">
         <div class="book__component__label">Giá</div>
-        <input type="text" class="book__component__content" />
+        <input
+          type="text"
+          v-model="price"
+          @input="validateNumberInputPrice"
+          @paste="onPastePrice"
+          class="book__component__content"
+        />
       </div>
       <div class="book__component">
-        <div class="book__component__label">Số lượng</div>
-        <input type="text" class="book__component__content" />
+        <div
+          class="book__component__label"
+          @input="validateNumberInputQuantity"
+          @paste="onPasteQuantity"
+        >
+          Số lượng
+        </div>
+        <input
+          type="text"
+          v-model="quantity"
+          class="book__component__content"
+        />
       </div>
     </div>
-    <button class="bg-[#FFCA42] px-4 py-3 text-[#1B3764] font-semibold">Xác nhận</button>
+    <button
+      class="bg-[#FFCA42] px-4 py-3 text-[#1B3764] font-semibold"
+      @click="submit"
+    >
+      Xác nhận
+    </button>
   </div>
 </template>
 
@@ -115,6 +136,8 @@ export default {
       .catch((e) => {
         console.log(e)
       })
+
+    this.selectedGenreId = this.genres[0]
   },
   methods: {
     async handleImageUpload(event) {
@@ -128,24 +151,71 @@ export default {
 
     handleGenreChange(event) {
       this.selectedGenreId = event.target.value
+      console.log(this.selectedGenreId)
     },
 
-    submit(){
-        axios({
-            method: 'post',
-            url: `${constant.base_url}/book`,
-            data: {
-                title: this.title,
-                genre: this.selectedGenreId,
-                description: this.description,
-                quantity: this.quantity,
-                price: this.price,
-                image: this.previewImage,
-                author_name: this.author_name,
-                publisher_name: this.publisher,
-            }
+    submit() {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'post',
+        url: `${constant.base_url}/book/create`,
+        data: {
+          title: this.title,
+          genre: this.selectedGenreId,
+          description: this.description,
+          quantity: parseInt(this.quantity),
+          price: parseInt(this.price),
+          image: this.previewImage,
+          author_name: this.author_name,
+          publisher_name: this.publisher,
+        },
+        headers: {
+          Authorization: authorization,
+        },
+      })
+        .then((res) => {
+          this.$notify({
+            title: 'Thành công',
+            text: 'Đăng bài thành công',
+            type: 'success',
+            group: 'foo',
+          })
+          this.$emit('reload');
         })
-    }
+        .catch((error) => {
+          if (!error.response?.data?.error.startsWith('Blog'))
+            this.$notify({
+              title: 'Thất bại',
+              text: 'Kích cỡ file quá lớn, không thể tải lên',
+              type: 'error',
+              group: 'foo',
+            })
+        })
+    },
+
+    validateNumberInputPrice() {
+      this.price = this.price.replace(/\D/g, '')
+    },
+
+    onPastePrice(event) {
+      event.preventDefault()
+      const pastedText = (event.clipboardData || window.clipboardData).getData(
+        'text'
+      )
+      this.price = pastedText.replace(/\D/g, '')
+    },
+
+    validateNumberInputQuantity() {
+      this.quantity = this.quantity.replace(/\D/g, '')
+    },
+
+    onPasteQuantity(event) {
+      event.preventDefault()
+      const pastedText = (event.clipboardData || window.clipboardData).getData(
+        'text'
+      )
+      this.quantity = pastedText.replace(/\D/g, '')
+    },
   },
 }
 </script>
