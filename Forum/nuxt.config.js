@@ -1,67 +1,76 @@
+// nuxt.config.js
+import path from 'path';
+import fs from 'fs';
+const pkg = require('./package');
+
 export default {
   ssr: false,
   // Global page headers: https://go.nuxtjs.dev/config-head
+  server: {
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'server.crt'))
+    }
+  },
+  mode: 'universal',
+
   head: {
     title: 'Forum',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' },
+      { name: 'format-detection', content: 'telephone=no' }
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
   },
 
-  // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '~/assets/css/main.css',
     '~/assets/css/quill.css',
     'quill/dist/quill.snow.css',
+    // 'vue3-datepicker/dist/vue3-datepicker.css' // Add this line
   ],
-  
+
+  loading: { color: '#fff' },
+
   middleware: [
     'cors'
   ],
 
   styleResources: {
     scss: [
-      '~/assets/scss/variables.scss',
+      '~/assets/scss/variables.scss'
     ]
   },
-  // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
+
   plugins: [
     { src: '~plugins/vue-quill-editor.js', ssr: false },
     '~/plugins/vue-notification.js',
     '~/plugins/axios-interceptor.js',
     '~/plugins/axios-interceptor.js',
-    '~/plugins/Behavior/scrollToTop.js'
+    '~/plugins/Behavior/scrollToTop.js',
+    // '~/plugins/socket.js'
+    // '~/plugins/server.js'
+
   ],
 
-  // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
-  // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
-    // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
-    // https://go.nuxtjs.dev/tailwindcss
     '@nuxtjs/tailwindcss',
-    // '@nuxtjs/style-resources',
+    // 'nuxt-vite'
   ],
 
-
-  // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
-    // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
-    '@nuxtjs/auth-next'
+    '@nuxtjs/auth-next',
+    'nuxt-socket-io',
   ],
 
-  // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
     baseURL: 'https://e518-42-116-158-46.ngrok-free.app',
   },
 
@@ -69,18 +78,37 @@ export default {
     middleware: 'middleware-auth'
   },
 
-  // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
     manifest: {
-      lang: 'en',
-    },
-  },  
-  // Build Configuration: https://go.nuxtjs.dev/config-build
+      lang: 'en'
+    }
+  },
+
+  io: {
+    // Socket.io module configuration
+    sockets: [{
+      name: 'main',
+      url: 'http://localhost:5000',
+      default: true,
+      vuex: {
+        actions: [],
+        mutations: []
+      }
+    }]
+  },
+
   build: {
-    extend(config, {_}) {
+    extend(config, { isDev, isClient }) {
+      if (isClient) {
+        config.module.rules.push({
+          test: /\.mjs$/,
+          include: /node_modules/,
+          type: 'javascript/auto'
+        });
+      }
       config.node = {
         fs: 'empty'
       }
     }
-  },
+  }
 }

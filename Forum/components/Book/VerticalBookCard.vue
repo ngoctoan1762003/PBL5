@@ -21,6 +21,7 @@
 
       <button
         class="border-[1px] border-[#FFCA42] py-3 px-5 w-auto self-start text-[13px] text-[#1B3764] font-semibold hover:bg-[#FFCA42] transition ease-in-out duration-300"
+        @click="toOrder(book._id)"
       >
         Đặt ngay
       </button>
@@ -41,6 +42,9 @@ export default {
     toBookId(id) {
       this.$router.push(`/book/${id}`)
     },
+    toOrder(id){
+      this.$router.push(`/order/${id}`)
+    }
   },
   computed: {
     getPriceFormat() {

@@ -8,7 +8,7 @@
         class="flex flex-col form gap-7 py-[60px] justify-center items-center w-[400px] rounded-md px-10"
         @keydown.enter="userLogin"
       >
-        <div class="text-3xl font-bold text-gray-700">Sign in</div>
+        <div class="text-3xl font-bold text-gray-700">Đăng nhập</div>
         <div class="w-full flex flex-col gap-2">
           <label for="" class="text-sm text-gray-700 font-medium">Email</label>
           <input
@@ -22,7 +22,7 @@
         </div>
         <div class="w-full relative flex flex-col gap-2">
           <label for="" class="text-sm text-gray-700 font-medium"
-            >Password</label
+            >Mật khẩu</label
           >
           <input
             v-model="login.password"

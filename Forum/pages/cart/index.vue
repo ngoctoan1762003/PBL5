@@ -2,9 +2,16 @@
   <div>
     <TopNaviBar />
     <SearchBar />
-    <div class="fixed flex justify-center items-center w-full h-full top-0" v-show="isDeleting">
+    <div
+      class="fixed flex justify-center items-center w-full h-full top-0"
+      v-show="isDeleting"
+    >
       <div class="absolute bg-gray-500 opacity-50 w-full h-full"></div>
-      <ModalDeleteAlert class="relative z-[1]" @cancel="cancel" @delete="deleteBookFromCart(bookIdToDelete, shopIdToDelete)"/>
+      <ModalDeleteAlert
+        class="relative z-[1]"
+        @cancel="cancel"
+        @delete="deleteBookFromCart(bookIdToDelete, shopIdToDelete)"
+      />
     </div>
     <div class="cart__header">
       <div class="cart__product">Sản phẩm</div>
@@ -40,10 +47,11 @@
       <div
         class="w-[15%] flex items-center text-[16px] font-semibold text-[#1B3764]"
       >
-        {{ calculateTotalPrice }}
+        {{ getPriceFormat(calculateTotalPrice) }}
       </div>
       <button
         class="w-[10%] bg-[#FFCA42] px-5 py-3 text-[16px] font-semibold text-[#1B3764]"
+        @click="confirmOrderBook"
       >
         Đặt hàng
       </button>
@@ -75,8 +83,8 @@ export default {
       cart: [],
       selectedBook: [],
       isDeleting: false,
-      bookIdToDelete: "",
-      shopIdToDelete: "",
+      bookIdToDelete: '',
+      shopIdToDelete: '',
     }
   },
   mounted() {
@@ -130,6 +138,13 @@ export default {
         this.removeAll()
       }
     },
+    getPriceFormat(price) {
+      if (this.amount === 0) return '' // Return empty string if book is not defined
+      const formattedPrice = price
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      return `${formattedPrice} VND`
+    },
     addAll() {
       for (let i = 0; i < this.cart.length; i++) {
         this.cart[i].books.forEach((book) => {
@@ -176,10 +191,6 @@ export default {
           }
         })
       }
-      console.log('Number of selected books:', this.selectedBook.length)
-
-      console.log(this.selectedBook)
-      console.log(this.cart)
     },
     removeBook(bookId, shopId) {
       const index = this.selectedBook.findIndex(
@@ -241,8 +252,8 @@ export default {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       const book = this.getBook(shopId, bookId)
       if (book.quantity === 1) {
-        this.deleteWarning(bookId, shopId);
-        return;
+        this.deleteWarning(bookId, shopId)
+        return
       }
       book.quantity -= 1
       axios({
@@ -258,8 +269,8 @@ export default {
     },
     async deleteBookFromCart(bookId, shopId) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
-      const book = this.getBook(shopId, bookId);
-      this.isDeleting = false;
+      const book = this.getBook(shopId, bookId)
+      this.isDeleting = false
       await axios({
         method: 'delete',
         url: `${constant.base_url}/cart/${book.cart_id}`,
@@ -308,14 +319,85 @@ export default {
           })
         })
     },
-    cancel(){
-      this.isDeleting = false;
+    cancel() {
+      this.isDeleting = false
     },
-    deleteWarning(bookId, shopId){
-      this.bookIdToDelete = bookId;
-      this.shopIdToDelete = shopId;
-      this.isDeleting = true;
-    }
+    deleteWarning(bookId, shopId) {
+      this.bookIdToDelete = bookId
+      this.shopIdToDelete = shopId
+      this.isDeleting = true
+    },
+    confirmOrderBook() {
+      const shops = []
+
+      // Duyệt qua từng sách trong selectedBook
+      this.selectedBook.forEach((book) => {
+        // Tìm kiếm xem cửa hàng đã tồn tại trong mảng shops hay chưa
+        let found = false
+        shops.some((shop) => {
+          if (shop.shop_id === book.shop_id) {
+            // Nếu đã tồn tại, thêm sách vào mảng books của cửa hàng
+            shop.books.push(book)
+            found = true
+            return true // Thoát khỏi vòng lặp some
+          }
+          return false // Tiếp tục duyệt các phần tử khác trong mảng
+        })
+        // Nếu cửa hàng chưa tồn tại, thêm cửa hàng mới vào mảng shops
+        if (!found) {
+          const shopName =
+            this.cart.find((item) => item.shop_id === book.shop_id)
+              ?.shop_name || 'Unknown'
+
+          shops.push({
+            shop_id: book.shop_id,
+            shop_name: shopName,
+            books: [book],
+          })
+        }
+      })
+
+      console.log('shop to order', shops)
+
+      // Đưa selectedBook vào query
+      this.$router.push({
+        path: '/order/confirm',
+        query: { shops: JSON.stringify(shops) },
+      })
+
+      // const userid = localStorage.getItem('userId')
+      // const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      // axios({
+      //   method: 'post',
+      //   url: `${constant.base_url}/order/order`,
+      //   headers: {
+      //     Authorization: authorization,
+      //   },
+      //   data: {
+      //     userid,
+      //     address: 'something',
+      //     status: 'pending',
+      //     shipping_id: '6624eded2b9b7db58edcb9e7',
+      //     books: this.selectedBook,
+      //   },
+      // })
+      //   .then(() => {
+      //     this.$notify({
+      //       title: 'Thành công',
+      //       text: 'Đặt hàng thành công',
+      //       type: 'success',
+      //       group: 'foo',
+      //     })
+      //   })
+      //   .catch((error) => {
+      //     this.$notify({
+      //       title: 'Thất bại',
+      //       text: 'Không thể đặt hàng ' + error,
+      //       type: 'error',
+      //       group: 'foo',
+      //     })
+      //   })
+    },
   },
 }
 </script>

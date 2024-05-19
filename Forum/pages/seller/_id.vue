@@ -10,46 +10,55 @@
           <div class="category__item" @click="changeOption(1)">
             <img src="~/assets/icon/person.svg" alt="" />
             <div class="category__item__info">
-              <span class="name">Quản lý sách</span>
+              <span class="name">Thống kê</span>
             </div>
           </div>
           <div class="category__item" @click="changeOption(2)">
             <img src="~/assets/icon/person.svg" alt="" />
-            <div class="category__item__info">
-              <span class="name">Thêm sách</span>
-            </div>
-          </div>
-          <!-- <div class="category__item" @click="changeOption(2)">
-            <img src="~/assets/icon/person.svg" alt="" />
-            <div class="category__item__info">
-              <span class="name">Quản lý người bán</span>
-            </div>
-          </div>
-          <div class="category__item" @click="changeOption(2)">
-            <img src="~/assets/icon/popular.svg" alt="" />
             <div class="category__item__info">
               <span class="name">Quản lý sách</span>
             </div>
           </div>
           <div class="category__item" @click="changeOption(3)">
-            <img src="~/assets/icon/popular.svg" alt="" />
+            <img src="~/assets/icon/person.svg" alt="" />
             <div class="category__item__info">
-              <span class="name">Quản lý đơn đặt hàng</span>
+              <span class="name">Thêm sách</span>
             </div>
-          </div> -->
+          </div>
+          <div class="category__item" @click="changeOption(4)">
+            <img src="~/assets/icon/person.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Quản lý mã giảm giá</span>
+            </div>
+          </div>
+          <div class="category__item" @click="changeOption(5)">
+            <img src="~/assets/icon/person.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Thêm mã giảm giá</span>
+            </div>
+          </div>
         </div>
       </div>
-      <BookList
-        class="w-full"
-        :users="books"
-        @reload="reload"
-        v-show="manageOption === 1 && !isLoading"
-        @changePage="changeBookPage"
-        :count="bookCount"
-        :recordsPerPage="recordsPerPage"
-      />
+      <div v-show="manageOption === 2 && !isLoading" class="w-full">
+        <BookList
+          class="w-full"
+          :users="books"
+          @reload="reload"
+          v-if="this.books.length > 0"
+          @changePage="changeBookPage"
+          :count="bookCount"
+          :recordsPerPage="recordsPerPage"
+        />
+        <div v-else class="w-full">
+          <div
+            class="bg-[#1B3764] w-full p-5 flex justify-center items-center text-white rounded-[20px] text-[14px] font-semibold"
+          >
+            Bạn chưa đăng sách nào
+          </div>
+        </div>
+      </div>
       <AddBookPanel
-        v-show="manageOption === 2 && !isLoading"
+        v-show="manageOption === 3 && !isLoading"
         @reload="reload"
       />
       <div
@@ -58,6 +67,16 @@
       >
         <LoadingSpinner />
       </div>
+      <DiscountList
+        class="w-full"
+        v-show="manageOption === 4 && !isLoading"
+        @reload="reload"
+      />
+      <AddDiscount
+        class="w-full"
+        v-show="manageOption === 5 && !isLoading"
+        @reload="reload"
+      />
     </div>
   </div>
 </template>
@@ -71,6 +90,8 @@ import BookList from '~/components/Manage/BookList.vue'
 import constant from '~/constant'
 import TopNaviBar from '~/components/TopNaviBar.vue'
 import AddBookPanel from '~/components/Book/AddBookPanel.vue'
+import DiscountList from '~/components/Discount/DiscountList.vue'
+import AddDiscount from '~/components/Discount/AddDiscount.vue'
 
 export default {
   components: {
@@ -80,6 +101,8 @@ export default {
     TopNaviBar,
     BookList,
     AddBookPanel,
+    DiscountList,
+    AddDiscount,
   },
   layout: 'empty',
   data() {
@@ -302,6 +325,9 @@ export default {
 
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
+@import '~/node_modules/@syncfusion/ej2-base/styles/material.css';
+@import '~/node_modules/@syncfusion/ej2-buttons/styles/material.css';
+@import '~/node_modules/@syncfusion/ej2-vue-calendars/styles/material.css';
 
 .default {
   display: flex;

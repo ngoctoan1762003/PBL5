@@ -2,98 +2,68 @@
   <div
     class="bg-[#1B3764] py-5 rounded-[20px] flex flex-col gap-5 justify-center items-center w-full"
   >
-    <div class="text-white font-bold text-[20px]">Thêm sách mới</div>
-    <!-- <div class="book__component">
-            <div class="book__component__label">Hình ảnh</div>
-            <input type="text" class="book__component__content">
-        </div> -->
-    <div class="flex justify-center gap-5 w-full pl-10">
-      <div
-        class="avt flex flex-col gap-[20px] justify-center items-center w-[100px]"
-      >
-        <div
-          class="text-[#333] font-[500] text-[#fff] text-[16px] w-full flex justify-center items-cnter"
-        >
-          Bìa sách
+    <div class="text-white font-bold text-[20px]">Thêm mã giảm giá mới</div>
+
+    <div class="book__component">
+      <div class="book__component__label">Mã giảm giá</div>
+      <input type="text" v-model="title" class="book__component__content" />
+    </div>
+    <div class="flex items-start w-full">
+      <div class="w-[50%] flex flex-col relative">
+        <div class="flex">
+          <div class="book__component relative">
+            <div class="book__component__label w-[100%]">Lượng giảm</div>
+            <div class="relative w-full">
+              <input
+                type="text"
+                v-model="publisher"
+                class="book__component__content"
+              />
+              <div class="absolute right-5 flex top-1">VND</div>
+            </div>
+          </div>
+          <div class="flex gap-5 w-full items-end">
+            <div class="book__component w-full">
+              <div class="book__component__label"></div>
+              <select name="" id="">
+                <option value="">Theo giá tiền</option>
+                <option value="">Theo phần trăm</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="avt-preview relative">
-          <img :src="previewImage" class="rounded-full w-[100px] h-[100px]" />
-          <label
-            for="fileInput"
-            class="absolute top-0 left-0 w-[100px] h-[100px] rounded-full bg-[#5f6c8580] flex justify-center items-center cursor-pointer"
+        <div class="book__component">
+          <div
+            class="book__component__label"
+            @input="validateNumberInputQuantity"
+            @paste="onPasteQuantity"
           >
-            <img
-              src="~/assets/icon/upload.svg"
-              class="w-[30px] h-[30px]"
-              alt="Upload"
-            />
-          </label>
-        </div>
-        <input
-          id="fileInput"
-          class="hidden"
-          type="file"
-          accept="image/jpeg"
-          @change="handleImageUpload"
-        />
-      </div>
-      <div class="w-full">
-        <div class="book__component">
-          <div class="book__component__label">Tiêu đề</div>
-          <input type="text" v-model="title" class="book__component__content" />
-        </div>
-        <div class="book__component">
-          <div class="book__component__label">Nhà xuất bản</div>
+            Số lượng
+          </div>
           <input
             type="text"
-            v-model="publisher"
+            v-model="quantity"
             class="book__component__content"
           />
         </div>
       </div>
-    </div>
-    <div class="book__component">
-      <div class="book__component__label">Miêu tả</div>
-      <textarea class="book__component__content" v-model="description" />
-    </div>
-    <div class="book__component">
-      <div class="book__component__label">Thể loại</div>
-      <select class="book__component__content" @change="handleGenreChange">
-        <option
-          v-for="genreOption in genres"
-          :key="genreOption._id"
-          :value="genreOption._id"
-        >
-          {{ genreOption.Theloai }}
-        </option>
-      </select>
-    </div>
-    <div class="w-full flex justify-center items-center gap-10">
-      <div class="book__component">
-        <div class="book__component__label">Giá</div>
-        <input
-          type="text"
-          v-model="price"
-          @input="validateNumberInputPrice"
-          @paste="onPastePrice"
-          class="book__component__content"
-        />
-      </div>
-      <div class="book__component">
-        <div
-          class="book__component__label"
-          @input="validateNumberInputQuantity"
-          @paste="onPasteQuantity"
-        >
-          Số lượng
+
+      <div class="flex font-semibold text-[14px] gap-20">
+        <div class="flex flex-col gap-4">
+          <label class="book__component__label">Thời gian bắt đầu</label>
+          <input type="time" class="py-1 px-3 rounded-[10px]">
+          <label class="book__component__label">Ngày bắt đầu</label>
+          <input type="date" class="py-1 px-3 rounded-[10px]">
         </div>
-        <input
-          type="text"
-          v-model="quantity"
-          class="book__component__content"
-        />
+        <div class="flex flex-col gap-4">
+          <label class="book__component__label">Thời gian kết thúc</label>
+          <input type="time" class="py-1 px-3 rounded-[10px]">
+          <label class="book__component__label">Ngày kết thúc</label>
+          <input type="date" class="py-1 px-3 rounded-[10px]">
+        </div>
       </div>
     </div>
+
     <button
       class="bg-[#FFCA42] px-4 py-3 text-[#1B3764] font-semibold"
       @click="submit"
@@ -105,10 +75,14 @@
 
 <script>
 import axios from 'axios'
+// import VueDatePicker from '@vuepic/vue-datepicker';
+// import '@vuepic/vue-datepicker/dist/main.css'
+
 import UploadImage from '~/api/uploadImage.js'
 import constant from '~/constant'
-
+// import '@vuepic/vue-datepicker/dist/main.css'
 export default {
+        // components: { VueDatePicker },
   data() {
     return {
       previewImage: '',
@@ -180,7 +154,7 @@ export default {
             type: 'success',
             group: 'foo',
           })
-          this.$emit('reload');
+          this.$emit('reload')
         })
         .catch((error) => {
           if (!error.response?.data?.error.startsWith('Blog'))
@@ -232,7 +206,6 @@ export default {
   padding: 10px 30px;
 
   &__label {
-    width: 25%;
     color: white;
     font-weight: 500;
     font-size: 14px;
