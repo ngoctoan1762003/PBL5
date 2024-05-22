@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="h-[100%] w-full">
-          <!-- <ul class="space-y-4 p-4 chat-container__content overflow-y-auto">
+          <ul class="space-y-4 p-4 chat-container__content overflow-y-auto">
             <li
               v-for="(msg, index) in messages"
               :key="index"
@@ -72,8 +72,7 @@
             placeholder="Type a message"
             @keyup.enter="sendMessage"
             class="h-10 w-full border border-gray-500 py-2 px-3 mt-2"
-          /> -->
-          <div class="flex justify-center items-center w-full h-full text-[30px] font-semibold text-blue-500">Chọn người trò chuyện</div>
+          />
         </div>
       </div>
     </div>

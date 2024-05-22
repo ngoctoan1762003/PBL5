@@ -156,7 +156,7 @@ export default {
               const token = `${res.data.token}`
               localStorage.setItem('accessToken', token)
               localStorage.setItem('userId', res.data.user.User_id)
-              localStorage.setItem('user', res.data.user)
+              localStorage.setItem('user', JSON.stringify(res.data.user))
               this.$router.push('/')
             })
             .catch((err) => {
