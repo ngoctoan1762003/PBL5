@@ -6,10 +6,19 @@ const pkg = require('./package');
 export default {
   ssr: false,
   // Global page headers: https://go.nuxtjs.dev/config-head
-  server: {
-    https: {
-      key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
-      cert: fs.readFileSync(path.resolve(__dirname, 'server.crt'))
+  // server: {
+  //   https: {
+  //     key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
+  //     cert: fs.readFileSync(path.resolve(__dirname, 'server.crt'))
+  //   }
+  // },
+  devServer: {
+    proxy: {
+      '/ws': {
+        target: 'ws://localhost:5000',
+        ws: true,
+        changeOrigin: true
+      }
     }
   },
   mode: 'universal',
@@ -75,7 +84,7 @@ export default {
   },
 
   router: {
-    middleware: 'middleware-auth'
+    middleware: ['middleware-auth', 'middleware-admin']
   },
 
   pwa: {

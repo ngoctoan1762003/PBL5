@@ -29,41 +29,38 @@
           </div>
         </div>
         <div class="h-[100%] w-full">
-          <ul class="space-y-4 p-4 chat-container__content overflow-y-auto">
+          <ul
+            class="space-y-4 p-4 chat-container__content overflow-y-auto"
+            :ref="chatContainer"
+          >
             <li
               v-for="(msg, index) in messages"
               :key="index"
               class="flex gap-5"
               :class="{
-                'justify-end': msg.senderId === user.User_id,
-                'justify-start': msg.senderId !== user.User_id,
+                'justify-end': msg.senderId === user._id,
+                'justify-start': msg.senderId !== user._id,
               }"
             >
               <img
-                :src="
-                  msg.senderId === user.User_id ? user.Image : recipient.image
-                "
+                :src="msg.senderId === user._id ? user.image : recipient.image"
                 alt=""
                 class="w-10 h-10 rounded-full"
-                v-if="msg.senderId !== user.User_id"
+                v-if="msg.senderId !== user._id"
               />
               <div
                 class="bg-white px-5 py-3 font-semibold rounded-2xl text-blue-900 shadow-md"
               >
                 <div>
-                  {{
-                    msg.senderId === user.User_id ? user.Name : recipient.Name
-                  }}
+                  {{ msg.senderId === user._id ? user.Name : recipient.Name }}
                 </div>
                 <div>{{ msg.content }}</div>
               </div>
               <img
-                :src="
-                  msg.senderId === user.User_id ? user.Image : recipient.image
-                "
+                :src="msg.senderId === user._id ? user.image : recipient.image"
                 alt=""
                 class="w-10 h-10 rounded-full"
-                v-if="msg.senderId === user.User_id"
+                v-if="msg.senderId === user._id"
               />
             </li>
           </ul>
@@ -80,11 +77,18 @@
 </template>
 
 <script>
+import { ref, watch } from 'vue'
 import axios from 'axios'
 import constant from '~/constant'
 import TopNaviBarVue from '~/components/TopNaviBar.vue'
 
 export default {
+  setup() {
+    const chatContainer = ref(null)
+    return {
+      chatContainer,
+    }
+  },
   layout: 'empty',
   components: {
     TopNaviBarVue,
@@ -104,6 +108,7 @@ export default {
         name: '',
         y: 0,
       },
+      shouldScrollToBottom: true,
     }
   },
   mounted() {
@@ -180,6 +185,18 @@ export default {
     this.connection.onclose = () => {
       console.log('Disconnected from server')
     }
+
+    watch(
+      () => this.messages,
+      () => {
+        // If shouldScrollToBottom is true, scroll to the bottom
+        if (this.shouldScrollToBottom) {
+          // console.log(this.$refs.chatContainer)
+          // this.$refs.chatContainer.scrollTop =
+          //   this.$refs.chatContainer.scrollHeight
+        }
+      }
+    )
   },
   methods: {
     sendMessage() {

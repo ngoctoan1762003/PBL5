@@ -1,10 +1,10 @@
 <template>
   <div>
     <TopNaviBarGuest v-if="isLogedIn === false" />
-    <TopNaviBar v-else/>
-    <SearchBar />
+    <TopNaviBar v-else />
+    <SearchBar @search="search" />
     <div class="flex flex-wrap p-10 gap-10 justify-center">
-      <div v-for="book in books" :key="book.BookId" class="w-[20%]">
+      <div v-for="book in filterdBook" :key="book.BookId" class="w-[20%]">
         <VerticalBookCard :book="book" />
       </div>
     </div>
@@ -27,16 +27,28 @@ export default {
     SearchBar,
     VerticalBookCard,
     FooterBar,
-    TopNaviBar
+    TopNaviBar,
   },
   data() {
     return {
       books: [],
       isLogedIn: false,
+      keyword: '',
     }
   },
+  computed: {
+    filterdBook() {
+      if (!this.keyword) {
+        return this.books
+      }
+      const lowerCaseKeyword = this.keyword.toLowerCase()
+      return this.books.filter((book) =>
+        book.title.toLowerCase().includes(lowerCaseKeyword)
+      )
+    },
+  },
   mounted() {
-    if (localStorage.getItem('accessToken')) this.isLogedIn = true;
+    if (localStorage.getItem('accessToken')) this.isLogedIn = true
     axios({
       method: 'get',
       url: `${constant.base_url}/book/getallbook`,
@@ -59,6 +71,11 @@ export default {
           group: 'foo',
         })
       })
+  },
+  methods: {
+    search(keyword) {
+      this.keyword = keyword
+    },
   },
 }
 </script>

@@ -5,8 +5,8 @@ export default function ({ route, redirect }) {
     console.log(route)
 
     // Nếu route là '/auth/login', bạn có thể thực hiện redirect
-    // if (!route.name.includes('auth')) {
-    //   return redirect('/auth/login')
-    // }
+    if (!route.name.includes('auth') && !route.name.includes('book')) {
+      return redirect('/auth/login')
+    }
   }
 }

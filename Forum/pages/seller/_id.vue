@@ -39,6 +39,9 @@
           </div>
         </div>
       </div>
+      <div v-show="manageOption === 1 && !isLoading" class="w-full">
+        <BarChart />
+      </div>
       <div v-show="manageOption === 2 && !isLoading" class="w-full">
         <BookList
           class="w-full"
@@ -85,6 +88,8 @@
 import axios from 'axios'
 // import UserList from '~/components/Manage/UserList.vue'
 // import BlogList from '~/components/Manage/BlogList.vue'
+import BarChart from '~/components/BarChart'
+
 import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
 import BookList from '~/components/Manage/BookList.vue'
 import constant from '~/constant'
@@ -103,6 +108,7 @@ export default {
     AddBookPanel,
     DiscountList,
     AddDiscount,
+    BarChart,
   },
   layout: 'empty',
   data() {

@@ -6,7 +6,7 @@
 
     <div class="book__component">
       <div class="book__component__label">Mã giảm giá</div>
-      <input type="text" v-model="title" class="book__component__content" />
+      <input type="text" v-model="discountCode" class="book__component__content" />
     </div>
     <div class="flex items-start w-full">
       <div class="w-[50%] flex flex-col relative">
@@ -16,7 +16,7 @@
             <div class="relative w-full">
               <input
                 type="text"
-                v-model="publisher"
+                v-model="discountNumber"
                 class="book__component__content"
               />
               <div class="absolute right-5 flex top-1">VND</div>
@@ -25,9 +25,9 @@
           <div class="flex gap-5 w-full items-end">
             <div class="book__component w-full">
               <div class="book__component__label"></div>
-              <select name="" id="">
-                <option value="">Theo giá tiền</option>
-                <option value="">Theo phần trăm</option>
+              <select name="" id="" v-model="type">
+                <option value="flat">Theo giá tiền</option>
+                <option value="percent">Theo phần trăm</option>
               </select>
             </div>
           </div>
@@ -51,15 +51,15 @@
       <div class="flex font-semibold text-[14px] gap-20">
         <div class="flex flex-col gap-4">
           <label class="book__component__label">Thời gian bắt đầu</label>
-          <input type="time" class="py-1 px-3 rounded-[10px]">
+          <input type="time" class="py-1 px-3 rounded-[10px]" v-model="startTime">
           <label class="book__component__label">Ngày bắt đầu</label>
-          <input type="date" class="py-1 px-3 rounded-[10px]">
+          <input type="date" class="py-1 px-3 rounded-[10px]" v-model="startDate">
         </div>
         <div class="flex flex-col gap-4">
           <label class="book__component__label">Thời gian kết thúc</label>
-          <input type="time" class="py-1 px-3 rounded-[10px]">
+          <input type="time" class="py-1 px-3 rounded-[10px]" v-model="endTime">
           <label class="book__component__label">Ngày kết thúc</label>
-          <input type="date" class="py-1 px-3 rounded-[10px]">
+          <input type="date" class="py-1 px-3 rounded-[10px]" v-model="endDate">
         </div>
       </div>
     </div>
@@ -87,12 +87,17 @@ export default {
     return {
       previewImage: '',
       genres: [],
-      title: '',
-      publisher: '',
+      discountCode: '',
+      discountNumber: '',
       price: 0,
       quantity: 0,
       description: '',
       selectedGenreId: '',
+      startDate: '',
+      endDate: '',
+      startTime: '',
+      endTime: '',
+      type: 'flat',
     }
   },
   mounted() {
@@ -130,18 +135,20 @@ export default {
 
     submit() {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      const userId = localStorage.getItem('userId');
+      const startDateTime = this.formatDateTime(this.startDate, this.startTime);
+      const endDateTime = this.formatDateTime(this.endDate, this.endTime);
       axios({
         method: 'post',
-        url: `${constant.base_url}/book/create`,
+        url: `${constant.base_url}/discount/${userId}`,
         data: {
-          title: this.title,
-          genre: this.selectedGenreId,
-          description: this.description,
+          discount_code: this.discountCode,
+          type: this.type,
+          amount: this.type === "flat" ? this.discountNumber : 0,
+          percent: this.type === "percent" ? this.discountNumber : 0,
           quantity: parseInt(this.quantity),
-          price: parseInt(this.price),
-          image: this.previewImage,
-          author_name: this.author_name,
-          publisher_name: this.publisher,
+          start_day: startDateTime,
+          end_day: endDateTime,
         },
         headers: {
           Authorization: authorization,
@@ -189,6 +196,17 @@ export default {
         'text'
       )
       this.quantity = pastedText.replace(/\D/g, '')
+    },
+
+    formatDateTime(date, time) {
+      const [year, month, day] = date.split('-');
+      const [hours, minutes] = time.split(':');
+      
+      // Create a new Date object with the given date and time
+      const dateTime = new Date(year, month - 1, day, hours, minutes);
+
+      // Return the formatted date and time in ISO 8601 format
+      return dateTime.toISOString();
     },
   },
 }

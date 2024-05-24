@@ -149,38 +149,6 @@ export default {
       console.log(res.data)
       this.conversations = res.data
     })
-
-    this.connection = new WebSocket('ws://localhost:5000')
-
-    this.connection.onopen = () => {
-      this.recipientId = id
-
-      setTimeout(() => {
-        this.connection.send(
-          JSON.stringify({ type: 'clientId', clientId: this.userId })
-        )
-      }, 100)
-    }
-
-    this.connection.onmessage = (event) => {
-      const data = event.data
-      if (data instanceof Blob) {
-        const reader = new FileReader()
-        reader.onload = () => {
-          const msg = reader.result
-          const msgObj = JSON.parse(msg)
-          this.messages.push(msgObj)
-        }
-        reader.readAsText(data)
-      } else {
-        const msg = JSON.parse(data)
-        this.messages.push(msg)
-      }
-    }
-
-    this.connection.onclose = () => {
-      console.log('Disconnected from server')
-    }
   },
   methods: {
     sendMessage() {

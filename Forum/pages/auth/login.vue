@@ -152,12 +152,21 @@ export default {
               password: this.login.password,
             },
           })
-            .then( (res) => {
+            .then((res) => {
               const token = `${res.data.token}`
               localStorage.setItem('accessToken', token)
-              localStorage.setItem('userId', res.data.user.User_id)
-              localStorage.setItem('user', JSON.stringify(res.data.user))
+              const userId = res.data.user.User_id 
+              localStorage.setItem('userId', userId)
               this.$router.push('/')
+              axios({
+                method: 'get',
+                url: `${constant.base_url}/user/${userId}`,
+                headers: {
+                  'ngrok-skip-browser-warning': 'skip-browser-warning',
+                },
+              }).then((result) => {
+                localStorage.setItem('user', JSON.stringify(result.data))
+              })
             })
             .catch((err) => {
               this.alert = {

@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="top-nav__option items-center">
+    <div class="relative top-nav__option items-center">
       <div class="top-nav__option__element">Trang chủ</div>
       <div class="top-nav__option__element">Sách</div>
       <div class="top-nav__option__element">Về chúng tôi</div>
@@ -37,9 +37,16 @@
       <div class="top-nav__option__element">Liên hệ</div>
       <img
         :src="user.image"
-        @click="toUserDetail()"
+        @click="isShowOption = !isShowOption"
         class="flex justify-center items-center cursor-pointer w-[40px] h-[40px] rounded-full"
       />
+      <div
+        class="absolute top-[50px] right-[0px] bg-[#FFFFFF] px-5 py-3 font-semibold rounded-[20px] text-[#1B3764] shadow-md flex flex-col gap-3 items-center z-[10]"
+        v-show="isShowOption"
+      >
+        <div class="text-[14px] cursor-pointer" @click="toUserDetail()">Thông tin</div>
+        <div class="text-[14px] cursor-pointer" @click="logout()">Đăng xuất</div>
+      </div>
     </div>
   </div>
 </template>
@@ -51,6 +58,7 @@ export default {
   data() {
     return {
       user: Object,
+      isShowOption: false,
     }
   },
   mounted() {
@@ -74,6 +82,12 @@ export default {
     toSellerPage() {
       const id = localStorage.getItem('userId')
       this.$router.push(`/seller/${id}`)
+    },
+    logout() {
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('user')
+      localStorage.removeItem('userId')
+      this.$router.push('/auth/login')
     },
   },
 }
