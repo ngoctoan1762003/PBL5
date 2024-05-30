@@ -15,7 +15,7 @@
       <div
         class="absolute right-[-50px] top-[30%] w-[20px] h-[20px] flex gap-5 items-center"
       >
-        <img
+        <!-- <img
           src="~/assets/icon/cart.svg"
           class="cursor-pointer"
           @click="toCart"
@@ -26,7 +26,7 @@
           class="cursor-pointer"
           @click="toMessage"
           alt=""
-        />
+        /> -->
       </div>
     </div>
   </div>

@@ -26,6 +26,14 @@ export default {
       type: String,
       // default: null,
     },
+    commentUserId: {
+      type: String,
+      default: '',
+    },
+    sellerId: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -40,6 +48,8 @@ export default {
       if (this.content === '') return
       const authorization = localStorage.getItem('accessToken')
       const userId = localStorage.getItem('userId')
+      const user = JSON.parse(localStorage.getItem('user'))
+      console.log(user)
 
       try {
         axios({
@@ -58,7 +68,36 @@ export default {
             parent_comment_id: this.parentCommentId,
           },
         })
-          .then((res) => {})
+          .then((res) => {
+            this.$notify({
+              title: 'Thành công',
+              text: 'Bình luận thành công',
+              type: 'success',
+              group: 'foo',
+            })
+
+            if (this.commentUserId !== '') {
+              console.log("for comment", this.sellerId, user.Name)
+              axios({
+                method: 'post',
+                url: `${constant.base_url}/notification/new_notif`,
+                data: {
+                  receiver_id: this.commentUserId,
+                  content: `${user.Name} đã bình luận về bình luận của bạn`,
+                },
+              })
+            }
+
+            console.log("for seller", this.sellerId, user.Name)
+            axios({
+              method: 'post',
+              url: `${constant.base_url}/notification/new_notif`,
+              data: {
+                receiver_id: this.sellerId,
+                content: `${user.Name} đã bình luận về sách của bạn`,
+              },
+            })
+          })
           .catch((e) => {
             console.log(e)
           })

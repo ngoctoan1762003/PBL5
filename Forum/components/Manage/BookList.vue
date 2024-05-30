@@ -1,9 +1,9 @@
 <template>
   <div>
     <div>
-      <EditRole
-        v-if="isEditProfile"
-        :user="currentUser"
+      <EditBook
+        v-show="isEditProfile"
+        :book="currentBook"
         @cancel="cancelSave"
         @save="save"
         @reload="reload"
@@ -32,7 +32,7 @@
           <img :src="user.image" class="p-2 rounded-full" />
         </div>
         <div class="user-list-row-cell title">
-          {{ getName(user.AuthorName) }}
+          {{ getName(user.Title) }}
         </div>
         <div class="user-list-row-cell gender">
           {{ getPriceFormat(user.Price) }}
@@ -72,7 +72,7 @@
                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                   ></path>
                 </svg>
-                Edit
+                Sửa
               </button>
               <button
                 class="hover:bg-red-400 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
@@ -92,7 +92,7 @@
                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   ></path>
                 </svg>
-                Delete
+                Xóa
               </button>
             </div>
           </div>
@@ -112,13 +112,13 @@
 <script>
 import axios from 'axios'
 import { format } from 'date-fns'
-import EditRole from '../User/EditRole.vue'
+import EditBook from '../Book/EditBook.vue'
 import constant from '~/constant'
 import Pagination from '~/components/Pagination.vue'
 
 export default {
   components: {
-    EditRole,
+    EditBook,
     Pagination,
   },
   props: {
@@ -129,7 +129,7 @@ export default {
   data() {
     return {
       // users: [],
-      currentUser: {
+      currentBook: {
         type: Object,
         default: () => {},
       },
@@ -163,13 +163,11 @@ export default {
     cancelSave() {
       this.isEditProfile = false
     },
-    save(userProp) {
-      alert('Luu thanh cong:', JSON.stringify(userProp))
-      console.log(userProp)
+    save() {
       this.isEditProfile = false
     },
-    showPopup(user) {
-      this.currentUser = user
+    showPopup(book) {
+      this.currentBook = book
       this.isEditProfile = true
     },
     onDelete(id) {

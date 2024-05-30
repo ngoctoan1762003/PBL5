@@ -6,7 +6,11 @@
 
     <div class="book__component">
       <div class="book__component__label">Mã giảm giá</div>
-      <input type="text" v-model="discountCode" class="book__component__content" />
+      <input
+        type="text"
+        v-model="discountCode"
+        class="book__component__content"
+      />
     </div>
     <div class="flex items-start w-full">
       <div class="w-[50%] flex flex-col relative">
@@ -51,15 +55,31 @@
       <div class="flex font-semibold text-[14px] gap-20">
         <div class="flex flex-col gap-4">
           <label class="book__component__label">Thời gian bắt đầu</label>
-          <input type="time" class="py-1 px-3 rounded-[10px]" v-model="startTime">
+          <input
+            type="time"
+            class="py-1 px-3 rounded-[10px]"
+            v-model="startTime"
+          />
           <label class="book__component__label">Ngày bắt đầu</label>
-          <input type="date" class="py-1 px-3 rounded-[10px]" v-model="startDate">
+          <input
+            type="date"
+            class="py-1 px-3 rounded-[10px]"
+            v-model="startDate"
+          />
         </div>
         <div class="flex flex-col gap-4">
           <label class="book__component__label">Thời gian kết thúc</label>
-          <input type="time" class="py-1 px-3 rounded-[10px]" v-model="endTime">
+          <input
+            type="time"
+            class="py-1 px-3 rounded-[10px]"
+            v-model="endTime"
+          />
           <label class="book__component__label">Ngày kết thúc</label>
-          <input type="date" class="py-1 px-3 rounded-[10px]" v-model="endDate">
+          <input
+            type="date"
+            class="py-1 px-3 rounded-[10px]"
+            v-model="endDate"
+          />
         </div>
       </div>
     </div>
@@ -82,7 +102,7 @@ import UploadImage from '~/api/uploadImage.js'
 import constant from '~/constant'
 // import '@vuepic/vue-datepicker/dist/main.css'
 export default {
-        // components: { VueDatePicker },
+  // components: { VueDatePicker },
   data() {
     return {
       previewImage: '',
@@ -135,17 +155,18 @@ export default {
 
     submit() {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
-      const userId = localStorage.getItem('userId');
-      const startDateTime = this.formatDateTime(this.startDate, this.startTime);
-      const endDateTime = this.formatDateTime(this.endDate, this.endTime);
+      const userId = localStorage.getItem('userId')
+      const startDateTime = this.formatDateTime(this.startDate, this.startTime)
+      const endDateTime = this.formatDateTime(this.endDate, this.endTime)
+      console.log(startDateTime, endDateTime)
       axios({
         method: 'post',
         url: `${constant.base_url}/discount/${userId}`,
         data: {
           discount_code: this.discountCode,
           type: this.type,
-          amount: this.type === "flat" ? this.discountNumber : 0,
-          percent: this.type === "percent" ? this.discountNumber : 0,
+          amount: this.type === 'flat' ? this.discountNumber : 0,
+          percent: this.type === 'percent' ? this.discountNumber : 0,
           quantity: parseInt(this.quantity),
           start_day: startDateTime,
           end_day: endDateTime,
@@ -157,20 +178,19 @@ export default {
         .then((res) => {
           this.$notify({
             title: 'Thành công',
-            text: 'Đăng bài thành công',
+            text: 'Thêm mã giảm giá thành công',
             type: 'success',
             group: 'foo',
           })
           this.$emit('reload')
         })
         .catch((error) => {
-          if (!error.response?.data?.error.startsWith('Blog'))
-            this.$notify({
-              title: 'Thất bại',
-              text: 'Kích cỡ file quá lớn, không thể tải lên',
-              type: 'error',
-              group: 'foo',
-            })
+          this.$notify({
+            title: 'Thất bại',
+            text: error,
+            type: 'error',
+            group: 'foo',
+          })
         })
     },
 
@@ -199,14 +219,11 @@ export default {
     },
 
     formatDateTime(date, time) {
-      const [year, month, day] = date.split('-');
-      const [hours, minutes] = time.split(':');
-      
-      // Create a new Date object with the given date and time
-      const dateTime = new Date(year, month - 1, day, hours, minutes);
-
-      // Return the formatted date and time in ISO 8601 format
-      return dateTime.toISOString();
+      const [year, month, day] = date.split('-')
+      const [hours, minutes] = time.split(':')
+      const dateTime = `${year}-${month}-${day}T${hours}:${minutes}:00.000+00:00`
+      // const dateTime = new Date(Date.UTC(year, month - 1, day, hours, minutes))
+      return dateTime
     },
   },
 }

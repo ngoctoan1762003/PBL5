@@ -13,99 +13,48 @@
         @delete="deleteBookFromCart(bookIdToDelete, shopIdToDelete)"
       />
     </div>
-    <div
-      class="fixed flex justify-center items-center w-full h-full top-0"
-      v-show="isChangingVoucher"
-    >
-      <div class="absolute bg-gray-500 opacity-50 w-full h-full"></div>
-      <div class="w-[400px] bg-white z-[1] flex flex-col gap-5 py-5 px-3">
-        <div
-          class="relative text-[#1B3764] font-semibold text-[21px] bg-[#FFCA42] py-3 px-5"
-        >
-          <div>Các voucher hiện có</div>
-          <img
-            class="absolute right-5 top-[30%] w-[20px] h-[20px] cursor-pointer"
-            @click="isChangingVoucher = false"
-            src="~/assets/icon/x.svg"
-            alt=""
-          />
-        </div>
-        <select
-          name=""
-          id=""
-          class="relative z-[1]"
-          v-model="selectedDiscountCode"
-        >
-          <option
-            v-for="discount in changingShopVoucher.discount"
-            :key="discount._id"
-            :value="discount?.DiscountCode || ''"
-          >
-            {{ discount?.DiscountCode || '' }} -
-            {{ getDiscountValue(discount) }}
-          </option>
-        </select>
-        <button
-          class="text-[#1B3764] font-semibold text-[14px] text-center bg-[#FFCA42] py-3 px-5"
-          @click="submitVoucher"
-        >
-          Xác nhận
-        </button>
-      </div>
 
-      <!-- <div v-for="shop in changingShopVoucher.discount" :key="shop._id">
-      </div> -->
-    </div>
     <div class="cart__header py-3 flex flex-col gap-5 my-2">
       <div class="pl-5 text-[20px] text-[#1B3764] font-semibold">
-        Địa chỉ nhận hàng
-      </div>
-      <div class="pl-5 flex gap-5 w-full items-center">
-        <div class="min-w-[200px]">Tên</div>
-        <input
-          type="text"
-          placeholder="Địa chỉ"
-          class="py-3 px-5 w-[60%] rounded-[20px] text-[#1B3764]"
-        />
-        <div class="text-[#FFCA42]">Thay đổi</div>
+        Danh sách các đơn hàng đã đặt
       </div>
     </div>
     <div class="cart__header">
-      <div class="cart__product">Sản phẩm</div>
-      <div class="cart__price">Đơn giá</div>
-      <div class="cart__quantity">Số lượng</div>
-      <div class="cart__total">Số tiền</div>
+      <div class="cart__product">Ngày đặt</div>
+      <div class="cart__price">Tổng tiền</div>
+      <div class="cart__quantity">Phương thức giao hàng</div>
+      <div class="cart__total">Trạng thái</div>
       <div class="cart__ulti"></div>
     </div>
-    <div class="py-5" v-for="shop in shops" :key="shop.shop_id">
-      <div class="flex bg-[#FFCA42] items-center gap-5 px-5 py-2">
+    <div class="py-5">
+      <!-- <div class="flex bg-[#FFCA42] items-center gap-5 px-5 py-2">
         <div class="text-[#1B3764] text-[16px] font-semibold">
-          {{ shop.shop_name }}
+          {{ order._id }}
         </div>
         <div>></div>
-      </div>
+      </div> -->
       <div class="flex flex-col gap-3">
-        <div v-for="book in shop.books" :key="book.shop_id">
+        <div v-for="order in orders.orders" :key="order._id">
           <div class="flex items-center px-5 py-3 bg-[#F5F8FC] text-[#1B3764]">
             <div class="flex items-center gap-5 w-[35%]">
-              <img class="w-[100px]" :src="book.image" />
-              <div class="text-[16px] font-semibold">{{ book.title }}</div>
+              <!-- <img class="w-[100px]" :src="order.image" /> -->
+              <div class="text-[16px] font-semibold">{{ order.OrderDate }}</div>
             </div>
             <div class="w-[20%] text-[14px] font-semibold">
-              {{ getPriceFormat(book.price) }}
+              {{ getPriceFormat(order.OrderAmount) }}
             </div>
             <div class="flex w-[20%] text-[16px] font-semibold">
-              <div class="">{{ book.quantity }}</div>
+              <div class="">{{ order.ShippingMethodId }}</div>
             </div>
             <div class="w-[20%] text-[14px] font-semibold">
-              {{ getPriceFormat(book.total_price) }}
+              {{ getPriceFormat(order._id) }}
             </div>
             <button class="w-[5%]">
               <img src="~/assets/icon/bin.svg" alt="" />
             </button>
           </div>
         </div>
-        <div
+        <!-- <div
           class="bg-[#F4F8FF] py-5 px-5 flex flex-col gap-4"
           v-show="shop.selectedDiscount"
         >
@@ -118,7 +67,7 @@
                 </div>
               </div>
               <div class="w-[20%] text-[#1B3764] font-semibold">
-                <!-- {{ getPriceFormat(5000) }} -->
+                {{ getPriceFormat(5000) }}
               </div>
               <div class="cart__price text-[#1B3764] font-semibold"></div>
               <div class="w-[10%] text-[#1B3764] font-semibold">
@@ -129,7 +78,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="bg-[#1B3764] py-5 flex items-center gap-0">
@@ -234,98 +183,26 @@ export default {
       shops: [],
       changingShopVoucher: Object,
       isChangingVoucher: false,
-      selectedDiscountCode: '', 
-      provinces: [],
-      choosingProvince: Object,
-      districts: [],
-      choosingDistrict: Object,
-      wards: [],
-      choosingWard: Object,
+      selectedDiscountCode: '',
+      orders: [],
     }
   },
   async mounted() {
-    const shopsQuery = this.$route.query.shops
-    if (shopsQuery) {
-      this.shops = JSON.parse(shopsQuery)
-      console.log(this.shops) // Access the books object here
-    }
-
+    const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     await axios({
       method: 'get',
-      url: `${constant.base_url}/shipping/method`,
+      url: `${constant.base_url}/order/self`,
       headers: {
+        Authorization: authorization,
         'ngrok-skip-browser-warning': 'skip-browser-warning',
-      },
-    })
-      .then((res) => {
-        this.shippingMethod = res.data
-        console.log(res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.selectedMethod = this.shippingMethod[0]
-      })
-
-    for (let i = 0; i < this.shops.length; i++) {
-      try {
-        const res = await axios({
-          method: 'get',
-          url: `${constant.base_url}/discount/${this.shops[i].shop_id}`,
-          headers: {
-            'ngrok-skip-browser-warning': 'skip-browser-warning',
-          },
-        })
-
-        // Add the discount property to the shop object
-        this.$set(this.shops, i, {
-          ...this.shops[i],
-          discount: res.data,
-          discount_id: '',
-          selectedDiscount: '',
-        })
-
-        if (this.shops[i].discount.length > 0) {
-          this.shops[i].discount_id = this.shops[i].discount[0]._id
-          this.shops[i].selectedDiscount = this.shops[i].discount[0]
-        }
-
-        console.log('discount', this.shops[i])
-      } catch (error) {
-        console.error(
-          `Error fetching discount for shop ${this.shops[i].shop_id}:`,
-          error
-        )
       }
-    }
-
-    // await axios({
-    //   method: 'get',
-    //   url: 'https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1',
-    // })
-    // .then(res => {
-    //   this.provinces = res.data;
-    //   this.choosingProvince = this.provinces[0];
-    // })
-
-    // await axios({
-    //   method: 'get',
-    //   url: `https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${this.choosingProvince.code}&limit=-1`
-    // })
-    // .then(res => {
-    //   this.districts = res.data;
-    //   this.choosingDistrict = this.districts[0];
-    // })
-
-    // await axios({
-    //   method: 'get',
-    //   url: `https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${this.choosingDistrict.code}&limit=-1`
-    // })
-    // .then(res => {
-    //   this.wards = res.data;
-    //   this.choosingWard = this.wards[0];
-    // })
+    })
+    .then(res => {
+      this.orders = res.data;
+    })
+    .catch(err => {
+      console.log(err.response)
+    })
   },
   computed: {
     calculateTotalPrice() {
@@ -557,15 +434,7 @@ export default {
     confirmOrderBook() {
       const userid = localStorage.getItem('userId')
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
-            console.log(
-        ({
-          userid,
-          address: 'something',
-          status: 'pending',
-          shipping_id: '6624eded2b9b7db58edcb9e7',
-          shops: this.shops,
-        })
-      )
+
       axios({
         method: 'post',
         url: `${constant.base_url}/order/order`,
@@ -587,13 +456,11 @@ export default {
             type: 'success',
             group: 'foo',
           })
-          this.$router.push('/order/list')
         })
         .catch((error) => {
-          console.log(error.response)
           this.$notify({
             title: 'Thất bại',
-            text: 'Không thể đặt hàng: ' + error.response.data.error,
+            text: 'Không thể đặt hàng ' + error,
             type: 'error',
             group: 'foo',
           })

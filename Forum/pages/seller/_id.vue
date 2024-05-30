@@ -40,7 +40,12 @@
         </div>
       </div>
       <div v-show="manageOption === 1 && !isLoading" class="w-full">
-        <BarChart />
+        <ChartistChart
+          :data="chartData"
+          :options="chartOptions"
+          :responsiveOptions="responsiveOptions"
+        />
+        <div class="ct-chart ct-perfect-fourth"></div>
       </div>
       <div v-show="manageOption === 2 && !isLoading" class="w-full">
         <BookList
@@ -72,6 +77,7 @@
       </div>
       <DiscountList
         class="w-full"
+        :discounts="discounts"
         v-show="manageOption === 4 && !isLoading"
         @reload="reload"
       />
@@ -83,6 +89,8 @@
     </div>
   </div>
 </template>
+
+<script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
 
 <script>
 import axios from 'axios'
@@ -97,6 +105,7 @@ import TopNaviBar from '~/components/TopNaviBar.vue'
 import AddBookPanel from '~/components/Book/AddBookPanel.vue'
 import DiscountList from '~/components/Discount/DiscountList.vue'
 import AddDiscount from '~/components/Discount/AddDiscount.vue'
+import ChartistChart from '~/components/ChartistChart.vue'
 
 export default {
   components: {
@@ -109,6 +118,7 @@ export default {
     DiscountList,
     AddDiscount,
     BarChart,
+    ChartistChart,
   },
   layout: 'empty',
   data() {
@@ -125,6 +135,54 @@ export default {
       newsCount: Number,
       isLoading: false,
       recordsPerPage: 5,
+      discounts: [],
+      chartData: {
+        labels: [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'Mai',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ],
+        series: [
+          [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
+          [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+        ],
+      },
+      chartOptions: {
+        seriesBarDistance: 15,
+      },
+      responsiveOptions: [
+        [
+          'screen and (min-width: 641px) and (max-width: 1024px)',
+          {
+            seriesBarDistance: 10,
+            axisX: {
+              labelInterpolationFnc: function (value) {
+                return value
+              },
+            },
+          },
+        ],
+        [
+          'screen and (max-width: 640px)',
+          {
+            seriesBarDistance: 5,
+            axisX: {
+              labelInterpolationFnc: function (value) {
+                return value[0]
+              },
+            },
+          },
+        ],
+      ],
     }
   },
   created() {
@@ -134,6 +192,7 @@ export default {
     // )
     //   this.$router.push('/auth/login')
     const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+    const userId = `${localStorage.getItem('userId')}`
     axios({
       method: 'get',
       url: `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
@@ -153,10 +212,29 @@ export default {
       .finally(() => {
         this.isLoading = false
       })
+
+    axios({
+      method: 'get',
+      url: `${constant.base_url}/discount/${userId}`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res.data)
+        this.discounts = res.data
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+      .finally(() => {
+        this.isLoading = false
+      })
   },
   methods: {
     reload() {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      const userId = `${localStorage.getItem('userId')}`
       axios({
         method: 'get',
         url: `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
@@ -169,6 +247,23 @@ export default {
           console.log(res.data)
           this.books = res.data.books
           this.bookCount = res.data.count
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/discount/${userId}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
+        .then((res) => {
+          console.log(res.data)
+          this.discounts = res.data
         })
         .catch((err) => {
           console.log(err)
@@ -234,57 +329,6 @@ export default {
     changeOption(optionNumber) {
       this.manageOption = optionNumber
     },
-    // reload() {
-    //   this.$axios
-    //     .get(`/users/?page=1&limit=${this.recordsPerPage}`)
-    //     .then((res) => {
-    //       console.log(res)
-    //       this.users = res.data.docs
-    //       this.userCount = res.data.totalDocs
-    //     })
-    //     .catch((err) => {
-    //       console.error(err)
-    //     })
-
-    //   this.$axios
-    //     .get(`/blogs/awaiting-approval/?page=1&limit=${this.recordsPerPage}`)
-    //     .then((res) => {
-    //       console.log(res)
-    //       this.pendingNews = res.data.docs
-    //       this.pendingNewsCount = res.data.totalDocs
-    //     })
-    //     .catch((err) => {
-    //       console.error(err)
-    //     })
-    //   this.$axios
-    //     .get(`/blogs/?page=1&limit=${this.recordsPerPage}`, {})
-    //     .then((res) => {
-    //       console.log(res)
-    //       this.news = res.data.docs
-    //       this.newsCount = res.data.totalDocs
-    //     })
-    //     .catch((err) => {
-    //       console.error(err)
-    //     })
-    //   this.isLoading = false
-    // },
-    // changeUserPage(page, limit) {
-    //   console.log('page: ' + page + ' limit: ' + limit)
-    //   console.log('oke')
-    //   this.isLoading = true
-    //   this.$axios
-    //     .get(`/users/?page=${page}&limit=${limit}`)
-    //     .then((res) => {
-    //       this.users = res.data.docs
-    //       this.userCount = res.data.totalDocs
-    //     })
-    //     .catch((err) => {
-    //       console.log(err)
-    //     })
-    //     .finally(() => {
-    //       this.isLoading = false
-    //     })
-    // },
     changePendingPage(page, limit) {
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
@@ -331,9 +375,8 @@ export default {
 
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
-@import '~/node_modules/@syncfusion/ej2-base/styles/material.css';
-@import '~/node_modules/@syncfusion/ej2-buttons/styles/material.css';
-@import '~/node_modules/@syncfusion/ej2-vue-calendars/styles/material.css';
+// @import "_my-chartist-settings.scss";
+@import 'chartist/dist/scss/chartist.scss';
 
 .default {
   display: flex;

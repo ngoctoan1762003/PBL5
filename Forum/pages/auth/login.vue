@@ -71,7 +71,22 @@
           >
             Đăng nhập
           </button>
+          <googleSignIn
+            :clientId="'924458972373-8fjviiu7k2dqkn3uo6ob1ab3seom2fob.apps.googleusercontent.com'"
+            :successCallBack="getSuccessData"
+            :failureCallBack="getFailureData"
+          />
         </div>
+<GoogleOAuthProvider clientId="924458972373-8fjviiu7k2dqkn3uo6ob1ab3seom2fob.apps.googleusercontent.com">
+  <GoogleLogin
+  onSuccess={credentialResponse => {
+    console.log(credentialResponse);
+  }}
+  onError={() => {
+    console.log('Login Failed');
+  }}
+/>;
+  </GoogleOAuthProvider>;
       </form>
       <img src="~/assets/icon/login-decor.svg" class="w-[40vw]" />
     </div>
@@ -89,8 +104,16 @@ import axios from 'axios'
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
 import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
 import constant from '~/constant'
+import googleSignIn from 'google-signin-vue'
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
+
+
+
+// import gAuthPlugin from 'vue3-google-oauth2';
+
 export default {
-  components: { ModalAlert, TopNaviBarGuest },
+  components: { ModalAlert, TopNaviBarGuest, googleSignIn, GoogleLogin, GoogleOAuthProvider },
   layout: 'empty',
   data() {
     return {
@@ -125,6 +148,12 @@ export default {
     toggleShowPassword() {
       this.isShowPassword = !this.isShowPassword
     },
+    getSuccessData: function (user) {
+      console.log(user)
+    },
+    getFailureData: function (errorData) {
+      console.log(errorData)
+    },
 
     userLogin() {
       if (!this.validateEmail || !this.checkData) {
@@ -155,7 +184,7 @@ export default {
             .then((res) => {
               const token = `${res.data.token}`
               localStorage.setItem('accessToken', token)
-              const userId = res.data.user.User_id 
+              const userId = res.data.user.User_id
               localStorage.setItem('userId', userId)
               this.$router.push('/')
               axios({

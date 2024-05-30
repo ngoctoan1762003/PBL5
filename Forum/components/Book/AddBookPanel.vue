@@ -11,15 +11,15 @@
       <div
         class="avt flex flex-col gap-[20px] justify-center items-center w-[100px]"
       >
-        <div
-          class="text-[#333] font-[500] text-[#fff] text-[16px] w-full flex justify-center items-cnter"
-        >
-          Bìa sách
-        </div>
-        <div class="avt-preview relative">
+        <!-- <div
+                      class="text-[#1B3764] font-[500] text-[16px] w-full flex justify-center items-cnter"
+                    >
+                      Bìa sách
+                    </div> -->
+        <div class="avt-preview relative ml-[10px] w-[100px]">
           <img :src="previewImage" class="rounded-full w-[100px] h-[100px]" />
           <label
-            for="fileInput"
+            for="file"
             class="absolute top-0 left-0 w-[100px] h-[100px] rounded-full bg-[#5f6c8580] flex justify-center items-center cursor-pointer"
           >
             <img
@@ -30,7 +30,7 @@
           </label>
         </div>
         <input
-          id="fileInput"
+          id="file"
           class="hidden"
           type="file"
           accept="image/jpeg"
@@ -51,6 +51,10 @@
           />
         </div>
       </div>
+    </div>
+    <div class="book__component">
+      <div class="book__component__label">Tác giả</div>
+      <input type="text" v-model="authorName" class="book__component__content" />
     </div>
     <div class="book__component">
       <div class="book__component__label">Miêu tả</div>
@@ -119,6 +123,7 @@ export default {
       quantity: 0,
       description: '',
       selectedGenreId: '',
+      authorName: '',
     }
   },
   mounted() {
@@ -131,14 +136,17 @@ export default {
     })
       .then((res) => {
         this.genres = res.data
+        // Set the selectedGenreId after genres have been populated
+        if (this.genres.length > 0) {
+          this.selectedGenreId = this.genres[0]._id // Assuming _id is the correct property
+        }
         console.log(this.genres)
       })
       .catch((e) => {
         console.log(e)
       })
-
-    this.selectedGenreId = this.genres[0]
   },
+
   methods: {
     async handleImageUpload(event) {
       const selectedImage = event.target.files[0]
@@ -166,7 +174,7 @@ export default {
           quantity: parseInt(this.quantity),
           price: parseInt(this.price),
           image: this.previewImage,
-          author_name: this.author_name,
+          author_name: this.authorName,
           publisher_name: this.publisher,
         },
         headers: {
@@ -180,7 +188,7 @@ export default {
             type: 'success',
             group: 'foo',
           })
-          this.$emit('reload');
+          this.$emit('reload')
         })
         .catch((error) => {
           if (!error.response?.data?.error.startsWith('Blog'))
@@ -232,7 +240,6 @@ export default {
   padding: 10px 30px;
 
   &__label {
-    width: 25%;
     color: white;
     font-weight: 500;
     font-size: 14px;

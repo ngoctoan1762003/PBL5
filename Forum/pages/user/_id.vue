@@ -72,8 +72,18 @@
                         type="button"
                         style="transition: all 0.15s ease 0s"
                         @click="EditProfile"
+                        v-if="isSelf"
                       >
-                        Edit profile
+                        Chỉnh sửa thông tin
+                      </button>
+                      <button
+                        class="bg-[#FF571A] active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1"
+                        type="button"
+                        style="transition: all 0.15s ease 0s"
+                        @click="toChat"
+                        v-if="!isSelf"
+                      >
+                        Nhắn tin
                       </button>
                     </div>
                   </div>
@@ -185,6 +195,7 @@ export default {
       filternews: [],
       isEditProfile: false,
       isUpdatingBlog: true,
+      isSelf: false,
     }
   },
   computed: {
@@ -221,8 +232,12 @@ export default {
     }).then((res) => {
       console.log(res.data)
       this.user = res.data
-      localStorage.setItem('user', JSON.stringify(this.user))
+      // localStorage.setItem('user', JSON.stringify(this.user))
     })
+
+    const currentLoginId = localStorage.getItem('userId')
+    if (currentLoginId === userId) this.isSelf = true
+    else this.isSelf = false
   },
   beforeMount() {
     this.filternews = this.news.slice(0, 2)
@@ -264,6 +279,9 @@ export default {
           console.log(err)
         })
     },
+    toChat(){
+      this.$router.push(`/chat/${this.$route.params.id}`)
+    }
   },
 }
 </script>

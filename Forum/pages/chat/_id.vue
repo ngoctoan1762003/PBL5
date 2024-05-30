@@ -137,8 +137,9 @@ export default {
         receiverId: id,
       },
     }).then((res) => {
-      console.log(res.data)
-      this.messages = res.data
+      console.log("conversation", res.data)
+      if (res.data) this.messages = res.data
+      console.log(this.messages)
     })
 
     const authorization = `Bearer ${localStorage.getItem('accessToken')}`

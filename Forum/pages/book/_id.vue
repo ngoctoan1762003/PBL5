@@ -15,23 +15,29 @@
               Đặt ngay
             </div>
           </button>
-          <button class="underline underline-offset-2">
+          <!-- <button class="underline underline-offset-2">
             Đọc bản thử miễn phí
-          </button>
+          </button> -->
+          <div class="flex gap-5">
+            <div class="text-[16px]">Người bán :</div>
+            <button class="text-[#B4C7E7] underline underline-offset-2" @click="toSellerProfile(book.SellerId)">
+              {{ book.Seller_name }}
+            </button>
+          </div>
         </div>
         <div class="flex gap-8">
           <div class="flex gap-3">
             <div class="bg-[#FFCA42] rounded-full w-4 h-4 mt-1"></div>
             <div>
-              <div class="text-[16px]">Trang :</div>
-              <div class="text-[#B4C7E7]">586 trang</div>
+              <div class="text-[16px]">Số lượng :</div>
+              <div class="text-[#B4C7E7]">{{ book.Quantity }} quyển</div>
             </div>
           </div>
           <div class="flex gap-3">
             <div class="bg-[#FFCA42] rounded-full w-4 h-4 mt-1"></div>
             <div>
-              <div class="text-[16px]">Đánh giá :</div>
-              <div class="text-[#B4C7E7]">4.5/5 (300 đánh giá)</div>
+              <div class="text-[16px]">Giá bán :</div>
+              <div class="text-[#B4C7E7]">{{ book.Price ? getPriceFormat(book.Price) : 0 }}</div>
             </div>
           </div>
         </div>
@@ -112,10 +118,12 @@
         <CommentCard
           :comment="c"
           :user_id="c.user_id"
+          :sellerId="book.SellerId"
           @showCommentBox="showCommentBox"
+          @send="getListComment()"
         />
       </div>
-      <CommentBox :bookId="book._id" @send="getListComment()" />
+      <CommentBox :bookId="book._id" :sellerId="book.SellerId" @send="getListComment()" />
     </div>
     <!-- <modal-alert
       v-if="alert.isShowModal"
@@ -163,6 +171,7 @@ export default {
       isCreatingPost: false,
       totalBlogs: 0,
       recordsPerPage: 4,
+      currentCommentUserId: "",
       alert: {
         isShowModal: false,
         title: '',
@@ -278,6 +287,13 @@ export default {
     },
     GoToDetails(id) {
       this.$router.push(`/blog/${id}`)
+    },
+    getPriceFormat(price) {
+      if (this.amount === 0) return '' // Return empty string if book is not defined
+      const formattedPrice = price
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      return `${formattedPrice} VND`
     },
     async getListComment() {
       const id = this.$route.params.id
@@ -435,18 +451,21 @@ export default {
         })
     },
     showCommentBox(evt, id) {
-      console.log(id);
+      console.log(id)
       this.comments.forEach((comment) => {
         if (comment._id !== id) {
           // Logic to hide the comment box
           // You might need to add a property to your comment objects to track visibility
           comment.isVisible = false // for example
-        }
-        else{
+        } else {
           comment.isVisible = true
         }
+        this.currentCommentUserId = comment.user_id;
       })
     },
+    toSellerProfile(id){
+      this.$router.push(`/user/${id}`)
+    }
   },
 }
 </script>

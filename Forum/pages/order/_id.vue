@@ -70,7 +70,7 @@
               @click="showOrderPanel()"
             >
               <div>Thêm vào giỏ hàng</div>
-              <img src="~/assets/icon/cart.svg" />
+              <img src="~/assets/icon/cart_blue.svg" />
             </button>
           </div>
         </div>

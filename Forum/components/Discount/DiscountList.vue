@@ -1,9 +1,9 @@
 <template>
   <div>
     <div>
-      <EditRole
+      <EditDiscount
         v-if="isEditProfile"
-        :user="currentUser"
+        :book="currentUser"
         @cancel="cancelSave"
         @save="save"
         @reload="reload"
@@ -15,48 +15,50 @@
       <div class="font-semibold user-list-row">
         <div class="user-list-row-cell avatar"></div>
         <div class="user-list-row-cell title">Mã giảm giá</div>
-        <div class="user-list-row-cell gender">Giá</div>
-        <div class="user-list-row-cell phone">Tác giả</div>
-        <div class="user-list-row-cell email">Tên shop</div>
+        <div class="user-list-row-cell gender">Số tiền giảm</div>
+        <div class="user-list-row-cell phone">Phần trăm giảm</div>
+        <div class="user-list-row-cell status">Ngày bắt đầu</div>
+        <div class="user-list-row-cell email">Ngày kết thúc</div>
         <div class="user-list-row-cell birthday">Số lượng</div>
         <!-- <div class="user-list-row-cell role">Role</div> -->
-        <div class="user-list-row-cell status">Thể loai</div>
         <div class="tooltip"></div>
       </div>
       <div
-        v-for="user in users"
+        v-for="discount in discounts"
         class="user-list-row user-list-information"
-        :key="user._id"
+        :key="discount._id"
       >
         <div class="avatar">
-          <img :src="user.image" class="p-2 rounded-full" />
+          <!-- <img :src="discount.DiscountCode" class="p-2 rounded-full" /> -->
         </div>
         <div class="user-list-row-cell title">
-          {{ getName(user.AuthorName) }}
+          {{ getName(discount.DiscountCode) }}
         </div>
         <div class="user-list-row-cell gender">
-          {{ getPriceFormat(user.Price) }}
+          {{ getPriceFormat(discount.DiscountAmount) }}
         </div>
-        <div class="user-list-row-cell phone">{{ user.PublisherName }}</div>
-        <div class="user-list-row-cell email">{{ user.shop_name }}</div>
-        <div class="user-list-row-cell birthday">{{ user.Quantity }}</div>
-        <!-- <div class="user-list-row-cell role">{{ user.roleName }}</div> -->
-        <div class="user-list-row-cell status">{{ user.Genre }}</div>
+        <div class="user-list-row-cell phone">
+          {{ discount.DiscountPercent }}
+        </div>
+        <div class="user-list-row-cell status">{{ discount.StartDay }}</div>
+        <div class="user-list-row-cell email">{{ discount.EndDay }}</div>
+        <div class="user-list-row-cell birthday">{{ discount.Quantity }}</div>
+        <!-- <div class="user-list-row-cell role">{{ discount.roleName }}</div> -->
         <div class="tooltip relative">
           <img
             src="~/assets/icon/more.svg"
-            @mouseenter="displayTooltip(user._id)"
+            @mouseenter="displayTooltip(discount._id)"
             class="cursor-pointer"
           />
           <div
-            :id="'action-' + user._id"
+            :id="'action-' + discount._id"
             class="hidden absolute top-1 right-0 z-10"
             @mouseleave="closeAllPopup()"
           >
             <div class="px-1 py-1 bg-white rounded-lg">
               <button
                 class="hover:bg-gray-500 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                @click="showPopup(user)"
+                @click="showPopup(discount)"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -72,11 +74,11 @@
                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                   ></path>
                 </svg>
-                Edit
+                Sửa
               </button>
               <button
                 class="hover:bg-red-400 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                @click="onDelete(user._id)"
+                @click="onDelete(discount._id)"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -92,18 +94,18 @@
                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   ></path>
                 </svg>
-                Delete
+                Xóa
               </button>
             </div>
           </div>
         </div>
       </div>
       <div class="w-full h-[1px] bg-gray-500"></div>
-      <Pagination
+      <!-- <Pagination
         :count="count"
         @changePage="changePage"
         :recordsPerPage="recordsPerPage"
-      />
+      /> -->
     </div>
   </div>
 </template>
@@ -112,17 +114,17 @@
 <script>
 import axios from 'axios'
 import { format } from 'date-fns'
-import EditRole from '../User/EditRole.vue'
+import EditDiscount from '../Discount/EditDiscount.vue'
 import constant from '~/constant'
-import Pagination from '~/components/Pagination.vue'
+// import Pagination from '~/components/Pagination.vue'
 
 export default {
   components: {
-    EditRole,
-    Pagination,
+    EditDiscount,
+    // Pagination,
   },
   props: {
-    users: Array,
+    discounts: Array,
     count: Number,
     recordsPerPage: Number,
   },
@@ -138,12 +140,12 @@ export default {
   },
   methods: {
     closeAllPopup() {
-      this.users.forEach((p) => {
+      this.discounts.forEach((p) => {
         document.querySelector('#action-' + p._id).classList.add('hidden')
       })
     },
     closeAllPopupExceptIndex(index) {
-      this.users.forEach((p) => {
+      this.discounts.forEach((p) => {
         if (p._id !== index)
           document.querySelector('#action-' + p._id).classList.add('hidden')
       })
@@ -173,16 +175,31 @@ export default {
       this.isEditProfile = true
     },
     onDelete(id) {
-      const authorization = localStorage.getItem('accessToken')
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
         method: 'delete',
-        url: `${constant.base_url}/users/${id}`,
+        url: `${constant.base_url}/discount/${id}`,
         headers: {
           Authorization: authorization,
         },
-      }).then((res) => {
-        this.reload()
       })
+        .then((res) => {
+          this.reload()
+          this.$notify({
+            title: 'Thành công',
+            text: 'Xóa thành công',
+            type: 'success',
+            group: 'foo',
+          })
+        })
+        .catch((error) => {
+          this.$notify({
+            title: 'Thất bại',
+            text: error,
+            type: 'error',
+            group: 'foo',
+          })
+        })
     },
     formatBirthday(date) {
       console.log(date)

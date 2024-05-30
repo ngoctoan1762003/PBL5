@@ -1,9 +1,9 @@
 <template>
-  <div class="top-nav">
+  <div class="top-nav relative">
     <div class="top-nav__logo" @click="$router.push('/')">
       <img src="~assets/icon/Logo.svg" alt="" />
       <div class="name-web">BOOK</div>
-      <div class="top-nav__link ml-2">
+      <div class="top-nav__link ml-2 relative">
         <img
           class="top-nav__link__icon"
           src="~assets/icon/Facebook.svg"
@@ -20,12 +20,51 @@
           alt=""
         />
         <img
-          class="top-nav__link__icon"
-          src="~/assets/icon/popular.svg"
+          class="top-nav__link__icon w-[25px] h-[25px]"
+          src="~/assets/icon/sell.svg"
           alt=""
           v-if="user.Role === 'seller'"
           @click="toSellerPage"
         />
+        <img
+          src="~/assets/icon/cart.svg"
+          class="cursor-pointer w-[25px] h-[25px]"
+          @click="toCart"
+          alt=""
+        />
+        <img
+          src="~/assets/icon/message.svg"
+          class="cursor-pointer w-[25px] h-[25px]"
+          @click="toMessage"
+          alt=""
+        />
+        <div class="relative">
+          <img
+            class="w-[25px] h-[25px]"
+            src="~/assets/icon/notification.svg"
+            alt=""
+            @click="showNotify"
+          />
+          <div
+            v-show="newNotifyCount > 0"
+            class="rounded-full w-[15px] h-[15px] absolute top-[-5px] right-[-5px] bg-red-500 text-white text-[10px] flex justify-center items-center pointer-events-none"
+          >
+            {{ newNotifyCount }}
+          </div>
+        </div>
+        <div
+          class="absolute z-[10] max-h-[90vh] overflow-y-scroll right-0 top-[40px] bg-[#FFFFFF] px-5 py-3 font-semibold rounded-[20px] text-[#1B3764] shadow-md flex flex-col gap-2"
+          v-show="isShowNotify"
+        >
+          <div
+            v-for="noti in notifications"
+            :key="noti._id"
+            :class="{ 'text-gray-300': noti.isNew === 0 }"
+          >
+            {{ noti.content }}
+            <div class="border-b-[1px] border-gray-500"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -44,8 +83,12 @@
         class="absolute top-[50px] right-[0px] bg-[#FFFFFF] px-5 py-3 font-semibold rounded-[20px] text-[#1B3764] shadow-md flex flex-col gap-3 items-center z-[10]"
         v-show="isShowOption"
       >
-        <div class="text-[14px] cursor-pointer" @click="toUserDetail()">Thông tin</div>
-        <div class="text-[14px] cursor-pointer" @click="logout()">Đăng xuất</div>
+        <div class="text-[14px] cursor-pointer" @click="toUserDetail()">
+          Thông tin
+        </div>
+        <div class="text-[14px] cursor-pointer" @click="logout()">
+          Đăng xuất
+        </div>
       </div>
     </div>
   </div>
@@ -59,10 +102,18 @@ export default {
     return {
       user: Object,
       isShowOption: false,
+      isShowNotify: false,
+      notifications: [],
     }
+  },
+  computed: {
+    newNotifyCount() {
+      return this.notifications.filter((noti) => noti.isNew === 1).length
+    },
   },
   mounted() {
     const userId = localStorage.getItem('userId')
+    const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     axios({
       method: 'get',
       url: `${constant.base_url}/user/${userId}`,
@@ -72,6 +123,18 @@ export default {
     }).then((res) => {
       console.log(res.data)
       this.user = res.data
+    })
+
+    axios({
+      method: 'get',
+      url: `${constant.base_url}/notification/all_notif`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+        Authorization: authorization,
+      },
+    }).then((res) => {
+      console.log(res.data)
+      this.notifications = res.data.reverse()
     })
   },
 
@@ -88,6 +151,39 @@ export default {
       localStorage.removeItem('user')
       localStorage.removeItem('userId')
       this.$router.push('/auth/login')
+    },
+    showNotify() {
+      this.isShowNotify = !this.isShowNotify
+      // const userId = localStorage.getItem('userId')
+
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      if (this.isShowNotify) {
+        axios({
+          method: 'put',
+          url: `${constant.base_url}/notification/clear/all`,
+          headers: {
+            Authorization: authorization,
+          },
+        }).then((res) => {
+          axios({
+            method: 'get',
+            url: `${constant.base_url}/notification/all_notif`,
+            headers: {
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+              Authorization: authorization,
+            },
+          }).then((res) => {
+            console.log(res.data)
+            this.notifications = res.data.reverse()
+          })
+        })
+      }
+    },
+    toCart() {
+      this.$router.push('/cart')
+    },
+    toMessage() {
+      this.$router.push('/chat')
     },
   },
 }
@@ -145,6 +241,7 @@ export default {
   &__link {
     display: flex;
     gap: 10px;
+    align-items: center;
 
     &__icon {
       width: 35px;

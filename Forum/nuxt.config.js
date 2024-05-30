@@ -23,6 +23,28 @@ export default {
   },
   mode: 'universal',
 
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
+          },
+        ],
+      },
+      {
+        source: "/auth/login",
+        headers: [
+          {
+            key: "Custom-Header",
+            value: "custom-value",
+          },
+        ],
+      },
+    ];
+  },
   head: {
     title: 'Forum',
     meta: [
@@ -31,13 +53,18 @@ export default {
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' }
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    script: [
+      { src: 'https://apis.google.com/js/platform.js', async: true, defer: true }
+    ]
   },
 
   css: [
     '~/assets/css/main.css',
     '~/assets/css/quill.css',
     'quill/dist/quill.snow.css',
+    'chartist/dist/chartist.min.css'
+
     // 'vue3-datepicker/dist/vue3-datepicker.css' // Add this line
   ],
 
@@ -59,12 +86,18 @@ export default {
     '~/plugins/axios-interceptor.js',
     '~/plugins/axios-interceptor.js',
     '~/plugins/Behavior/scrollToTop.js',
+    // { src: '~/plugins/google-auth.js', ssr: false },
+    // { src: '~/plugins/google-signin.js', ssr: false },
     // '~/plugins/socket.js'
     // '~/plugins/server.js'
 
   ],
 
   components: true,
+
+  build: {
+    transpile: ['chartist']
+  },
 
   buildModules: [
     '@nuxtjs/eslint-module',
