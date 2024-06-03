@@ -27,6 +27,13 @@
           @click="toSellerPage"
         />
         <img
+          class="top-nav__link__icon w-[25px] h-[25px]"
+          src="~/assets/icon/admin.svg"
+          alt=""
+          v-if="user.Role === 'admin'"
+          @click="toAdminPage"
+        />
+        <img
           src="~/assets/icon/cart.svg"
           class="cursor-pointer w-[25px] h-[25px]"
           @click="toCart"
@@ -145,6 +152,9 @@ export default {
     toSellerPage() {
       const id = localStorage.getItem('userId')
       this.$router.push(`/seller/${id}`)
+    },
+    toAdminPage() {
+      this.$router.push(`/admin`)
     },
     logout() {
       localStorage.removeItem('accessToken')

@@ -31,65 +31,69 @@
                       class="book__component__content"
                     />
                   </div>
-                  <div class="book__component">
+                  <!-- <div class="book__component">
                     <div class="book__component__label">Nhà xuất bản</div>
                     <input
                       type="text"
                       v-model="discountAmount"
                       class="book__component__content"
                     />
-                  </div>
+                  </div> -->
                 </div>
               </div>
               <div class="book__component">
                 <div class="book__component__label">Lượng giảm</div>
-                <div class="relative w-full flex">
+                <div class="relative w-full flex justify-between">
                   <div class="relative">
                     <input
                       type="text"
                       v-model="discountPercent"
                       class="book__component__content"
-                      v-show="selectedType === 'Theo giá tiền'"
+                      v-show="selectedType === 1"
                     />
                     <input
                       type="text"
                       v-model="discountAmount"
                       class="book__component__content"
-                      v-show="selectedType === 'Theo phần trăm'"
+                      v-show="selectedType === 2"
                     />
                     <div
                       class="absolute right-5 flex top-1"
-                      v-show="selectedType === 'Theo giá tiền'"
+                      v-show="selectedType === 1"
                     >
                       VND
                     </div>
                     <div
                       class="absolute right-5 flex top-1"
-                      v-show="selectedType === 'Theo phần trăm'"
+                      v-show="selectedType === 2"
                     >
                       %
                     </div>
                   </div>
                   <select name="" id="" @change="handleTypeChange">
-                    <option value="type.content" v-for="type in types" :key="type">
+                    <option
+                      :value="type._id"
+                      v-for="type in types"
+                      :key="type._id"
+                    >
                       {{ type.content }}
                     </option>
                   </select>
                 </div>
               </div>
-              <div class="book__component">
+              <!-- <div class="book__component">
                 <div class="book__component__label">Tác giả</div>
                 <input
                   type="text"
                   v-model="discountPercent"
                   class="book__component__content"
                 />
-              </div>
+              </div> -->
               <div class="book__component">
                 <div class="book__component__label">Miêu tả</div>
                 <textarea class="book__component__content" v-model="EndDay" />
               </div>
-              <div class="book__component">
+              <!-- <div class="book__component">
                 <div class="book__component__label">Thể loại</div>
                 <select
                   class="book__component__content"
@@ -103,7 +107,7 @@
                     {{ genreOption.Theloai }}
                   </option>
                 </select>
-              </div>
+              </div> -->
               <div class="flex gap-5">
                 <div class="book__component">
                   <div class="book__component__label">Số lượng</div>
@@ -113,11 +117,39 @@
                     class="book__component__content"
                   />
                 </div>
+              </div>
+              <!-- <div class="book__component">
+                <div class="book__component__label">Giá cả</div>
+                <input
+                  type="text"
+                  v-model="StartDay"
+                  class="book__component__content"
+                />
+              </div> -->
+              <div class="flex justify-between">
                 <div class="book__component">
-                  <div class="book__component__label">Giá cả</div>
+                  <div class="book__component__label">Ngày bắt đầu</div>
                   <input
-                    type="text"
-                    v-model="StartDay"
+                    type="date"
+                    v-model="startDate"
+                    class="book__component__content"
+                  />
+                  <input
+                    type="time"
+                    v-model="startTime"
+                    class="book__component__content"
+                  />
+                </div>
+                <div class="book__component">
+                  <div class="book__component__label">Ngày kết thúc</div>
+                  <input
+                    type="date"
+                    v-model="endDate"
+                    class="book__component__content"
+                  />
+                  <input
+                    type="time"
+                    v-model="endTime"
                     class="book__component__content"
                   />
                 </div>
@@ -172,12 +204,20 @@ export default {
       StartDay: '',
       quantity: 0,
       price: 0,
-      selectedType: 'Theo giá tiền',
-      types: [{ content: 'Theo giá tiền' }, { content: 'Theo phần trăm' }],
+      selectedType: 1,
+      types: [
+        { content: 'Theo giá tiền', _id: 1 },
+        { content: 'Theo phần trăm', _id: 2 },
+      ],
+      startDate: '',
+      startTime: '',
+      endDate: '',
+      endTime: '',
     }
   },
   mounted() {
     this.fetchGenres()
+    this.parseDateTimes()
   },
   watch: {
     book: {
@@ -196,9 +236,39 @@ export default {
     },
   },
   methods: {
+    parseDateTimes() {
+      if (this.book.StartDay) {
+        const startParts = this.book.StartDay.split(' ')
+        console.log(startParts)
+        const startDate = startParts[2]
+        const startTime = startParts[3]
+        console.log(startDate + ' ' + startTime)
+        const [day, month, year] = startDate.split('/')
+        const startDateTime = new Date(`${year}-${month}-${day}T${startTime}`)
+        if (!isNaN(startDateTime.getTime())) {
+          this.startDate = startDateTime.toISOString().slice(0, 10)
+          this.startTime = startTime.slice(0, 5)
+        } else {
+          console.error('Invalid StartDay:', this.book.StartDay)
+        }
+      }
+      if (this.book.EndDay) {
+        const endParts = this.book.EndDay.split(' ')
+        const endDate = endParts[2]
+        const endTime = endParts[3]
+        console.log(endDate + ' ' + endTime)
+        const [day, month, year] = endDate.split('/')
+        const endDateTime = new Date(`${year}-${month}-${day}T${endTime}`)
+        if (!isNaN(endDateTime.getTime())) {
+          this.endDate = endDateTime.toISOString().slice(0, 10)
+          this.endTime = endTime.slice(0, 5)
+        } else {
+          console.error('Invalid EndDay:', this.book.EndDay)
+        }
+      }
+    },
     handleTypeChange(event) {
-      this.selectedType = event.target.value
-      console.log(this.selectedType)
+      this.selectedType = JSON.parse(event.target.value)
     },
     fetchGenres() {
       axios({
@@ -215,7 +285,6 @@ export default {
           console.log(e)
         })
     },
-    handleChange(e) {},
     updateData() {
       this.updatePreviewImage()
       this.updateTitle()
@@ -225,17 +294,7 @@ export default {
       this.updatePrice()
       this.updateAuthorName()
       this.updateGenre()
-      console.log(
-        JSON.stringify({
-          DiscountAmount: this.book.DiscountAmount,
-          DiscountCode: this.book.DiscountCode,
-          DiscountPercent: this.book.DiscountPercent,
-          EndDay: this.book.EndDay,
-          Quantity: this.book.Quantity,
-          StartDay: this.book.StartDay,
-          _id: this.book._id,
-        })
-      )
+      this.parseDateTimes()
     },
     updatePreviewImage() {
       this.previewImage = this.book.image || ''
@@ -265,36 +324,37 @@ export default {
       this.EndDay = this.book.EndDay || 0
     },
     save() {
-      const authorization = localStorage.getItem('accessToken')
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      const startDateTime = this.formatDateTime(this.startDate, this.startTime)
+      const endDateTime = this.formatDateTime(this.endDate, this.endTime)
       axios({
         method: 'put',
-        url: `${constant.base_url}/book/${this.book._id}`,
+        url: `${constant.base_url}/discount/${this.book._id}`,
+        data: {
+          discount_code: this.discountCode,
+          amount: this.discountAmount,
+          percent: this.discountPercent,
+          quantity: this.quantity,
+          start_day: startDateTime,
+          end_day: endDateTime,
+        },
         headers: {
           Authorization: authorization,
-        },
-        data: {
-          title: this.discountCode,
-          description: this.description,
-          genre: this.selectedGenre,
-          quantity: this.quantity,
-          price: this.price,
-          author_name: this.discountPercent,
-          publisher_name: this.discountAmount,
-          image: this.previewImage,
         },
       })
         .then((res) => {
           this.$notify({
             title: 'Thành công',
-            text: 'Đăng bài thành công',
+            text: 'Sửa giảm giá thành công',
             type: 'success',
             group: 'foo',
           })
+          this.$emit('reload')
         })
-        .catch((err) => {
+        .catch((error) => {
           this.$notify({
-            title: 'Thành công',
-            text: err.response,
+            title: 'Thất bại',
+            text: error,
             type: 'error',
             group: 'foo',
           })
@@ -307,25 +367,20 @@ export default {
     async handleImageUpload(event) {
       const selectedImage = event.target.files[0]
       const res = await UploadImage(selectedImage)
-      // this.userProfile.profileImage = res
-      // const url = await cloudinary.image(`${res}`, {height: 250, width: 250, crop: "fill"})
       this.previewImage = res
-      //   if (file) {
-      //     const reader = new FileReader()
-      //     reader.onload = (e) => {
-      //       this.previewImage = e.target.result
-      //     }
-      //     reader.readAsDataURL(file)
-      //   }
     },
     handleGenreChange(event) {
       this.selectedGenre = event.target.value
-      console.log(this.selectedGenre)
+    },
+    formatDateTime(date, time) {
+      const [year, month, day] = date.split('-')
+      const [hours, minutes] = time.split(':')
+      const dateTime = `${year}-${month}-${day}T${hours}:${minutes}:00.000+00:00`
+      // const dateTime = new Date(Date.UTC(year, month - 1, day, hours, minutes))
+      return dateTime
     },
   },
 }
-</script>
-
 </script>
 
 <style lang="scss" scoped>

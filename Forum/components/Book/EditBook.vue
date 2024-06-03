@@ -248,7 +248,7 @@ export default {
       this.price = this.book.Price || 0
     },
     save() {
-      const authorization = localStorage.getItem('accessToken')
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
         method: 'put',
         url: `${constant.base_url}/book/${this.book._id}`,

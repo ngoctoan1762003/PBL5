@@ -77,16 +77,6 @@
             :failureCallBack="getFailureData"
           />
         </div>
-<GoogleOAuthProvider clientId="924458972373-8fjviiu7k2dqkn3uo6ob1ab3seom2fob.apps.googleusercontent.com">
-  <GoogleLogin
-  onSuccess={credentialResponse => {
-    console.log(credentialResponse);
-  }}
-  onError={() => {
-    console.log('Login Failed');
-  }}
-/>;
-  </GoogleOAuthProvider>;
       </form>
       <img src="~/assets/icon/login-decor.svg" class="w-[40vw]" />
     </div>
@@ -101,19 +91,18 @@
 
 <script>
 import axios from 'axios'
+import googleSignIn from 'google-signin-vue'
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
 import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
 import constant from '~/constant'
-import googleSignIn from 'google-signin-vue'
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { GoogleLogin } from '@react-oauth/google';
+
 
 
 
 // import gAuthPlugin from 'vue3-google-oauth2';
 
 export default {
-  components: { ModalAlert, TopNaviBarGuest, googleSignIn, GoogleLogin, GoogleOAuthProvider },
+  components: { ModalAlert, TopNaviBarGuest, googleSignIn },
   layout: 'empty',
   data() {
     return {
@@ -204,7 +193,7 @@ export default {
                   isShowModal: true,
                   title: 'Lỗi',
                   buttonOkContent: 'Đóng',
-                  content: err.response.data.error,
+                  content: err.response,
                   type: 'failed',
                 },
               }

@@ -20,9 +20,9 @@
       </div>
     </div>
     <div class="cart__header">
-      <div class="cart__product">Ngày đặt</div>
+      <div class="cart__product">Mã</div>
       <div class="cart__price">Tổng tiền</div>
-      <div class="cart__quantity">Phương thức giao hàng</div>
+      <div class="cart__quantity">Số lượng</div>
       <div class="cart__total">Trạng thái</div>
       <div class="cart__ulti"></div>
     </div>
@@ -36,18 +36,18 @@
       <div class="flex flex-col gap-3">
         <div v-for="order in orders.orders" :key="order._id">
           <div class="flex items-center px-5 py-3 bg-[#F5F8FC] text-[#1B3764]">
-            <div class="flex items-center gap-5 w-[35%]">
-              <!-- <img class="w-[100px]" :src="order.image" /> -->
-              <div class="text-[16px] font-semibold">{{ order.OrderDate }}</div>
+            <div class=" w-[35%] text-[14px] font-semibold">
+              {{ order._id }}
             </div>
             <div class="w-[20%] text-[14px] font-semibold">
-              {{ getPriceFormat(order.OrderAmount) }}
+              {{ getPriceFormat(order.price) }}
+            </div>
+            <div class="flex items-center gap-5 w-[20%]">
+              <!-- <img class="w-[100px]" :src="order.image" /> -->
+              <div class="text-[16px] font-semibold">{{ order.quantity[0] }}</div>
             </div>
             <div class="flex w-[20%] text-[16px] font-semibold">
-              <div class="">{{ order.ShippingMethodId }}</div>
-            </div>
-            <div class="w-[20%] text-[14px] font-semibold">
-              {{ getPriceFormat(order._id) }}
+              <div class="">{{ order.status }}</div>
             </div>
             <button class="w-[5%]">
               <img src="~/assets/icon/bin.svg" alt="" />

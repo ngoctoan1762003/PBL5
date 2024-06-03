@@ -25,12 +25,12 @@
               <span class="name">Quản lý sách</span>
             </div>
           </div>
-          <div class="category__item" @click="changeOption(4)">
+          <!-- <div class="category__item" @click="changeOption(4)">
             <img src="~/assets/icon/popular.svg" alt="" />
             <div class="category__item__info">
               <span class="name">Quản lý đơn đặt hàng</span>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
       <UserList
@@ -109,6 +109,10 @@ export default {
       newsCount: Number,
       isLoading: false,
       recordsPerPage: 5,
+      currentUserPage: 1,
+      currentSellerPage: 1,
+      currentBookPage: 1,
+      currentOrderPage: 1,
     }
   },
   created() {
@@ -211,42 +215,67 @@ export default {
       this.manageOption = optionNumber
     },
     reload() {
-      this.$axios
-        .get(`/users/?page=1&limit=${this.recordsPerPage}`)
-        .then((res) => {
-          console.log(res)
-          this.users = res.data.users
-          this.userCount = res.data.count
-        })
-        .catch((err) => {
-          console.error(err)
-        })
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+    console.log(authorization)
+    axios({
+      method: 'get',
+      withCredentials: false,
+      url: `${constant.base_url}/user/getalluser?page=${this.currentUserPage}&limit=${this.recordsPerPage}`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.users = res.data.users
+        this.userCount = res.data.count
+      })
+      .catch((err) => {
+        console.error(err)
+      })
 
-      this.$axios
-        .get(`/blogs/awaiting-approval/?page=1&limit=${this.recordsPerPage}`)
-        .then((res) => {
-          console.log(res)
-          this.pendingNews = res.data.docs
-          this.pendingNewsCount = res.data.totalDocs
-        })
-        .catch((err) => {
-          console.error(err)
-        })
-      this.$axios
-        .get(`/blogs/?page=1&limit=${this.recordsPerPage}`, {})
-        .then((res) => {
-          console.log(res)
-          this.news = res.data.docs
-          this.newsCount = res.data.totalDocs
-        })
-        .catch((err) => {
-          console.error(err)
-        })
-      this.isLoading = false
+    axios({
+      method: 'get',
+      withCredentials: false,
+      url: `${constant.base_url}/user/role/seller?page=${this.currentSellerPage}&limit=${this.recordsPerPage}`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.sellers = res.data.seller
+        this.sellerCount = res.data.count
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+
+    axios({
+      method: 'get',
+      url: `${constant.base_url}/book/books?page=${this.currentBookPage}&limit=${this.recordsPerPage}`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.books = res.data.books
+        this.bookCount = res.data.count
+        // this.userCount = res.data.totalDocs
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+    this.isLoading = false
     },
     changeUserPage(page, limit) {
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
+      this.currentUserPage = page;
       this.isLoading = true
       // this.$axios
       //   .get(`/users/?page=${page}&limit=${limit}`)
@@ -277,6 +306,7 @@ export default {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
+      this.currentSellerPage = page;
       this.isLoading = true
       axios({
         method: 'get',
@@ -301,6 +331,7 @@ export default {
       const authorization = localStorage.getItem('accessToken')
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
+      this.currentBookPage = page;
       this.isLoading = true
       axios({
         method: 'get',
@@ -326,6 +357,7 @@ export default {
     changePendingPage(page, limit) {
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
+      this.currentOrderPage = page;
       this.isLoading = true
       this.$axios
         .get(`/blogs/awaiting-approval/?page=${page}&limit=${limit}`)

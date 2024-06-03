@@ -227,11 +227,13 @@ export default {
             },
           }
       })
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     await axios({
       method: 'get',
       url: `${constant.base_url}/comment/book/${id}`,
       headers: {
         'ngrok-skip-browser-warning': 'skip-browser-warning',
+        Authorization: authorization
       },
     })
       .then((res) => {

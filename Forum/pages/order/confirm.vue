@@ -61,7 +61,7 @@
         Địa chỉ nhận hàng
       </div>
       <div class="pl-5 flex gap-5 w-full items-center">
-        <div class="min-w-[200px]">Tên</div>
+        <div class="min-w-[200px]">Địa chỉ</div>
         <input
           type="text"
           placeholder="Địa chỉ"
@@ -566,6 +566,18 @@ export default {
           shops: this.shops,
         })
       )
+
+      const orders = [];
+      for (let i = 0; i < this.shops.length; i++){
+        orders.push({
+          shop_id: this.shops[i].shop_id,
+          books: this.shops[i].books,
+          discount_id: this.shops[i].discount_id,
+        })
+        // for (let j = 0; j < this.shops[j].books.length; j++){
+// this.shops[j].books
+        // }
+      }
       axios({
         method: 'post',
         url: `${constant.base_url}/order/order`,
@@ -573,11 +585,12 @@ export default {
           Authorization: authorization,
         },
         data: {
-          userid,
+          // userid,
           address: 'something',
-          status: 'pending',
+          // status: 'pending',
           shipping_id: '6624eded2b9b7db58edcb9e7',
           shops: this.shops,
+          order: orders,
         },
       })
         .then(() => {
