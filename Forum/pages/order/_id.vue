@@ -36,9 +36,9 @@
             <div class="flex gap-10 items-center">
               <div class="flex flex-col gap-2">
                 <div class="text-[#969AA0] text-[14px]">Nhà xuất bản</div>
-                <div class="text-[#969AA0] text-[14px]">Ngôn ngữ</div>
-                <div class="text-[#969AA0] text-[14px]">Số trang</div>
-                <div class="text-[#969AA0] text-[14px]">Kích thước</div>
+                <div class="text-[#969AA0] text-[14px]">Số lượng còn</div>
+                <div class="text-[#969AA0] text-[14px]">Giá tiền</div>
+                <div class="text-[#969AA0] text-[14px]">Thể loại</div>
               </div>
               <div class="flex flex-col gap-2">
                 <div class="text-[#969AA0] text-[14px]">:</div>
@@ -48,11 +48,13 @@
               </div>
               <div class="flex flex-col gap-2">
                 <div class="text-[#969AA0] text-[14px]">
-                  Learning Private Limited (1 January 2023)
+                  {{ book.PublisherName }}
                 </div>
-                <div class="text-[#969AA0] text-[14px]">English</div>
-                <div class="text-[#969AA0] text-[14px]">212 trang</div>
-                <div class="text-[#969AA0] text-[14px]">20 x 14 x 4 cm</div>
+                <div class="text-[#969AA0] text-[14px]">
+                  {{ book.Quantity }}
+                </div>
+                <div class="text-[#969AA0] text-[14px]">{{ getPriceFormat }}</div>
+                <div class="text-[#969AA0] text-[14px]">{{ book.Genre }}</div>
               </div>
             </div>
           </div>
@@ -214,7 +216,38 @@ export default {
 
     submit() {
       const id = this.$route.params.id
+      const userId = localStorage.getItem('userId')
+      const user = JSON.parse( localStorage.getItem('user'))
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      if (this.book.SellerId === userId) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Không thể tự đặt sách của bản thân',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (parseInt(this.amount) > this.book.Quantity) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Số lượng trong kho không đủ',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      console.log(user)
+      console.log(user.Role)
+      if (user.Role === 'admin') {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Admin không được đặt hàng',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
       axios({
         method: 'post',
         url: `${constant.base_url}/cart/${id}`,

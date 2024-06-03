@@ -19,6 +19,7 @@
                     @decreaseQuantity="decreaseQuantity"
                     @increaseQuantity="increaseQuantity"
                     @deleteBookFromCart="deleteBookFromCart"
+                    @updateQuantity="updateQuantity"
                 />
             </div>
         </div>
@@ -65,6 +66,9 @@ export default {
         },
         deleteBookFromCart(bookId){
             this.$emit('deleteBookFromCart', bookId, this.shop_id);
+        },
+        updateQuantity(bookId, quantity){
+            this.$emit('updateQuantity', bookId, this.shop_id, quantity);
         }
     }
 }

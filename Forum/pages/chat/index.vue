@@ -11,13 +11,13 @@
     <div class="chat-container">
       <div class="h-[100%] w-[100%] flex">
         <div
-          class="h-[100%] w-[100px] flex flex-col items-center gap-4 py-4 overflow-y-auto overflow-x-hidden border-[1px] shadow-md relative"
+          class="h-[100%] w-[180px] flex flex-col pl-4 gap-4 py-4 overflow-y-auto overflow-x-hidden border-[1px] shadow-md relative"
         >
           <div
             v-for="conversation in conversations"
             :key="conversation.user_id"
             @click="toConversationWith(conversation.user_id)"
-            class="cursor-pointer relative"
+            class="cursor-pointer relative flex gap-3 justify-start items-center"
           >
             <img
               :src="conversation.image"
@@ -26,6 +26,9 @@
               @mouseover="showPopup(conversation, $event)"
               @mouseleave="hidePopup"
             />
+            <div class="font-semibold text-blue-900">
+              {{ conversation.name }}
+            </div>
           </div>
         </div>
         <div class="h-[100%] w-full">
@@ -73,7 +76,11 @@
             @keyup.enter="sendMessage"
             class="h-10 w-full border border-gray-500 py-2 px-3 mt-2"
           /> -->
-          <div class="flex justify-center items-center w-full h-full text-[30px] font-semibold text-blue-500">Chọn người trò chuyện</div>
+          <div
+            class="flex justify-center items-center w-full h-full text-[30px] font-semibold text-blue-500"
+          >
+            Chọn người trò chuyện
+          </div>
         </div>
       </div>
     </div>

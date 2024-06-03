@@ -14,10 +14,18 @@
     </div>
     <div class="flex w-[20%] text-[16px] font-semibold">
       <button class="bg-gray-300 px-4 py-1" @click="decreaseQuantity">-</button>
-      <div class="bg-gray-300 px-4 py-1 w-[50px]">{{ book.quantity }}</div>
+      <input
+        ref="quantityInput"
+        class="bg-gray-300 py-1 w-[50px] text-center"
+        :value="localQuantity"
+        @keyup.enter="handleQuantityChange"
+        @focus="saveCurrentQuantity"
+      />
       <button class="bg-gray-300 px-4 py-1" @click="increaseQuantity">+</button>
     </div>
-    <div class="w-[20%] text-[14px] font-semibold">{{ getPriceFormat(book.total_price) }}</div>
+    <div class="w-[20%] text-[14px] font-semibold">
+      {{ getPriceFormat(book.price * book.quantity) }}
+    </div>
     <button class="w-[5%]">
       <img src="~/assets/icon/bin.svg" alt="" @click="deleteCart" />
     </button>
@@ -29,11 +37,19 @@ export default {
   props: {
     book: Object,
   },
+  data() {
+    return {
+      localQuantity: this.book.quantity,
+      previousQuantity: this.book.quantity,
+    }
+  },
   methods: {
     decreaseQuantity() {
+      this.localQuantity--;
       this.$emit('decreaseQuantity', this.book._id)
     },
     increaseQuantity() {
+      this.localQuantity++;
       this.$emit('increaseQuantity', this.book._id)
     },
     handleCheckboxChange() {
@@ -45,6 +61,29 @@ export default {
     },
     deleteCart() {
       this.$emit('deleteBookFromCart', this.book._id)
+    },
+    saveCurrentQuantity() {
+      this.previousQuantity = this.localQuantity
+    },
+    handleQuantityChange(event) {
+      const newQuantity = parseInt(event.target.value, 10)
+      if (newQuantity > this.book.quantity) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Số lượng trong kho không đủ',
+          type: 'error',
+          group: 'foo',
+        })
+        this.localQuantity = this.previousQuantity // Revert to previous quantity
+        event.target.value = this.previousQuantity // Update the input value
+      } else if (!isNaN(newQuantity) && newQuantity > 0) {
+        this.localQuantity = newQuantity
+        this.$emit('updateQuantity', {
+          id: this.book._id,
+          quantity: this.localQuantity,
+        })
+      }
+      this.$refs.quantityInput.blur() // Remove focus from the input field
     },
     getPriceFormat(price) {
       if (this.amount === 0) return '' // Return empty string if book is not defined

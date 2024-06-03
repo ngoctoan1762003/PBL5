@@ -61,7 +61,7 @@
         Địa chỉ nhận hàng
       </div>
       <div class="pl-5 flex gap-5 w-full items-center">
-        <div class="min-w-[200px]">Địa chỉ</div>
+        <div class="min-w-[200px]">Tên</div>
         <input
           type="text"
           placeholder="Địa chỉ"
@@ -98,7 +98,7 @@
               <div class="">{{ book.quantity }}</div>
             </div>
             <div class="w-[20%] text-[14px] font-semibold">
-              {{ getPriceFormat(book.total_price) }}
+              {{ getPriceFormat(book.price * book.quantity) }}
             </div>
             <button class="w-[5%]">
               <img src="~/assets/icon/bin.svg" alt="" />
@@ -234,13 +234,7 @@ export default {
       shops: [],
       changingShopVoucher: Object,
       isChangingVoucher: false,
-      selectedDiscountCode: '', 
-      provinces: [],
-      choosingProvince: Object,
-      districts: [],
-      choosingDistrict: Object,
-      wards: [],
-      choosingWard: Object,
+      selectedDiscountCode: '', // Initialize selected discount code
     }
   },
   async mounted() {
@@ -299,33 +293,6 @@ export default {
         )
       }
     }
-
-    // await axios({
-    //   method: 'get',
-    //   url: 'https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1',
-    // })
-    // .then(res => {
-    //   this.provinces = res.data;
-    //   this.choosingProvince = this.provinces[0];
-    // })
-
-    // await axios({
-    //   method: 'get',
-    //   url: `https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${this.choosingProvince.code}&limit=-1`
-    // })
-    // .then(res => {
-    //   this.districts = res.data;
-    //   this.choosingDistrict = this.districts[0];
-    // })
-
-    // await axios({
-    //   method: 'get',
-    //   url: `https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${this.choosingDistrict.code}&limit=-1`
-    // })
-    // .then(res => {
-    //   this.wards = res.data;
-    //   this.choosingWard = this.wards[0];
-    // })
   },
   computed: {
     calculateTotalPrice() {
@@ -555,29 +522,12 @@ export default {
       this.isDeleting = true
     },
     confirmOrderBook() {
+      this.shops.forEach((shop) => 
+      shop.books.forEach(book => {
+        book.price = parseInt(book.price)
+      }))
       const userid = localStorage.getItem('userId')
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
-            console.log(
-        ({
-          userid,
-          address: 'something',
-          status: 'pending',
-          shipping_id: '6624eded2b9b7db58edcb9e7',
-          shops: this.shops,
-        })
-      )
-
-      const orders = [];
-      for (let i = 0; i < this.shops.length; i++){
-        orders.push({
-          shop_id: this.shops[i].shop_id,
-          books: this.shops[i].books,
-          discount_id: this.shops[i].discount_id,
-        })
-        // for (let j = 0; j < this.shops[j].books.length; j++){
-// this.shops[j].books
-        // }
-      }
       axios({
         method: 'post',
         url: `${constant.base_url}/order/order`,
@@ -585,12 +535,11 @@ export default {
           Authorization: authorization,
         },
         data: {
-          // userid,
+          userid,
           address: 'something',
-          // status: 'pending',
+          status: 'pending',
           shipping_id: '6624eded2b9b7db58edcb9e7',
           shops: this.shops,
-          order: orders,
         },
       })
         .then(() => {
@@ -603,10 +552,9 @@ export default {
           this.$router.push('/order/list')
         })
         .catch((error) => {
-          console.log(error.response)
           this.$notify({
             title: 'Thất bại',
-            text: 'Không thể đặt hàng: ' + error.response.data.error,
+            text: 'Không thể đặt hàng ' + error,
             type: 'error',
             group: 'foo',
           })

@@ -1,23 +1,23 @@
 <template>
   <div class="h-screen">
     <TopNaviBarVue />
-    <div
+    <!-- <div
       v-if="popup.visible"
       :style="{ top: `${popup.y}px` }"
       class="absolute left-[110px] whitespace-nowrap bg-white px-2 py-1 rounded bg-white px-5 py-3 font-semibold rounded-2xl text-blue-900 shadow-md"
     >
       {{ popup.name }}
-    </div>
+    </div> -->
     <div class="chat-container">
       <div class="h-[100%] w-[100%] flex">
         <div
-          class="h-[100%] w-[100px] flex flex-col items-center gap-4 py-4 overflow-y-auto overflow-x-hidden border-[1px] shadow-md relative"
+          class="h-[100%] w-[200px] flex flex-col pl-4 gap-4 py-4 overflow-y-auto overflow-x-hidden border-[1px] shadow-md relative"
         >
           <div
             v-for="conversation in conversations"
             :key="conversation.user_id"
             @click="toConversationWith(conversation.user_id)"
-            class="cursor-pointer relative"
+            class="cursor-pointer relative flex gap-3 justify-start items-center"
           >
             <img
               :src="conversation.image"
@@ -26,6 +26,9 @@
               @mouseover="showPopup(conversation, $event)"
               @mouseleave="hidePopup"
             />
+            <div class="font-semibold text-blue-900">
+              {{ conversation.name }}
+            </div>
           </div>
         </div>
         <div class="h-[100%] w-full">
@@ -137,7 +140,7 @@ export default {
         receiverId: id,
       },
     }).then((res) => {
-      console.log("conversation", res.data)
+      console.log('conversation', res.data)
       if (res.data) this.messages = res.data
       console.log(this.messages)
     })

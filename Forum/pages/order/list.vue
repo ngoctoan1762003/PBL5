@@ -14,18 +14,50 @@
       />
     </div>
 
-    <div class="cart__header py-3 flex flex-col gap-5 my-2">
-      <div class="pl-5 text-[20px] text-[#1B3764] font-semibold">
-        Danh sách các đơn hàng đã đặt
+    <div class="cart__header flex justify-between gap-5 my-2 gap-2">
+      <div
+        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 1 }"
+        @click="currentOption = 1"
+      >
+        Tất cả
+      </div>
+      <div
+        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 2 }"
+        @click="currentOption = 2"
+      >
+        Chờ thanh toán
+      </div>
+      <div
+        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 3 }"
+        @click="currentOption = 3"
+      >
+        Đã thanh toán
+      </div>
+      <div
+        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 4 }"
+        @click="currentOption = 4"
+      >
+        Hoàn thành
+      </div>
+      <div
+        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 5 }"
+        @click="currentOption = 5"
+      >
+        Đã hủy
       </div>
     </div>
-    <div class="cart__header">
-      <div class="cart__product">Mã</div>
-      <div class="cart__price">Tổng tiền</div>
-      <div class="cart__quantity">Số lượng</div>
-      <div class="cart__total">Trạng thái</div>
-      <div class="cart__ulti"></div>
-    </div>
+    <!-- <div class="cart__header">
+      <div class="py-3 cart__product">Mã</div>
+      <div class="py-3 cart__price">Tổng tiền</div>
+      <div class="py-3 cart__quantity">Số lượng</div>
+      <div class="py-3 cart__total">Trạng thái</div>
+      <div class="py-3 cart__ulti"></div>
+    </div> -->
     <div class="py-5">
       <!-- <div class="flex bg-[#FFCA42] items-center gap-5 px-5 py-2">
         <div class="text-[#1B3764] text-[16px] font-semibold">
@@ -34,24 +66,59 @@
         <div>></div>
       </div> -->
       <div class="flex flex-col gap-3">
-        <div v-for="order in orders.orders" :key="order._id">
+        <div v-for="order in orders.order_details" :key="order._id">
           <div class="flex items-center px-5 py-3 bg-[#F5F8FC] text-[#1B3764]">
-            <div class=" w-[35%] text-[14px] font-semibold">
-              {{ order._id }}
+            <!-- <div class="w-[35%] text-[14px] font-semibold">
+              {{ order.OrderId }}
             </div>
             <div class="w-[20%] text-[14px] font-semibold">
-              {{ getPriceFormat(order.price) }}
+              {{ getPriceFormat(order.Total_price) }}
             </div>
             <div class="flex items-center gap-5 w-[20%]">
-              <!-- <img class="w-[100px]" :src="order.image" /> -->
-              <div class="text-[16px] font-semibold">{{ order.quantity[0] }}</div>
+              <img class="w-[100px]" :src="order.image" />
+              <div class="text-[16px] font-semibold">{{ order.ShopId }}</div>
             </div>
             <div class="flex w-[20%] text-[16px] font-semibold">
-              <div class="">{{ order.status }}</div>
+              <div class="">{{ order.Status }}</div>
             </div>
             <button class="w-[5%]">
               <img src="~/assets/icon/bin.svg" alt="" />
-            </button>
+            </button> -->
+            <div class="w-[100%] flex flex-col gap-3">
+              <div class="w-[100%] py-3 flex justify-between">
+                <div class="flex gap-3 items-center">
+                  <div class="font-semibold">{{ order.shop_name }}</div>
+                  <button
+                    @click="toChatWithShop(order.ShopId)"
+                    class="text-[16px] bg-orange-500 py-2 px-4 text-white font-semibole"
+                  >
+                    Chat
+                  </button>
+                </div>
+                <div class="font-semibold text-[18px]">
+                  {{ order.Status }}
+                </div>
+              </div>
+              <div
+                v-for="item in order.Items"
+                :key="item.BookId"
+                class="flex justify-between w-[100%] items-center"
+              >
+                <div class="flex gap-5">
+                  <img :src="item.Image" class="w-[80px] h-[100px]" alt="" />
+                  <div class="flex flex-col h-[100%] justify-between">
+                    <div class="text-[18px] font-semibold text-darkblue">
+                      {{ item.Title }}
+                    </div>
+                    <div class="text-gray-600">{{ item.Genre }}</div>
+                    <div class="text-darkblue font-semibold">
+                      x {{ item.Quantity }}
+                    </div>
+                  </div>
+                </div>
+                <div>{{ item.Price }}</div>
+              </div>
+            </div>
           </div>
         </div>
         <!-- <div
@@ -81,7 +148,7 @@
         </div> -->
       </div>
     </div>
-    <div class="bg-[#1B3764] py-5 flex items-center gap-0">
+    <!-- <div class="bg-[#1B3764] py-5 flex items-center gap-0">
       <div class="cart__product text-white font-semibold text-[18px]">
         Đơn vị vận chuyển
       </div>
@@ -107,7 +174,7 @@
             : getPriceFormat(0)
         }}
       </div>
-    </div>
+    </div> -->
     <!-- <div class="bg-[#F4F8FF] py-5 px-5">
       <div class="text-[#1B3764] font-semibold text-[20px]">Voucher</div>
       <div class="flex flex-col">
@@ -130,7 +197,7 @@
         </div>
       </div>
     </div> -->
-    <div class="flex py-5 justify-end ml-[-30px]">
+    <!-- <div class="flex py-5 justify-end ml-[-30px]">
       <div
         class="w-[40%] items-center flex justify-end pr-20 text-[16px] font-semibold text-[#1B3764]"
       >
@@ -147,7 +214,7 @@
       >
         Đặt hàng
       </button>
-    </div>
+    </div> -->
     <FooterBar />
   </div>
 </template>
@@ -185,24 +252,26 @@ export default {
       isChangingVoucher: false,
       selectedDiscountCode: '',
       orders: [],
+      currentOption: 1,
     }
   },
   async mounted() {
+    const userId = localStorage.getItem('userId')
     const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     await axios({
       method: 'get',
-      url: `${constant.base_url}/order/self`,
+      url: `${constant.base_url}/order/order_detail/${userId}`,
       headers: {
         Authorization: authorization,
         'ngrok-skip-browser-warning': 'skip-browser-warning',
-      }
+      },
     })
-    .then(res => {
-      this.orders = res.data;
-    })
-    .catch(err => {
-      console.log(err.response)
-    })
+      .then((res) => {
+        this.orders = res.data
+      })
+      .catch((err) => {
+        console.log(err.response)
+      })
   },
   computed: {
     calculateTotalPrice() {
@@ -431,6 +500,9 @@ export default {
       this.shopIdToDelete = shopId
       this.isDeleting = true
     },
+    toChatWithShop(shopId) {
+      this.$router.push(`/chat/${shopId}`)
+    },
     confirmOrderBook() {
       const userid = localStorage.getItem('userId')
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
@@ -509,7 +581,7 @@ export default {
     color: #969aa0;
     display: flex;
     font-size: 16px;
-    padding: 15px;
+    // padding: 15px;
     font-weight: 500;
     border-bottom: 1px solid gray;
   }

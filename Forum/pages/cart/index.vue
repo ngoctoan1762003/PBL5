@@ -32,6 +32,7 @@
         @increaseQuantity="increaseQuantity"
         @decreaseQuantity="decreaseQuantity"
         @deleteBookFromCart="deleteWarning"
+        @updateQuantity="updateQuantity"
       />
     </div>
     <div class="flex py-5">
@@ -267,6 +268,31 @@ export default {
         },
       })
     },
+    updateQuantity(bookChange, shopId, quantity) {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      const book = this.getBook(shopId, bookChange.id)
+      console.log(book, shopId, quantity)
+      if (!book) {
+        console.log('Book not found')
+        return
+      }
+      console.log(book)
+      if (bookChange.quantity === 0) {
+        this.deleteWarning(book, shopId)
+        return
+      }
+      book.quantity = parseInt(bookChange.quantity)
+      axios({
+        method: 'put',
+        url: `${constant.base_url}/cart/${book.cart_id}`,
+        headers: {
+          Authorization: authorization,
+        },
+        data: {
+          quantity: book.quantity,
+        },
+      })
+    },
     async deleteBookFromCart(bookId, shopId) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       const book = this.getBook(shopId, bookId)
@@ -331,6 +357,15 @@ export default {
       const shops = []
 
       // Duyệt qua từng sách trong selectedBook
+      if (this.selectedBook.length === 0) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Phải chọn ít nhất một món hàng',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
       this.selectedBook.forEach((book) => {
         // Tìm kiếm xem cửa hàng đã tồn tại trong mảng shops hay chưa
         let found = false
