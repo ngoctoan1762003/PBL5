@@ -14,7 +14,7 @@
         <div class="text-[#FFCA42] text-[12px] font-semibold">
           {{getPriceFormat}}
         </div>
-        <div class="text-[#969AA0] text-[12px]">
+        <div class="text-[#969AA0] text-[12px] min-h-[100px] max-h-[100px]">
           {{ book.description }}
         </div>
       </div>
