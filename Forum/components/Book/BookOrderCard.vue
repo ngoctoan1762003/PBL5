@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import constant from '~/constant'
 export default {
   props: {
     book: Object,
@@ -41,15 +43,64 @@ export default {
     return {
       localQuantity: this.book.quantity,
       previousQuantity: this.book.quantity,
+      currentBookStock: 0,
     }
+  },
+  mounted() {
+    const id = this.book._id
+    axios({
+      method: 'get',
+      url: `${constant.base_url}/book/${id}`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.currentBookStock = res.data.Quantity
+      })
+      .catch((err) => {
+        if (err.response.data.status === 401)
+          this.alert = {
+            ...this.alert,
+            ...{
+              isShowModal: true,
+              title: 'Lỗi',
+              buttonOkContent: 'Đăng nhập lại',
+              content: 'Hết phiên đăng nhập, vui lòng đăng nhập lại',
+              type: 'failed',
+              typeSubmit: 'loginagain',
+            },
+          }
+        else
+          this.alert = {
+            ...this.alert,
+            ...{
+              isShowModal: true,
+              title: 'Lỗi',
+              buttonOkContent: 'Đóng',
+              content: err.response.data.error,
+              type: 'failed',
+            },
+          }
+      })
   },
   methods: {
     decreaseQuantity() {
-      this.localQuantity--;
+      this.localQuantity--
       this.$emit('decreaseQuantity', this.book._id)
     },
     increaseQuantity() {
-      this.localQuantity++;
+      if (this.localQuantity === this.currentBookStock) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Số lượng trong kho không đủ',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      this.localQuantity++
       this.$emit('increaseQuantity', this.book._id)
     },
     handleCheckboxChange() {
@@ -67,7 +118,7 @@ export default {
     },
     handleQuantityChange(event) {
       const newQuantity = parseInt(event.target.value, 10)
-      if (newQuantity > this.book.quantity) {
+      if (newQuantity > this.currentBookStock) {
         this.$notify({
           title: 'Thất bại',
           text: 'Số lượng trong kho không đủ',

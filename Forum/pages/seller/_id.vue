@@ -25,14 +25,14 @@
               <span class="name">Thêm sách</span>
             </div>
           </div>
-          <!-- <div class="category__item" @click="changeOption(4)">
+          <div class="category__item" @click="changeOption(4)">
             <div class="bg-[#2C353D] rounded-[5px] pr-[-10px] ml-[2px]">
               <img class="w-[30px]" src="~/assets/icon/discount.svg" alt="" />
             </div>
             <div class="category__item__info">
               <span class="name">Quản lý mã giảm giá</span>
             </div>
-          </div> -->
+          </div>
           <div class="category__item" @click="changeOption(5)">
             <div class="bg-[#2C353D] rounded-[5px] pr-[-10px] ml-[2px]">
               <img class="w-[30px]" src="~/assets/icon/discount.svg" alt="" />
@@ -41,7 +41,7 @@
               <span class="name">Thêm mã giảm giá</span>
             </div>
           </div>
-          <!-- <div class="category__item" @click="changeOption(6)">
+          <div class="category__item" @click="changeOption(6)">
             <div
               class="w-[30px] bg-[#2C353D] rounded-[5px] pr-[-10px] ml-[2px]"
             >
@@ -58,7 +58,7 @@
             <div class="category__item__info">
               <span class="name">Hóa đơn chờ xác nhận</span>
             </div>
-          </div> -->
+          </div>
         </div>
       </div>
       <div v-show="manageOption === 1 && !isLoading" class="w-[100%] flex">
@@ -156,6 +156,12 @@
         class="w-full"
         :user="doneOrders"
         v-show="manageOption === 6 && !isLoading"
+        @reload="reload"
+      />
+      <OrderList
+        class="w-full"
+        :user="doneOrders"
+        v-show="manageOption === 7 && !isLoading"
         @reload="reload"
       />
     </div>
@@ -731,6 +737,9 @@ export default {
         })
         .reduce((sum, book) => sum + book.Quantity, 0)
     },
+    pendingOrder(){
+      return this.doneOrders.filter(order => order.Status === "đang chờ");
+    }
   },
   methods: {
     parseDate(dateString) {
