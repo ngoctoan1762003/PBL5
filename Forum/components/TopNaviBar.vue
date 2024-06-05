@@ -93,6 +93,9 @@
         <div class="text-[14px] cursor-pointer" @click="toUserDetail()">
           Thông tin
         </div>
+        <div class="text-[14px] cursor-pointer" @click="toOrderList()">
+          Đơn hàng
+        </div>
         <div class="text-[14px] cursor-pointer" @click="logout()">
           Đăng xuất
         </div>
@@ -148,6 +151,9 @@ export default {
   methods: {
     toUserDetail() {
       this.$router.push('/user/profile')
+    },
+    toOrderList() {
+      this.$router.push('/order/list')
     },
     toSellerPage() {
       const id = localStorage.getItem('userId')

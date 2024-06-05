@@ -96,6 +96,12 @@
       v-bind="alert"
       @close="onCloseModal"
     />
+    <div
+      v-if="isLoading"
+      class="flex justify-center items-center w-screen h-screen bg-black opacity-70 absolute z-[10]"
+    >
+      <LoadingSpinner />
+    </div>
   </div>
 </template>
 
@@ -104,8 +110,10 @@ import axios from 'axios'
 import constant from '~/constant'
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
 import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
+import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
+
 export default {
-  components: { ModalAlert, TopNaviBarGuest },
+  components: { ModalAlert, TopNaviBarGuest, LoadingSpinner },
   layout: 'empty',
   data() {
     return {
@@ -123,6 +131,7 @@ export default {
         buttonOkContent: 'Ok',
         typeSubmit: '',
       },
+      isLoading: false,
     }
   },
   computed: {
@@ -170,33 +179,15 @@ export default {
           })
         }
       } else {
+        this.isLoading = true
         axios({
           method: 'post',
-          url: `${constant.base_url}/auth/register`,
-          data: {
-            email: this.email.toLowerCase().trim(),
-            password: this.password,          
-            username: "nonee",
-            name: "nonee",
-            phone: "00000000",
-            address: "none",
-            role: "user",
-            isactive: "1",
-            },
+          url: `${constant.base_url}/auth/activation/${this.email}`,
         })
           .then((res) => {
-            this.alert = {
-              ...this.alert,
-              ...{
-                isShowModal: true,
-                title: 'Thành công',
-                content:
-                  'Bạn đã đăng kí thành công, hãy đăng nhập để sử dụng trang web',
-                type: 'success',
-                buttonOkContent: 'Đến sign in',
-                typeSubmit: 'gotologin',
-              },
-            }
+            localStorage.setItem('signupEmail', this.email)
+            localStorage.setItem('signupPassword', this.password)
+            this.$router.push('/auth/verify-account')
           })
           .catch((res) => {
             this.alert = {
@@ -204,11 +195,14 @@ export default {
               ...{
                 isShowModal: true,
                 title: 'Thất bại',
-                content: res.response.data.message[0].message,
+                content: res.response.data.message,
                 type: 'failed',
                 buttonOkContent: 'Đóng',
               },
             }
+          })
+          .finally(() => {
+            this.isLoading = false
           })
       }
     },

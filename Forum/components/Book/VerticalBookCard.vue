@@ -3,18 +3,20 @@
     <div class="w-auto p-[20px] bg-[#F5F8FC]">
       <img class="aspect-[3/4] shadow-md" :src="book.image" alt="" />
     </div>
-    <div class="min-w-[230px] flex flex-col gap-4">
+    <div class="w-auto flex flex-col gap-4">
       <div>
         <button
-          class="text-[#1B3764] text-[18px] font-semibold"
+          class="text-[#1B3764] text-[18px] font-semibold max-h-[30px] overflow-hidden text-ellipsis max-w-[100%]"
           @click="toBookId(book._id)"
         >
           {{ book.title }}
         </button>
         <div class="text-[#FFCA42] text-[12px] font-semibold">
-          {{getPriceFormat}}
+          {{ getPriceFormat }}
         </div>
-        <div class="text-[#969AA0] text-[12px] min-h-[100px] max-h-[100px] overflow-y-hidden">
+        <div
+          class="text-[#969AA0] text-[12px] min-h-[100px] max-h-[100px] overflow-y-hidden"
+        >
           {{ book.description }}
         </div>
       </div>
@@ -42,9 +44,9 @@ export default {
     toBookId(id) {
       this.$router.push(`/book/${id}`)
     },
-    toOrder(id){
+    toOrder(id) {
       this.$router.push(`/order/${id}`)
-    }
+    },
   },
   computed: {
     getPriceFormat() {

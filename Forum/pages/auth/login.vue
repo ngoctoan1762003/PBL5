@@ -86,6 +86,12 @@
       v-bind="alert"
       @close="onCloseModal"
     />
+    <div
+      v-if="isLoading"
+      class="flex justify-center items-center w-screen h-screen bg-black opacity-70 absolute z-[10]"
+    >
+      <LoadingSpinner />
+    </div>
   </div>
 </template>
 
@@ -95,14 +101,12 @@ import googleSignIn from 'google-signin-vue'
 import ModalAlert from '~/components/Modal/ModalAlert.vue'
 import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
 import constant from '~/constant'
-
-
-
+import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
 
 // import gAuthPlugin from 'vue3-google-oauth2';
 
 export default {
-  components: { ModalAlert, TopNaviBarGuest, googleSignIn },
+  components: { ModalAlert, TopNaviBarGuest, googleSignIn, LoadingSpinner },
   layout: 'empty',
   data() {
     return {
@@ -120,6 +124,7 @@ export default {
         password: '',
       },
       isShowPassword: false,
+      isLoading: false,
     }
   },
   computed: {
@@ -162,6 +167,7 @@ export default {
           })
       } else
         try {
+          this.isLoading = true;
           axios({
             method: 'post',
             url: `${constant.base_url}/auth/login`,
@@ -197,6 +203,9 @@ export default {
                   type: 'failed',
                 },
               }
+            })
+            .finally(() => {
+              this.isLoading = true;
             })
         } catch (err) {
           console.log(err)
