@@ -167,7 +167,7 @@ export default {
           })
       } else
         try {
-          this.isLoading = true;
+          this.isLoading = true
           axios({
             method: 'post',
             url: `${constant.base_url}/auth/login`,
@@ -193,19 +193,25 @@ export default {
               })
             })
             .catch((err) => {
+              this.$notify({
+                group: 'foo',
+                title: 'Lỗi',
+                text: 'Sai tài khoản hoặc mật khẩu',
+                type: 'error',
+              })
               this.alert = {
                 ...this.alert,
                 ...{
                   isShowModal: true,
                   title: 'Lỗi',
                   buttonOkContent: 'Đóng',
-                  content: err.response.data.error,
+                  content: err.response.error,
                   type: 'failed',
                 },
               }
             })
             .finally(() => {
-              this.isLoading = false;
+              this.isLoading = false
             })
         } catch (err) {
           console.log(err)
