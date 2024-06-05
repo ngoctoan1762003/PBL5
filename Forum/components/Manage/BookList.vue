@@ -171,15 +171,21 @@ export default {
       this.isEditProfile = true
     },
     onDelete(id) {
-      const authorization = localStorage.getItem('accessToken')
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
         method: 'delete',
-        url: `${constant.base_url}/users/${id}`,
+        url: `${constant.base_url}/book/${id}`,
         headers: {
           Authorization: authorization,
         },
       }).then((res) => {
         this.reload()
+        this.$notify({
+          title: 'Thành công',
+          text: 'Xóa thành công',
+          type: 'success',
+          group: 'foo',
+        })
       })
     },
     formatBirthday(date) {

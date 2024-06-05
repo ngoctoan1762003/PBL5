@@ -269,10 +269,11 @@ export default {
         .then((res) => {
           this.$notify({
             title: 'Thành công',
-            text: 'Đăng bài thành công',
+            text: 'Chỉnh sửa thành công',
             type: 'success',
             group: 'foo',
           })
+          this.$emit('reload')
         })
         .catch((err) => {
           this.$notify({
