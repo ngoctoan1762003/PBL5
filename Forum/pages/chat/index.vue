@@ -11,13 +11,20 @@
     <div class="chat-container">
       <div class="h-[100%] w-[100%] flex">
         <div
-          class="h-[100%] w-[180px] flex flex-col pl-4 gap-4 py-4 overflow-y-auto overflow-x-hidden border-[1px] shadow-md relative"
+          class="h-[100%] w-[250px] flex flex-col pl-4 pr-4 gap-4 py-4 overflow-y-auto overflow-x-hidden border-[1px] shadow-md relative border-r-2 border-[#1B3764]"
         >
+          <input
+            type="text"
+            v-model="keyword"
+            placeholder="Tìm kiếm..."
+            class="p-3"
+          />
           <div
-            v-for="conversation in conversations"
+            v-for="conversation in filteredConversations"
             :key="conversation.user_id"
             @click="toConversationWith(conversation.user_id)"
             class="cursor-pointer relative flex gap-3 justify-start items-center"
+            :class="{'bg-blue-500': conversation.user_id === recipientId}"
           >
             <img
               :src="conversation.image"
@@ -112,6 +119,7 @@ export default {
         name: '',
         y: 0,
       },
+      keyword: '',
     }
   },
   mounted() {
@@ -156,6 +164,17 @@ export default {
       console.log(res.data)
       this.conversations = res.data
     })
+  },
+  computed: {
+    filteredConversations() {
+      if (this.keyword.trim() === '') {
+        return this.conversations
+      }
+      const keywordLowerCase = this.keyword.toLowerCase()
+      return this.conversations.filter((conversation) =>
+        conversation.name.toLowerCase().includes(keywordLowerCase)
+      )
+    },
   },
   methods: {
     sendMessage() {
@@ -216,5 +235,13 @@ export default {
   &__content {
     height: calc(100% - 50px);
   }
+}
+input[type="text"] {
+  padding: 8px;
+  outline: none; /* Remove default focus outline */
+  transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+input[type="text"]:focus {
 }
 </style>

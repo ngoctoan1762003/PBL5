@@ -8,16 +8,23 @@
     >
       {{ popup.name }}
     </div> -->
-    <div class="chat-container">
+    <div class="chat-container border-2 border-[#1B3764]">
       <div class="h-[100%] w-[100%] flex">
         <div
-          class="h-[100%] w-[200px] flex flex-col pl-4 gap-4 py-4 overflow-y-auto overflow-x-hidden border-[1px] shadow-md relative"
+          class="h-[100%] w-[250px] flex flex-col pl-4 pr-4 gap-4 py-4 overflow-y-auto overflow-x-hidden border-[1px] shadow-md relative border-r-2 border-[#1B3764]"
         >
+          <input
+            type="text"
+            v-model="keyword"
+            placeholder="Tìm kiếm..."
+            class="p-3"
+          />
           <div
-            v-for="conversation in conversations"
+            v-for="conversation in filteredConversations"
             :key="conversation.user_id"
             @click="toConversationWith(conversation.user_id)"
             class="cursor-pointer relative flex gap-3 justify-start items-center"
+            :class="[{ 'bg-blue-100': conversation.user_id === recipientId }, { 'rounded-md': conversation.user_id === recipientId }, { 'px-3': conversation.user_id === recipientId }, { 'py-2': conversation.user_id === recipientId }]"
           >
             <img
               :src="conversation.image"
@@ -69,7 +76,7 @@
           </ul>
           <input
             v-model="message"
-            placeholder="Type a message"
+            placeholder="Nhập tin nhắn"
             @keyup.enter="sendMessage"
             class="h-10 w-full border border-gray-500 py-2 px-3 mt-2"
           />
@@ -112,6 +119,7 @@ export default {
         y: 0,
       },
       shouldScrollToBottom: true,
+      keyword: '',
     }
   },
   mounted() {
@@ -202,7 +210,21 @@ export default {
       }
     )
   },
+  computed: {
+    filteredConversations() {
+      if (this.keyword.trim() === '') {
+        return this.conversations
+      }
+      const keywordLowerCase = this.keyword.toLowerCase()
+      return this.conversations.filter((conversation) =>
+        conversation.name.toLowerCase().includes(keywordLowerCase)
+      )
+    },
+  },
   methods: {
+    handleSearch(event) {
+      this.keyword = event.target.value
+    },
     sendMessage() {
       if (this.message.trim() !== '') {
         const msg = JSON.stringify({
@@ -261,5 +283,14 @@ export default {
   &__content {
     height: calc(100% - 50px);
   }
+}
+
+input[type='text'] {
+  padding: 8px;
+  outline: none; /* Remove default focus outline */
+  transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+input[type='text']:focus {
 }
 </style>

@@ -194,7 +194,7 @@ export default {
           if (!error.response?.data?.error.startsWith('Blog'))
             this.$notify({
               title: 'Thất bại',
-              text: 'Kích cỡ file quá lớn, không thể tải lên',
+              text: error.response,
               type: 'error',
               group: 'foo',
             })
