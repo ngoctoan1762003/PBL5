@@ -5,7 +5,7 @@
       class="container relative p-8 py-12 rounded-[10px] border border-[#1E252B] bg-[#2C353D]"
       @click.stop
     >
-      <h1 class="font-medium text-3xl text-[#FF571A]">Edit Profile User</h1>
+      <h1 class="font-medium text-3xl text-[#FF571A]">Chỉnh sửa thông tin người dùng</h1>
       <img
         src="~/assets/icon/close.svg"
         class="w-[30px] h-[30px] absolute right-8 top-8 cursor-pointer"
@@ -23,7 +23,7 @@
                   type="text"
                   name="name"
                   class="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
-                  placeholder="Enter your first name"
+                  placeholder="Nhập tên người dùng"
                 />
               </div>
               <div class="mb-[20px]">
@@ -34,7 +34,7 @@
                   type="text"
                   name="phone"
                   class="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
-                  placeholder="Enter your phone number"
+                  placeholder="Nhập số điện thoại người dùng"
                 />
               </div>
             </div>
@@ -88,7 +88,7 @@
               type="text"
               name="phone"
               class="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
-              placeholder="Enter your phone number"
+              placeholder="Nhập địa chỉ người dùng"
             />
           </div>
           <!-- <div class="flex items-center gap-[60px]">
@@ -187,7 +187,7 @@ export default {
       //     phone: this.userProfile.phone,
       //     profileImage: this.userProfile.profileImage,
       //   })
-      const authorization = localStorage.getItem('accessToken')
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
 
       axios({
         method: 'put',

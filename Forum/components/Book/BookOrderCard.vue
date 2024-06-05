@@ -87,7 +87,7 @@ export default {
   },
   methods: {
     decreaseQuantity() {
-      this.localQuantity--
+      if (this.localQuantity !== 1) this.localQuantity--
       this.$emit('decreaseQuantity', this.book._id)
     },
     increaseQuantity() {

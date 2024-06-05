@@ -209,6 +209,14 @@ export default {
         }
       }
     )
+
+    if (!this.conversations.find(c => c.user_id === this.recipientId)){
+      this.conversations.push({
+        user_id: this.recipient._id,
+        name: this.recipient.Name,
+        image: this.recipient.image,
+      })
+    }
   },
   computed: {
     filteredConversations() {

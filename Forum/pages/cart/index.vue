@@ -254,7 +254,7 @@ export default {
       const book = this.getBook(shopId, bookId)
       if (book.quantity === 1) {
         this.deleteWarning(bookId, shopId)
-        return
+        return;
       }
       book.quantity -= 1
       axios({
