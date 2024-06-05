@@ -199,13 +199,13 @@ export default {
                   isShowModal: true,
                   title: 'Lỗi',
                   buttonOkContent: 'Đóng',
-                  content: err.response,
+                  content: err.response.data.error,
                   type: 'failed',
                 },
               }
             })
             .finally(() => {
-              this.isLoading = true;
+              this.isLoading = false;
             })
         } catch (err) {
           console.log(err)
