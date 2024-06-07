@@ -85,7 +85,7 @@
               <img src="~/assets/icon/bin.svg" alt="" />
             </button> -->
             <div class="w-[100%] flex flex-col gap-3">
-              <div class="w-[100%] py-3 flex justify-between">
+              <div class="w-[100%] py-3 flex justify-between items-center">
                 <div class="flex gap-3 items-center">
                   <div class="font-semibold">{{ order.shop_name }}</div>
                   <button
@@ -95,8 +95,24 @@
                     Chat
                   </button>
                 </div>
-                <div class="font-semibold text-[16px]">
-                  {{ order.Status }}
+                <div class="flex gap-5 items-center">
+                  <div
+                    class="font-semibold text-[16px]"
+                    :class="{
+                      'text-green-500': order.Status === 'Đã xác nhận',
+                      'text-yellow-500': order.Status === 'Đang chờ xác nhận',
+                    }"
+                  >
+                    {{ order.Status }}
+                  </div>
+                  <div v-show="order.Status === 'Đang chờ xác nhận'">
+                    <button
+                      class="bg-red-500 text-white px-3 py-2 rounded-md"
+                      @click="cancelOrder(order.OrderDetailId)"
+                    >
+                      Hủy
+                    </button>
+                  </div>
                 </div>
               </div>
               <div
@@ -117,6 +133,37 @@
                   </div>
                 </div>
                 <div>{{ getPriceFormat(item.Price * item.Quantity) }}</div>
+              </div>
+              <div class="border-b-[1px] border-darkblue"></div>
+              <div
+                class="flex justify-between"
+                v-show="order.DiscountPercent !== 0"
+              >
+                <div class="flex gap-5 items-center">
+                  <div class="text-darkblue font-semibold">Mã giảm giá:</div>
+                  <div class="text-darkblue font-semibold">
+                    {{ order.DiscountCode }}
+                  </div>
+                </div>
+                <div>{{ order.DiscountPercent }}%</div>
+              </div>
+              <div
+                class="flex justify-between"
+                v-show="order.DiscountAmount !== 0"
+              >
+                <div class="flex gap-5 items-center">
+                  <div class="text-darkblue font-semibold">Mã giảm giá:</div>
+                  <div class="text-darkblue font-semibold">
+                    {{ order.DiscountCode }}
+                  </div>
+                </div>
+                <div>{{ getPriceFormat(order.DiscountAmount) }}</div>
+              </div>
+              <div class="flex justify-between">
+                <div class="text-darkblue font-semibold">
+                  Chi phí vận chuyển
+                </div>
+                <div>{{ getPriceFormat(order.ShippingCost) }}</div>
               </div>
               <div class="border-b-[1px] border-darkblue"></div>
               <div class="flex justify-between">
@@ -318,6 +365,50 @@ export default {
       } else {
         this.removeAll()
       }
+    },
+    cancelOrder(orderId) {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'delete',
+        url: `${constant.base_url}/order/order_cancel/${orderId}`,
+        headers: {
+          Authorization: authorization,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          this.$notify({
+            title: 'Thành công',
+            text: 'Xóa thành công',
+            type: 'success',
+            group: 'foo',
+          })
+          const userId = localStorage.getItem('userId')
+          const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+          axios({
+            method: 'get',
+            url: `${constant.base_url}/order/order_detail/${userId}`,
+            headers: {
+              Authorization: authorization,
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          })
+            .then((res) => {
+              this.orders = res.data
+            })
+            .catch((err) => {
+              console.log(err.response)
+            })
+        })
+
+        .catch((error) => {
+          this.$notify({
+            title: 'Thất bại',
+            text: 'Xóa thất bại: ' + error.response,
+            type: 'error',
+            group: 'foo',
+          })
+        })
     },
     addAll() {
       for (let i = 0; i < this.cart.length; i++) {

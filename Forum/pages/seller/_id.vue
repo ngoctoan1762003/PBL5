@@ -338,7 +338,7 @@ export default {
           },
         }),
         axios.get(
-          `${constant.base_url}/statistical/pending_confirmation/${userId}`,
+          `${constant.base_url}/statistical/orders_count/${userId}/Đang chờ xác nhận`,
           {
             headers: {
               Authorization: authorization,
@@ -374,7 +374,7 @@ export default {
       this.discounts = discountsRes.data
       this.doneOrders = doneOrdersRes.data.order_details
       this.allBookCount = allBookCountRes.data.books_count
-      this.pendingOrderCount = pendingOrderCountRes.data.pending_orders_count
+      this.pendingOrderCount = pendingOrderCountRes.data.orders_count
       this.allOrderCount = allOrderCountRes.data.orders_count
       this.soldBookCount = soldBookCountRes.data
       this.booksOfShop = booksOfShopRes.data
@@ -422,154 +422,93 @@ export default {
       return { month: monthNumber, year: year }
     },
 
-    reload() {
+    async reload() {
+      this.isLoading = true
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       const userId = `${localStorage.getItem('userId')}`
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
-        headers: {
-          Authorization: authorization,
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-        },
-      })
-        .then((res) => {
-          console.log(res.data)
-          this.books = res.data.books
-          this.bookCount = res.data.count
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/discount/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-        },
-      })
-        .then((res) => {
-          console.log(res.data)
-          this.discounts = res.data
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/statistical/books_count/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-          Authorization: authorization,
-        },
-      })
-        .then((res) => {
-          console.log(res.data)
-          this.allBookCount = res.data.books_count
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/statistical/pending_confirmation/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-          Authorization: authorization,
-        },
-      })
-        .then((res) => {
-          console.log(res.data)
-          this.pendingOrderCount = res.data.pending_orders_count
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/statistical/orders_count/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-          Authorization: authorization,
-        },
-      })
-        .then((res) => {
-          console.log(res.data)
-          this.allOrderCount = res.data.orders_count
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/statistical/sold_books_count/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-          Authorization: authorization,
-        },
-      })
-        .then((res) => {
-          console.log(res.data)
-          this.soldBookCount = res.data
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/book/shop/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-          Authorization: authorization,
-        },
-      })
-        .then((res) => {
-          console.log(res.data)
-          this.booksOfShop = res.data
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-      axios({
-        method: 'get',
-        url: `${constant.base_url}/discount/${userId}`,
-        headers: {
-          'ngrok-skip-browser-warning': 'skip-browser-warning',
-          Authorization: authorization,
-        },
-      })
-        .then((res) => {
-          console.log(res.data)
-          this.discounts = res.data
-          console.log(this.discounts)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
+
+      try {
+        const [
+          booksRes,
+          discountsRes,
+          doneOrdersRes,
+          allBookCountRes,
+          pendingOrderCountRes,
+          allOrderCountRes,
+          soldBookCountRes,
+          booksOfShopRes,
+        ] = await Promise.all([
+          axios.get(
+            `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
+            {
+              headers: {
+                Authorization: authorization,
+                'ngrok-skip-browser-warning': 'skip-browser-warning',
+              },
+            }
+          ),
+          axios.get(`${constant.base_url}/discount/${userId}`, {
+            headers: { 'ngrok-skip-browser-warning': 'skip-browser-warning' },
+          }),
+          axios.get(`${constant.base_url}/order/shop/${userId}`, {
+            headers: {
+              Authorization: authorization,
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          }),
+          axios.get(`${constant.base_url}/statistical/books_count/${userId}`, {
+            headers: {
+              Authorization: authorization,
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          }),
+          axios.get(
+            `${constant.base_url}/statistical/orders_count/${userId}/Đang chờ xác nhận`,
+            {
+              headers: {
+                Authorization: authorization,
+                'ngrok-skip-browser-warning': 'skip-browser-warning',
+              },
+            }
+          ),
+          axios.get(`${constant.base_url}/statistical/orders_count/${userId}`, {
+            headers: {
+              Authorization: authorization,
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          }),
+          axios.get(
+            `${constant.base_url}/statistical/sold_books_count/${userId}`,
+            {
+              headers: {
+                Authorization: authorization,
+                'ngrok-skip-browser-warning': 'skip-browser-warning',
+              },
+            }
+          ),
+          axios.get(`${constant.base_url}/book/shop/${userId}`, {
+            headers: {
+              Authorization: authorization,
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          }),
+        ])
+
+        this.books = booksRes.data.books
+        this.bookCount = booksRes.data.count
+        this.discounts = discountsRes.data
+        this.doneOrders = doneOrdersRes.data.order_details
+        this.allBookCount = allBookCountRes.data.books_count
+        this.pendingOrderCount = pendingOrderCountRes.data.orders_count
+        this.allOrderCount = allOrderCountRes.data.orders_count
+        this.soldBookCount = soldBookCountRes.data
+        this.booksOfShop = booksOfShopRes.data
+      } catch (err) {
+        console.error(err)
+      } finally {
+        console.log('done order', this.doneOrders)
+        this.isLoading = false
+      }
     },
 
     changeBookPage(page, limit) {

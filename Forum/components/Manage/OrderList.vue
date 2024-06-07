@@ -12,18 +12,38 @@
     <div
       class="w-full bg-[#1B3764] rounded-[16px] text-white font-medium p-5 flex justify-between text-[12px] mb-5"
     >
-      <div class="w-[25%] flex justify-center items-center cursor-pointer" @click="toAll()">Tất cả</div>
-      <div class="w-[25%] flex justify-center items-center cursor-pointer" @click="toPendingOrder()">Đang chờ</div>
-      <div class="w-[25%] flex justify-center items-center cursor-pointer" @click="toDoneOrder()">Đã xác nhận</div>
-      <div class="w-[25%] flex justify-center items-center cursor-pointer" @click="toAbandonedOrder">Đã hủy</div>
+      <div
+        class="w-[25%] flex justify-center items-center cursor-pointer"
+        @click="toAll()"
+      >
+        Tất cả
+      </div>
+      <div
+        class="w-[25%] flex justify-center items-center cursor-pointer"
+        @click="toPendingOrder()"
+      >
+        Đang chờ
+      </div>
+      <div
+        class="w-[25%] flex justify-center items-center cursor-pointer"
+        @click="toDoneOrder()"
+      >
+        Đã xác nhận
+      </div>
+      <div
+        class="w-[25%] flex justify-center items-center cursor-pointer"
+        @click="toAbandonedOrder"
+      >
+        Đã hủy
+      </div>
     </div>
     <div
       class="user-list text-white font-medium p-5 w-full bg-[#1B3764] rounded-[16px]"
     >
-      <div class="font-semibold user-list-row">
+      <div class="font-semibold user-list-row font-semibold">
         <!-- <div class="user-list-row-cell avatar"></div> -->
         <div class="user-list-row-cell title">Mã hóa đơn</div>
-        <div class="user-list-row-cell gender">Số lượng</div>
+        <div class="user-list-row-cell gender">Số loại sách</div>
         <div class="user-list-row-cell phone">Mã giảm giá</div>
         <div class="user-list-row-cell email">Tên shop</div>
         <div class="user-list-row-cell birthday">Trạng thái</div>
@@ -32,80 +52,78 @@
       </div>
       <div
         v-for="user in currentOrderSelect"
-        class="user-list-row user-list-information"
-        :key="user.OrderId"
+        class=""
+        :key="user.OrderDetailId"
       >
-        <!-- <div class="avatar"> -->
-        <!-- <img :src="user.image" class="p-2 rounded-full" /> -->
-        <!-- </div> -->
-        <div class="user-list-row-cell title">
-          {{ user.OrderId }}
-        </div>
-        <div class="user-list-row-cell gender">
-          {{ user.Items.length }}
-        </div>
-        <div class="user-list-row-cell phone">
-          {{ getName(user.DiscountId) }}
-        </div>
-        <div class="user-list-row-cell email">{{ user.shop_name }}</div>
-        <div class="user-list-row-cell birthday">{{ user.Status }}</div>
-        <div class="user-list-row-cell status">
-          {{ getPriceFormat(user.Total_price) }}
-        </div>
-        <div class="tooltip relative">
-          <!-- <img
-            src="~/assets/icon/more.svg"
-            @mouseenter="displayTooltip(user.OrderId)"
-            class="cursor-pointer"
-          />
-          <div
-            :id="'action-' + user.OrderId"
-            class="hidden absolute top-1 right-0 z-10"
-            @mouseleave="closeAllPopup()"
-          >
-            <div class="px-1 py-1 bg-white rounded-lg">
+        <div class="user-list-row bg-white hover:bg-gray-300">
+          <div class="user-list-row-cell font-semibold text-[#1B3764] title">
+            {{ user.OrderDetailId }}
+          </div>
+          <div class="user-list-row-cell font-semibold text-[#1B3764] gender">
+            {{ user.Items.length }}
+          </div>
+          <div class="user-list-row-cell font-semibold text-[#1B3764] phone">
+            {{ getName(user.DiscountCode) }}
+          </div>
+          <div class="user-list-row-cell font-semibold text-[#1B3764] email">{{ user.shop_name }}</div>
+          <div class="user-list-row-cell font-semibold text-[#1B3764] birthday">{{ user.Status }}</div>
+          <div class="user-list-row-cell font-semibold text-[#1B3764] status">
+            {{ getPriceFormat(user.Total_price) }}
+          </div>
+          <div class="tooltip relative">
+            <div
+              v-show="user.Status === 'Đang chờ xác nhận'"
+              class="flex gap-3 items-center justify-start ml-[-60px]"
+            >
               <button
-                class="hover:bg-gray-500 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                @click="showPopup(user)"
+                class="w-[75px] py-2 rounded-md bg-red-500"
+                @click="cancelOrder(user.OrderDetailId)"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-5 h-5 mr-2 text-violet-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  ></path>
-                </svg>
-                Sửa
+                Hủy
               </button>
               <button
-                class="hover:bg-red-400 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                @click="onDelete(user.OrderId)"
+                class="w-[75px] py-2 rounded-md bg-green-400"
+                @click="confirmOrder(user.OrderDetailId)"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-5 h-5 mr-2 text-violet-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  ></path>
-                </svg>
-                Xóa
+                Xác nhận
               </button>
             </div>
-          </div> -->
+          </div>
+        </div>
+        <div class="flex flex-col gap-3 bg-blue-500 opacity-70 rounded-md">
+          <div class="user-list-row user-list-information">
+            <div class="user-list-row-cell title flex gap-4 items-center">
+              <div>Sách</div>
+            </div>
+            <div class="user-list-row-cell gender">
+              Thể loại
+            </div>
+            <div class="user-list-row-cell phone">
+              Giá tiền
+            </div>
+            <div class="user-list-row-cell email">Số lượng</div>
+            <div class="user-list-row-cell birthday"></div>
+            <div class="user-list-row-cell status">
+              Tổng tiền
+            </div>
+          </div>
+          <div v-for="book in user.Items" :key="book.BookId"  class="user-list-row user-list-information">
+            <div class="user-list-row-cell title flex gap-4 items-center">
+              <img :src="book.Image" class="w-[40px]" alt="" />
+              <div>{{ book.Title }}</div>
+            </div>
+            <div class="user-list-row-cell gender">
+              {{ book.Genre }}
+            </div>
+            <div class="user-list-row-cell phone">
+              {{ book.Price }}
+            </div>
+            <div class="user-list-row-cell email">{{ book.Quantity }}</div>
+            <div class="user-list-row-cell birthday">{{ user.Status }}</div>
+            <div class="user-list-row-cell status">
+              {{ getPriceFormat(book.Price * book.Quantity) }}
+            </div>
+          </div>
         </div>
       </div>
       <div class="w-full h-[1px] bg-gray-500"></div>
@@ -163,20 +181,23 @@ export default {
       })
     console.log(this.users)
   },
-  computed: {
-  },
+  computed: {},
   methods: {
-    toDoneOrder(){
-      this.currentOrderSelect = this.users.filter(u => u.Status === 'Đã xác nhận');
+    toDoneOrder() {
+      this.currentOrderSelect = this.users.filter(
+        (u) => u.Status === 'Đã xác nhận'
+      )
     },
-    toPendingOrder(){
-      this.currentOrderSelect = this.users.filter(u => u.Status === 'đang chờ');
+    toPendingOrder() {
+      this.currentOrderSelect = this.users.filter(
+        (u) => u.Status === 'Đang chờ xác nhận'
+      )
     },
-    toAbandonedOrder(){
-      this.currentOrderSelect = this.users.filter(u => u.Status === 'Đã hủy');
+    toAbandonedOrder() {
+      this.currentOrderSelect = this.users.filter((u) => u.Status === 'Đã hủy')
     },
-    toAll(){
-      this.currentOrderSelect = this.users;
+    toAll() {
+      this.currentOrderSelect = this.users
     },
     closeAllPopup() {
       this.users.forEach((p) => {
@@ -239,6 +260,62 @@ export default {
     changePage(page, limit) {
       this.$emit('changePage', page, limit)
     },
+    confirmOrder(orderId) {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'put',
+        url: `${constant.base_url}/order/order_confirm/${orderId}`,
+        headers: {
+          Authorization: authorization,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          this.$notify({
+            title: 'Thành công',
+            text: 'Xác nhận thành công',
+            type: 'success',
+            group: 'foo',
+          })
+          this.reload()
+        })
+        .catch((error) => {
+          this.$notify({
+            title: 'Thất bại',
+            text: 'Xác nhận thất bại: ' + error.response,
+            type: 'error',
+            group: 'foo',
+          })
+        })
+    },
+    cancelOrder(orderId) {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'delete',
+        url: `${constant.base_url}/order/order_cancel/${orderId}`,
+        headers: {
+          Authorization: authorization,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          this.$notify({
+            title: 'Thành công',
+            text: 'Xóa thành công',
+            type: 'success',
+            group: 'foo',
+          })
+          this.reload()
+        })
+        .catch((error) => {
+          this.$notify({
+            title: 'Thất bại',
+            text: 'Xóa thất bại: ' + error.response,
+            type: 'error',
+            group: 'foo',
+          })
+        })
+    },
   },
 }
 </script>
@@ -262,6 +339,9 @@ export default {
     align-items: center;
     border-radius: 10px;
     min-height: 50px;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    padding-top: 10px;
 
     &-cell {
       grid-column: span 1 / span 1;
