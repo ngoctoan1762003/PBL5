@@ -5,7 +5,11 @@
       v-show="isUpRole"
     >
       <div class="absolute bg-gray-500 opacity-50 w-full h-full"></div>
-      <ModalUprole @submit="toRoleSeller" @cancel="isUpRole = false" class="relative z-[1]"/>
+      <ModalUprole
+        @submit="toRoleSeller"
+        @cancel="isUpRole = false"
+        class="relative z-[1]"
+      />
     </div>
     <TopNavBar />
     <main class="profile-page overflow-hidden">
@@ -79,7 +83,7 @@
                         type="button"
                         style="transition: all 0.15s ease 0s"
                         @click="isUpRole = true"
-                        v-if="user.Role !=='seller' && user.Role !== 'admin'"
+                        v-if="user.Role !== 'seller' && user.Role !== 'admin'"
                       >
                         Trở thành người bán
                       </button>
@@ -249,7 +253,7 @@ export default {
   methods: {
     toRoleSeller(shopName) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
-      this.isUpRole = false;
+      this.isUpRole = false
       axios({
         method: 'post',
         url: `${constant.base_url}/user/uprole`,
@@ -293,6 +297,18 @@ export default {
     save(userProp) {
       // alert('Luu thanh cong:', JSON.stringify(userProp))
       console.log(userProp)
+      const userId = localStorage.getItem('userId')
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/user/${userId}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      }).then((res) => {
+        console.log(res.data)
+        this.user = res.data
+        localStorage.setItem('user', JSON.stringify(this.user))
+      })
       this.isEditProfile = false
     },
     fetchInfoUser(data) {

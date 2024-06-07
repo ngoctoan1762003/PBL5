@@ -1,6 +1,10 @@
 <template>
   <div class="relative flex flex-col items-center h-[100vh]">
     <TopNaviBarGuest />
+    <div class="absolute w-[100vw] h-[100vh] flex justify-center items-center z-[100]" v-show="isForgotPassword">
+      <div class="absolute w-[100vw] h-[100vh] bg-gray-500 opacity-50"></div>
+      <forgot-password-panel-vue @cancel="isForgotPassword = false" @done="isForgotPassword = false" class="z-[10] min-w-[400px]"/>
+    </div>
     <!-- <div class="absolute w-full h-full border-2"></div> -->
     <div class="z-10 flex justify-start gap-[80px]">
       <form
@@ -102,6 +106,7 @@ import ModalAlert from '~/components/Modal/ModalAlert.vue'
 import TopNaviBarGuest from '~/components/TopNaviBarGuest.vue'
 import constant from '~/constant'
 import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
+import ForgotPasswordPanelVue from '~/components/User/ForgotPasswordPanel.vue'
 
 // import gAuthPlugin from 'vue3-google-oauth2';
 
@@ -111,6 +116,7 @@ export default {
     TopNaviBarGuest,
     // googleSignIn,
     LoadingSpinner,
+    ForgotPasswordPanelVue,
   },
   layout: 'empty',
   data() {
@@ -130,6 +136,7 @@ export default {
       },
       isShowPassword: false,
       isLoading: false,
+      isForgotPassword: false,
     }
   },
   computed: {
@@ -226,7 +233,7 @@ export default {
       this.$router.push('/auth/signup')
     },
     toFogotPassword() {
-      this.$router.push('/auth/forgot-password')
+      this.isForgotPassword = true;
     },
     onCloseModal(typeSubmit) {
       switch (typeSubmit) {

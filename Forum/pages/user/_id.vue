@@ -256,7 +256,6 @@ export default {
       this.isEditProfile = false
     },
     save(userProp) {
-      alert('Luu thanh cong:', JSON.stringify(userProp))
       console.log(userProp)
       this.isEditProfile = false
     },

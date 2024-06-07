@@ -58,6 +58,16 @@
               <input
                 type="radio"
                 name="sortOrder"
+                value=""
+                v-model="sortOrder"
+                @change="onSortOrderChange"
+              />
+              <span class="ml-2 text-[13px]">Hủy</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="sortOrder"
                 value="asc"
                 v-model="sortOrder"
                 @change="onSortOrderChange"
@@ -81,11 +91,21 @@
               <input
                 type="radio"
                 name="priceSortOrder"
+                value=""
+                v-model="priceSortOrder"
+                @change="onPriceSortOrderChange"
+              />
+              <span class="ml-2 text-[13px]">Hủy</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="priceSortOrder"
                 value="asc"
                 v-model="priceSortOrder"
                 @change="onPriceSortOrderChange"
               />
-              <span class="ml-2 text-[13px]">Từ trên xuống</span>
+              <span class="ml-2 text-[13px]">Từ thấp lên</span>
             </label>
             <label class="flex items-center">
               <input
@@ -95,7 +115,7 @@
                 v-model="priceSortOrder"
                 @change="onPriceSortOrderChange"
               />
-              <span class="ml-2 text-[13px]">Từ dưới lên</span>
+              <span class="ml-2 text-[13px]">Từ cao xuống</span>
             </label>
           </div>
         </div>

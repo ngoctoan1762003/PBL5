@@ -41,14 +41,13 @@ export default {
   },
   computed: {
     filterdBook() {
-      if (!this.keyword) {
-        return this.books
-      }
       const lowerCaseKeyword = this.keyword.toLowerCase()
       let filteredBooks = this.books.filter((book) =>
         book.title.toLowerCase().includes(lowerCaseKeyword)
       )
 
+      console.log(this.genre)
+      console.log(filteredBooks)
       if (this.genre) {
         filteredBooks = filteredBooks.filter(
           (book) => book.genre === this.genre
@@ -56,6 +55,7 @@ export default {
       }
 
       // Sort by name
+      console.log("sort", this.sortOrder)
       if (this.sortOrder) {
         filteredBooks = filteredBooks.sort((a, b) => {
           const titleA = a.title.toLowerCase()
@@ -68,7 +68,8 @@ export default {
         })
       }
 
-      // Sort by price
+      // // Sort by price
+      console.log("price", this.priceSortOrder)
       if (this.priceSortOrder) {
         filteredBooks = filteredBooks.sort((a, b) => {
           const priceA = parseFloat(a.price)
@@ -114,9 +115,10 @@ export default {
       this.keyword = keyword
     },
     filterChange(genre, sortByName, sortByPrice) {
+      this.sortOrder = sortByName
+      this.priceSortOrder = sortByPrice
+      this.genre = "h"
       this.genre = genre
-      this.sortByName = sortByName
-      this.sortByPrice = sortByPrice
       console.log(genre, sortByName, sortByPrice)
     },
   },

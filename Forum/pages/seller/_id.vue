@@ -562,6 +562,7 @@ export default {
         .then((res) => {
           console.log(res.data)
           this.discounts = res.data
+          console.log(this.discounts)
         })
         .catch((err) => {
           console.log(err)
