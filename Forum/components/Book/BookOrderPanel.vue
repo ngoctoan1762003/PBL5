@@ -13,7 +13,7 @@
     </div>
     <div class="bg-white p-10 flex flex-col gap-5">
       <div class="flex gap-5">
-        <img class="w-[80px]" src="~/assets/img/DemoBook.png" alt="" />
+        <img class="w-[80px]" :src="book.image" alt="" />
         <div class="flex flex-col justify-between">
           <div>
             <div class="flex gap-4 items-center">

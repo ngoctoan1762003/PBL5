@@ -44,7 +44,7 @@
       </div>
       <img class="section__1__image" :src="book.image" />
     </div>
-    <div class="section__2">
+    <!-- <div class="section__2">
       <div class="section__2__author__img">
         <img class="w-[100%]" src="~/assets/img/Author-Background.png" alt="" />
         <div
@@ -77,8 +77,8 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="section__3">
+    </div> -->
+    <!-- <div class="section__3">
       <div class="section__3__main">
         <div class="text-[35px] font-semibold">Get Book Copy Today</div>
         <div class="w-[60px] h-[1px] bg-[#FFCA42]"></div>
@@ -93,8 +93,8 @@
         </button>
       </div>
       <img class="w-[40%]" src="~/assets/img/Photo.png" />
-    </div>
-    <div class="section__4">
+    </div> -->
+    <div class="section__4" v-show="sameAuthorBook.length > 0">
       <div class="flex justify-center items-center flex-col gap-5">
         <div class="text-[#1B3764] text-[30px] font-semibold">
           Những sách khác cùng tác giả

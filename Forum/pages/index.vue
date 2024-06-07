@@ -2,7 +2,7 @@
   <div>
     <TopNaviBarGuest v-if="isLogedIn === false" />
     <TopNaviBar v-else />
-    <SearchBar @search="search" />
+    <SearchBar @search="search" @filterChange="filterChange" />
     <div class="flex flex-wrap p-10 gap-10 justify-center">
       <div v-for="book in filterdBook" :key="book.BookId" class="w-[20%]">
         <VerticalBookCard :book="book" />
@@ -34,6 +34,9 @@ export default {
       books: [],
       isLogedIn: false,
       keyword: '',
+      genre: '',
+      sortByName: '',
+      sortByPrice: '',
     }
   },
   computed: {
@@ -42,9 +45,43 @@ export default {
         return this.books
       }
       const lowerCaseKeyword = this.keyword.toLowerCase()
-      return this.books.filter((book) =>
+      let filteredBooks = this.books.filter((book) =>
         book.title.toLowerCase().includes(lowerCaseKeyword)
       )
+
+      if (this.genre) {
+        filteredBooks = filteredBooks.filter(
+          (book) => book.genre === this.genre
+        )
+      }
+
+      // Sort by name
+      if (this.sortOrder) {
+        filteredBooks = filteredBooks.sort((a, b) => {
+          const titleA = a.title.toLowerCase()
+          const titleB = b.title.toLowerCase()
+          if (this.sortOrder === 'asc') {
+            return titleA < titleB ? -1 : titleA > titleB ? 1 : 0
+          } else {
+            return titleA > titleB ? -1 : titleA < titleB ? 1 : 0
+          }
+        })
+      }
+
+      // Sort by price
+      if (this.priceSortOrder) {
+        filteredBooks = filteredBooks.sort((a, b) => {
+          const priceA = parseFloat(a.price)
+          const priceB = parseFloat(b.price)
+          if (this.priceSortOrder === 'asc') {
+            return priceA - priceB
+          } else {
+            return priceB - priceA
+          }
+        })
+      }
+
+      return filteredBooks
     },
   },
   mounted() {
@@ -75,6 +112,12 @@ export default {
   methods: {
     search(keyword) {
       this.keyword = keyword
+    },
+    filterChange(genre, sortByName, sortByPrice) {
+      this.genre = genre
+      this.sortByName = sortByName
+      this.sortByPrice = sortByPrice
+      console.log(genre, sortByName, sortByPrice)
     },
   },
 }

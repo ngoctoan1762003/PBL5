@@ -23,28 +23,28 @@
         Tất cả
       </div>
       <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 2 }"
         @click="currentOption = 2"
       >
         Chờ thanh toán
       </div>
       <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 3 }"
         @click="currentOption = 3"
       >
         Đã thanh toán
       </div>
       <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 4 }"
         @click="currentOption = 4"
       >
         Hoàn thành
       </div>
       <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 5 }"
         @click="currentOption = 5"
       >
@@ -95,7 +95,7 @@
                     Chat
                   </button>
                 </div>
-                <div class="font-semibold text-[18px]">
+                <div class="font-semibold text-[16px]">
                   {{ order.Status }}
                 </div>
               </div>

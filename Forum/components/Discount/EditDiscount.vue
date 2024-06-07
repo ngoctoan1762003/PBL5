@@ -332,9 +332,9 @@ export default {
         url: `${constant.base_url}/discount/${this.book._id}`,
         data: {
           discount_code: this.discountCode,
-          amount: this.discountAmount,
-          percent: this.discountPercent,
-          quantity: this.quantity,
+          amount: parseInt(this.discountAmount),
+          percent: parseInt(this.discountPercent),
+          quantity: parseInt(this.quantity),
           start_day: startDateTime,
           end_day: endDateTime,
         },

@@ -37,7 +37,7 @@
           v-model="selectedDiscountCode"
         >
           <option
-            v-for="discount in changingShopVoucher.discount"
+            v-for="discount in filteredDiscount"
             :key="discount._id"
             :value="discount?.DiscountCode || ''"
           >
@@ -58,16 +58,27 @@
     </div>
     <div class="cart__header py-3 flex flex-col gap-5 my-2">
       <div class="pl-5 text-[20px] text-[#1B3764] font-semibold">
-        Địa chỉ nhận hàng
+        Thông tin nhận hàng
       </div>
       <div class="pl-5 flex gap-5 w-full items-center">
-        <div class="min-w-[200px]">Tên</div>
+        <div class="min-w-[200px]">Địa chỉ</div>
         <input
           type="text"
           placeholder="Địa chỉ"
           class="py-3 px-5 w-[60%] rounded-[20px] text-[#1B3764]"
+          v-model="address"
         />
-        <div class="text-[#FFCA42]">Thay đổi</div>
+        <!-- <div class="text-[#FFCA42]">Thay đổi</div> -->
+      </div>
+      <div class="pl-5 flex gap-5 w-full items-center">
+        <div class="min-w-[200px]">Số điện thoại</div>
+        <input
+          type="text"
+          placeholder="Số điện thoại"
+          class="py-3 px-5 w-[60%] rounded-[20px] text-[#1B3764]"
+          v-model="phone"
+        />
+        <!-- <div class="text-[#FFCA42]">Thay đổi</div> -->
       </div>
     </div>
     <div class="cart__header">
@@ -107,7 +118,9 @@
         </div>
         <div
           class="bg-[#F4F8FF] py-5 px-5 flex flex-col gap-4"
-          v-show="shop.selectedDiscount"
+          v-show="
+            shop.selectedDiscount && shop.selectedDiscount?.DiscountCode !== ''
+          "
         >
           <div class="text-[#1B3764] font-semibold text-[20px]">Voucher</div>
           <div class="flex flex-col">
@@ -235,44 +248,44 @@ export default {
       changingShopVoucher: Object,
       isChangingVoucher: false,
       selectedDiscountCode: '', // Initialize selected discount code
+      user: {},
+      address: '',
+      phone: '',
     }
   },
   async mounted() {
     const shopsQuery = this.$route.query.shops
+    this.user = JSON.parse(localStorage.getItem('user'))
+    this.address = this.user?.Address || ''
+    this.phone = this.user?.Phone || ''
+
     if (shopsQuery) {
       this.shops = JSON.parse(shopsQuery)
-      console.log(this.shops) // Access the books object here
     }
 
-    await axios({
-      method: 'get',
-      url: `${constant.base_url}/shipping/method`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-      },
-    })
-      .then((res) => {
-        this.shippingMethod = res.data
-        console.log(res.data)
+    try {
+      const res = await axios.get(`${constant.base_url}/shipping/method`, {
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
       })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.selectedMethod = this.shippingMethod[0]
-      })
+      this.shippingMethod = res.data
+      this.selectedMethod = this.shippingMethod[0]
+    } catch (err) {
+      console.error(err)
+    }
 
     for (let i = 0; i < this.shops.length; i++) {
       try {
-        const res = await axios({
-          method: 'get',
-          url: `${constant.base_url}/discount/${this.shops[i].shop_id}`,
-          headers: {
-            'ngrok-skip-browser-warning': 'skip-browser-warning',
-          },
-        })
+        const res = await axios.get(
+          `${constant.base_url}/discount/${this.shops[i].shop_id}`,
+          {
+            headers: {
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          }
+        )
 
-        // Add the discount property to the shop object
         this.$set(this.shops, i, {
           ...this.shops[i],
           discount: res.data,
@@ -284,8 +297,6 @@ export default {
           this.shops[i].discount_id = this.shops[i].discount[0]._id
           this.shops[i].selectedDiscount = this.shops[i].discount[0]
         }
-
-        console.log('discount', this.shops[i])
       } catch (error) {
         console.error(
           `Error fetching discount for shop ${this.shops[i].shop_id}:`,
@@ -295,9 +306,18 @@ export default {
     }
   },
   computed: {
+    filteredDiscount() {
+      // Ensure changingShopVoucher is defined and has a discount property
+      if (
+        this.changingShopVoucher &&
+        Array.isArray(this.changingShopVoucher.discount)
+      ) {
+        return this.changingShopVoucher.discount.filter((d) => d.Quantity > 0)
+      }
+      return []
+    },
     calculateTotalPrice() {
-      // Calculate the total sum of prices of all books from all shops
-      const totalBooksPrice = this.shops.reduce((total, shop) => {
+      let totalBooksPrice = this.shops.reduce((total, shop) => {
         return (
           total +
           shop.books.reduce((subtotal, book) => {
@@ -306,11 +326,32 @@ export default {
         )
       }, 0)
 
-      // Add the cost of the selected method to the total price of books
+      this.shops.forEach((shop) => {
+        console.log('shop', shop)
+        if (
+          shop.selectedDiscount &&
+          shop.selectedDiscount?.DiscountCode !== ''
+        ) {
+          totalBooksPrice -= shop.selectedDiscount.DiscountAmount
+          totalBooksPrice -=
+            (totalBooksPrice * shop.selectedDiscount.DiscountPercent) / 100
+        }
+      })
+
       return (
         totalBooksPrice +
         (this.selectedMethod.Cost != null ? this.selectedMethod.Cost : 0)
       )
+    },
+  },
+  watch: {
+    address(newAddress) {
+      this.user.Address = newAddress
+      localStorage.setItem('user', JSON.stringify(this.user))
+    },
+    phone(newPhone) {
+      this.user.Phone = newPhone
+      localStorage.setItem('user', JSON.stringify(this.user))
     },
   },
   methods: {
@@ -522,10 +563,29 @@ export default {
       this.isDeleting = true
     },
     confirmOrderBook() {
-      this.shops.forEach((shop) => 
-      shop.books.forEach(book => {
-        book.price = parseInt(book.price)
-      }))
+      if (this.address === '') {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Hãy điền địa chỉ nhận hàng',
+          type: 'error',
+          group: 'foo',
+        })
+        return;
+      }
+      if (this.phone === '') {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Hãy điền số điện thoại',
+          type: 'error',
+          group: 'foo',
+        })
+        return;
+      }
+      this.shops.forEach((shop) =>
+        shop.books.forEach((book) => {
+          book.price = parseInt(book.price)
+        })
+      )
       const userid = localStorage.getItem('userId')
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
@@ -536,7 +596,8 @@ export default {
         },
         data: {
           userid,
-          address: 'something',
+          address: this.address,
+          phone: this.phone,
           status: 'pending',
           shipping_id: '6624eded2b9b7db58edcb9e7',
           shops: this.shops,

@@ -165,8 +165,8 @@ export default {
         data: {
           discount_code: this.discountCode,
           type: this.type,
-          amount: this.type === 'flat' ? this.discountNumber : 0,
-          percent: this.type === 'percent' ? this.discountNumber : 0,
+          amount: this.type === 'flat' ? parseInt(this.discountNumber) : 0,
+          percent: this.type === 'percent' ? parseInt(this.discountNumber) : 0,
           quantity: parseInt(this.quantity),
           start_day: startDateTime,
           end_day: endDateTime,

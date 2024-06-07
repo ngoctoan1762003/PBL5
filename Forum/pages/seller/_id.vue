@@ -41,7 +41,7 @@
               <span class="name">Thêm mã giảm giá</span>
             </div>
           </div>
-          <div class="category__item" @click="changeOption(6)">
+          <!-- <div class="category__item" @click="changeOption(6)">
             <div
               class="w-[30px] bg-[#2C353D] rounded-[5px] pr-[-10px] ml-[2px]"
             >
@@ -50,13 +50,13 @@
             <div class="category__item__info">
               <span class="name">Hóa đơn đã đặt tại cửa hàng</span>
             </div>
-          </div>
+          </div> -->
           <div class="category__item" @click="changeOption(7)">
             <div class="bg-[#2C353D] rounded-[5px] pr-[-10px] ml-[2px]">
               <img class="w-[30px]" src="~/assets/icon/order.svg" alt="" />
             </div>
             <div class="category__item__info">
-              <span class="name">Hóa đơn chờ xác nhận</span>
+              <span class="name">Quản lý hóa đơn</span>
             </div>
           </div>
         </div>
@@ -298,448 +298,100 @@ export default {
     }
   },
   async created() {
-    // if (
-    //   !localStorage.getItem('accessToken') ||
-    //   localStorage.getItem('accessToken') === 'false'
-    // )
-    //   this.$router.push('/auth/login')
+    this.isLoading = true
     const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     const userId = `${localStorage.getItem('userId')}`
-    axios({
-      method: 'get',
-      url: `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
-      headers: {
-        Authorization: authorization,
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-      },
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.books = res.data.books
-        this.bookCount = res.data.count
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
 
-    // axios({
-    //   method: 'get',
-    //   url: `${constant.base_url}/discount/${userId}`,
-    //   headers: {
-    //     'ngrok-skip-browser-warning': 'skip-browser-warning',
-    //   },
-    // })
-    //   .then((res) => {
-    //     console.log(res.data)
-    //     this.discounts = res.data
-    //   })
-    //   .catch((err) => {
-    //     console.log(err)
-    //   })
-    //   .finally(() => {
-    //     this.isLoading = false
-    //   })
+    try {
+      const [
+        booksRes,
+        discountsRes,
+        doneOrdersRes,
+        allBookCountRes,
+        pendingOrderCountRes,
+        allOrderCountRes,
+        soldBookCountRes,
+        booksOfShopRes,
+      ] = await Promise.all([
+        axios.get(
+          `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
+          {
+            headers: {
+              Authorization: authorization,
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          }
+        ),
+        axios.get(`${constant.base_url}/discount/${userId}`, {
+          headers: { 'ngrok-skip-browser-warning': 'skip-browser-warning' },
+        }),
+        axios.get(`${constant.base_url}/order/shop/${userId}`, {
+          headers: {
+            Authorization: authorization,
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
+          },
+        }),
+        axios.get(`${constant.base_url}/statistical/books_count/${userId}`, {
+          headers: {
+            Authorization: authorization,
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
+          },
+        }),
+        axios.get(
+          `${constant.base_url}/statistical/pending_confirmation/${userId}`,
+          {
+            headers: {
+              Authorization: authorization,
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          }
+        ),
+        axios.get(`${constant.base_url}/statistical/orders_count/${userId}`, {
+          headers: {
+            Authorization: authorization,
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
+          },
+        }),
+        axios.get(
+          `${constant.base_url}/statistical/sold_books_count/${userId}`,
+          {
+            headers: {
+              Authorization: authorization,
+              'ngrok-skip-browser-warning': 'skip-browser-warning',
+            },
+          }
+        ),
+        axios.get(`${constant.base_url}/book/shop/${userId}`, {
+          headers: {
+            Authorization: authorization,
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
+          },
+        }),
+      ])
 
-    axios({
-      method: 'get',
-      url: `${constant.base_url}/order/shop/${userId}`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-        Authorization: authorization,
-      },
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.doneOrders = res.data
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
-
-    axios({
-      method: 'get',
-      url: `${constant.base_url}/statistical/books_count/${userId}`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-        Authorization: authorization,
-      },
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.allBookCount = res.data.books_count
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
-    axios({
-      method: 'get',
-      url: `${constant.base_url}/statistical/pending_confirmation/${userId}`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-        Authorization: authorization,
-      },
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.pendingOrderCount = res.data.pending_orders_count
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
-    axios({
-      method: 'get',
-      url: `${constant.base_url}/statistical/orders_count/${userId}`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-        Authorization: authorization,
-      },
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.allOrderCount = res.data.orders_count
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
-    axios({
-      method: 'get',
-      url: `${constant.base_url}/statistical/sold_books_count/${userId}`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-        Authorization: authorization,
-      },
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.soldBookCount = res.data
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
-    axios({
-      method: 'get',
-      url: `${constant.base_url}/statistical/sold_books_count/${userId}`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-        Authorization: authorization,
-      },
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.soldBookCount = res.data
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
-    await axios({
-      method: 'get',
-      url: `${constant.base_url}/book/shop/${userId}`,
-      headers: {
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-        Authorization: authorization,
-      },
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.booksOfShop = res.data
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
-    this.chartData = {
-      labels: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ],
-      series: [
-        [
-          this.bookQuantityJan,
-          this.bookQuantityFeb,
-          this.bookQuantityMar,
-          this.bookQuantityApr,
-          parseInt(this.bookQuantityMay),
-          this.bookQuantityJun,
-          this.bookQuantityJul,
-          this.bookQuantityAug,
-          this.bookQuantitySep,
-          this.bookQuantityOct,
-          this.bookQuantityNov,
-          this.bookQuantityDec,
-        ],
-        [200, 200, 200, 200, 200, 200, 250, 270, 150, 290, 268, 176],
-      ],
+      this.books = booksRes.data.books
+      this.bookCount = booksRes.data.count
+      this.discounts = discountsRes.data
+      this.doneOrders = doneOrdersRes.data.order_details
+      this.allBookCount = allBookCountRes.data.books_count
+      this.pendingOrderCount = pendingOrderCountRes.data.pending_orders_count
+      this.allOrderCount = allOrderCountRes.data.orders_count
+      this.soldBookCount = soldBookCountRes.data
+      this.booksOfShop = booksOfShopRes.data
+    } catch (err) {
+      console.error(err)
+    } finally {
+      console.log('done order', this.doneOrders)
+      this.isLoading = false
     }
   },
   computed: {
-    chartDataComputed() {
-      return {
-        labels: [
-          'Jan',
-          'Feb',
-          'Mar',
-          'Apr',
-          'May',
-          'Jun',
-          'Jul',
-          'Aug',
-          'Sep',
-          'Oct',
-          'Nov',
-          'Dec',
-        ],
-        series: [
-          [
-            this.bookJan,
-            this.bookFeb,
-            this.bookMar,
-            this.bookApr,
-            this.bookMay,
-            this.bookJun,
-            this.bookJul,
-            this.bookAug,
-            this.bookSep,
-            this.bookOct,
-            this.bookNov,
-            this.bookDec,
-          ],
-          [200, 200, 200, 200, 200, 200, 250, 270, 150, 290, 268, 176],
-        ],
-      }
+    pendingOrder() {
+      return this.doneOrders.filter((order) => order.Status === 'Đã xác nhận')
     },
-    bookQuantitySeries() {
-      const currentYear = 2024 // Or dynamically get the current year
-      return [
-        this.getBookQuantitiesForYear(currentYear),
-        [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
-      ]
+    filteredDoneOrders() {
+      return this.doneOrders.filter((order) => order.Status === 'pending')
     },
-    bookQuantityJan() {
-      this.bookJan = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantityFeb() {
-      this.bookFeb = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 1 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantityMar() {
-      this.bookMar = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 2 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantityApr() {
-      this.bookApr = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 3 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    async bookQuantityMay() {
-      const mayBooks = this.books.filter((book) => {
-        const { month, year } = this.parseDate(book.time_create)
-        console.log('dateeee', month, year)
-        return month === 4 && year === 2024 // May is month 4
-      })
-
-      const sumMayBooks = mayBooks.reduce((sum, book) => sum + book.Quantity, 0)
-      this.bookMay = sumMayBooks
-      console.log(this.bookMay)
-
-      return sumMayBooks
-    },
-
-    bookQuantityJun() {
-      this.bookJun = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 5 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantityJul() {
-      this.bookJul = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 6 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantityAug() {
-      this.bookAug = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 7 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantitySep() {
-      this.bookSep = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 8 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantityOct() {
-      this.bookOct = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 9 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantityNov() {
-      this.bookNov = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 10 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    bookQuantityDec() {
-      this.bookDec = this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month, year)
-          return month === 0 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-      return this.books
-        .filter((book) => {
-          const { month, year } = this.parseDate(book.time_create)
-          console.log('dateeee', month)
-          return month === 11 && year === 2024
-        })
-        .reduce((sum, book) => sum + book.Quantity, 0)
-    },
-    pendingOrder(){
-      return this.doneOrders.filter(order => order.Status === "đang chờ");
-    }
   },
   methods: {
     parseDate(dateString) {
@@ -769,21 +421,7 @@ export default {
 
       return { month: monthNumber, year: year }
     },
-    bookQuantityForMonthYear(month, year) {
-      return this.books
-        .filter((book) => {
-          const date = new Date(book.time_create)
-          return date.getMonth() === month && date.getFullYear() === year
-        })
-        .reduce((sum, book) => sum + book.quantity, 0)
-    },
-    getBookQuantitiesForYear(year) {
-      const months = Array(12).fill(0)
-      for (let month = 0; month < 12; month++) {
-        months[month] = this.bookQuantityForMonthYear(month, year)
-      }
-      return months
-    },
+
     reload() {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       const userId = `${localStorage.getItem('userId')}`
@@ -806,23 +444,23 @@ export default {
         .finally(() => {
           this.isLoading = false
         })
-      // axios({
-      //   method: 'get',
-      //   url: `${constant.base_url}/discount/${userId}`,
-      //   headers: {
-      //     'ngrok-skip-browser-warning': 'skip-browser-warning',
-      //   },
-      // })
-      //   .then((res) => {
-      //     console.log(res.data)
-      //     this.discounts = res.data
-      //   })
-      //   .catch((err) => {
-      //     console.log(err)
-      //   })
-      //   .finally(() => {
-      //     this.isLoading = false
-      //   })
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/discount/${userId}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
+        .then((res) => {
+          console.log(res.data)
+          this.discounts = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
       axios({
         method: 'get',
         url: `${constant.base_url}/statistical/books_count/${userId}`,
@@ -913,35 +551,26 @@ export default {
         .finally(() => {
           this.isLoading = false
         })
-    },
-    submit() {
       axios({
-        method: 'post',
-        url: `http://${process.env.BASE_URL}:3000/auth/reset-password`,
-        data: {
-          title: this.title,
-          content: this.content,
-          createdAt: Date.now(),
+        method: 'get',
+        url: `${constant.base_url}/discount/${userId}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          Authorization: authorization,
         },
       })
-        .then((response) => {
-          console.log(response)
-          this.$notify({
-            title: 'Success',
-            text: response.data.message,
-            type: 'success',
-          })
-          return response.data
+        .then((res) => {
+          console.log(res.data)
+          this.discounts = res.data
         })
-        .catch((error) => {
-          console.error('Login error:', error)
-          this.$notify({
-            title: 'Error',
-            text: error.response.data.message,
-            type: 'error',
-          })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
         })
     },
+
     changeBookPage(page, limit) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       console.log('page: ' + page + ' limit: ' + limit)
@@ -971,15 +600,20 @@ export default {
     changeOption(optionNumber) {
       this.manageOption = optionNumber
     },
-    changePendingPage(page, limit) {
-      console.log('page: ' + page + ' limit: ' + limit)
-      console.log('oke')
-      this.isLoading = true
-      this.$axios
-        .get(`/blogs/awaiting-approval/?page=${page}&limit=${limit}`)
+    loadDoneOrders() {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      const userId = `${localStorage.getItem('userId')}`
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/order/shop/${userId}`,
+        headers: {
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+          Authorization: authorization,
+        },
+      })
         .then((res) => {
-          this.pendingNews = res.data.docs
-          this.pendingNewsCount = res.data.totalDocs
+          console.log('done order', res.data)
+          this.doneOrders = res.data
         })
         .catch((err) => {
           console.log(err)
@@ -987,29 +621,6 @@ export default {
         .finally(() => {
           this.isLoading = false
         })
-    },
-    changeNewsPage(page, limit) {
-      console.log('page: ' + page + ' limit: ' + limit)
-      console.log('oke')
-      this.isLoading = true
-      this.$axios
-        .get(`/blogs/?page=${page}&limit=${limit}`)
-        .then((res) => {
-          this.news = res.data.docs
-          this.newsCount = res.data.totalDocs
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-    },
-    setLoading() {
-      this.isLoading = true
-    },
-    doneLoading() {
-      this.isLoading = false
     },
   },
 }

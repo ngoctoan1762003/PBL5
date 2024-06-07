@@ -210,6 +210,7 @@ export default {
             type: 'success',
             group: 'foo',
           })
+          this.$emit('save')
         })
         .catch((err) => {
           console.log(err)

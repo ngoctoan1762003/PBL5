@@ -167,7 +167,7 @@ export default {
       method: 'get',
       url: `${constant.base_url}/book/books?page=1&limit=${this.recordsPerPage}`,
       headers: {
-        Authorization: authorization,
+        // Authorization: authorization,
         'ngrok-skip-browser-warning': 'skip-browser-warning',
       },
     })

@@ -10,46 +10,56 @@
       />
     </div>
     <div
+      class="w-full bg-[#1B3764] rounded-[16px] text-white font-medium p-5 flex justify-between text-[12px] mb-5"
+    >
+      <div class="w-[25%] flex justify-center items-center cursor-pointer" @click="toAll()">Tất cả</div>
+      <div class="w-[25%] flex justify-center items-center cursor-pointer" @click="toPendingOrder()">Đang chờ</div>
+      <div class="w-[25%] flex justify-center items-center cursor-pointer" @click="toDoneOrder()">Đã xác nhận</div>
+      <div class="w-[25%] flex justify-center items-center cursor-pointer" @click="toAbandonedOrder">Đã hủy</div>
+    </div>
+    <div
       class="user-list text-white font-medium p-5 w-full bg-[#1B3764] rounded-[16px]"
     >
       <div class="font-semibold user-list-row">
-        <div class="user-list-row-cell avatar"></div>
-        <div class="user-list-row-cell title">Tiêu đề</div>
-        <div class="user-list-row-cell gender">Giá</div>
-        <div class="user-list-row-cell phone">Tác giả</div>
+        <!-- <div class="user-list-row-cell avatar"></div> -->
+        <div class="user-list-row-cell title">Mã hóa đơn</div>
+        <div class="user-list-row-cell gender">Số lượng</div>
+        <div class="user-list-row-cell phone">Mã giảm giá</div>
         <div class="user-list-row-cell email">Tên shop</div>
-        <div class="user-list-row-cell birthday">Số lượng</div>
-        <!-- <div class="user-list-row-cell role">Role</div> -->
-        <div class="user-list-row-cell status">Thể loai</div>
+        <div class="user-list-row-cell birthday">Trạng thái</div>
+        <div class="user-list-row-cell status">Tổng tiền</div>
         <div class="tooltip"></div>
       </div>
       <div
-        v-for="user in users"
+        v-for="user in currentOrderSelect"
         class="user-list-row user-list-information"
-        :key="user._id"
+        :key="user.OrderId"
       >
-        <div class="avatar">
-          <!-- <img :src="user.image" class="p-2 rounded-full" /> -->
-        </div>
+        <!-- <div class="avatar"> -->
+        <!-- <img :src="user.image" class="p-2 rounded-full" /> -->
+        <!-- </div> -->
         <div class="user-list-row-cell title">
-          {{ getName(user.OrderAmount) }}
+          {{ user.OrderId }}
         </div>
         <div class="user-list-row-cell gender">
-          {{ getPriceFormat(user.OrderDate) }}
+          {{ user.Items.length }}
         </div>
-        <div class="user-list-row-cell phone">{{ user.ShippingMethod }}</div>
-        <div class="user-list-row-cell email">{{ user._id }}</div>
-        <!-- <div class="user-list-row-cell birthday">{{ user.Quantity }}</div> -->
-        <!-- <div class="user-list-row-cell role">{{ user.roleName }}</div> -->
-        <!-- <div class="user-list-row-cell status">{{ user.Genre }}</div> -->
+        <div class="user-list-row-cell phone">
+          {{ getName(user.DiscountId) }}
+        </div>
+        <div class="user-list-row-cell email">{{ user.shop_name }}</div>
+        <div class="user-list-row-cell birthday">{{ user.Status }}</div>
+        <div class="user-list-row-cell status">
+          {{ getPriceFormat(user.Total_price) }}
+        </div>
         <div class="tooltip relative">
-          <img
+          <!-- <img
             src="~/assets/icon/more.svg"
-            @mouseenter="displayTooltip(user._id)"
+            @mouseenter="displayTooltip(user.OrderId)"
             class="cursor-pointer"
           />
           <div
-            :id="'action-' + user._id"
+            :id="'action-' + user.OrderId"
             class="hidden absolute top-1 right-0 z-10"
             @mouseleave="closeAllPopup()"
           >
@@ -76,7 +86,7 @@
               </button>
               <button
                 class="hover:bg-red-400 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                @click="onDelete(user._id)"
+                @click="onDelete(user.OrderId)"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -95,61 +105,92 @@
                 Xóa
               </button>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="w-full h-[1px] bg-gray-500"></div>
-      <Pagination
+      <!-- <Pagination
         :count="count"
         @changePage="changePage"
         :recordsPerPage="recordsPerPage"
-      />
+      /> -->
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from 'axios'
 import { format } from 'date-fns'
 import EditBook from '../Book/EditBook.vue'
 import constant from '~/constant'
-import Pagination from '~/components/Pagination.vue'
+// import Pagination from '~/components/Pagination.vue'
 
 export default {
   components: {
     EditBook,
-    Pagination,
+    // Pagination,
   },
   props: {
-    users: Array,
     count: Number,
     recordsPerPage: Number,
   },
   data() {
     return {
-      // users: [],
+      users: Array,
       currentBook: {
         type: Object,
-        default: () => {},
+        default: () => ({}),
       },
       isEditProfile: false,
+      currentOrderSelect: [],
+      currentStatus: '',
     }
   },
+  mounted() {
+    const userId = localStorage.getItem('userId')
+    const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+    axios
+      .get(`${constant.base_url}/order/shop/${userId}`, {
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
+      })
+      .then((res) => {
+        this.users = res.data.order_details
+        console.log(this.users)
+        this.currentOrderSelect = this.users
+      })
+    console.log(this.users)
+  },
+  computed: {
+  },
   methods: {
+    toDoneOrder(){
+      this.currentOrderSelect = this.users.filter(u => u.Status === 'Đã xác nhận');
+    },
+    toPendingOrder(){
+      this.currentOrderSelect = this.users.filter(u => u.Status === 'đang chờ');
+    },
+    toAbandonedOrder(){
+      this.currentOrderSelect = this.users.filter(u => u.Status === 'Đã hủy');
+    },
+    toAll(){
+      this.currentOrderSelect = this.users;
+    },
     closeAllPopup() {
       this.users.forEach((p) => {
-        document.querySelector('#action-' + p._id).classList.add('hidden')
+        document.querySelector('#action-' + p.OrderId).classList.add('hidden')
       })
     },
     closeAllPopupExceptIndex(index) {
       this.users.forEach((p) => {
-        if (p._id !== index)
-          document.querySelector('#action-' + p._id).classList.add('hidden')
+        if (p.OrderId !== index)
+          document.querySelector('#action-' + p.OrderId).classList.add('hidden')
       })
     },
     getPriceFormat(price) {
-      if (this.amount === 0) return '' // Return empty string if book is not defined
+      if (price === 0) return '' // Return empty string if book is not defined
       const formattedPrice = price
         .toString()
         .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
@@ -183,10 +224,8 @@ export default {
       })
     },
     formatBirthday(date) {
-      console.log(date)
       if (date) {
         const jsDate = new Date(date)
-
         return format(jsDate, 'dd/MM/yyyy')
       }
       return ''
@@ -194,18 +233,16 @@ export default {
     reload() {
       this.$emit('reload')
     },
-    getName(firstName, lastName) {
-      if (!firstName) firstName = ''
-      if (!lastName) lastName = ''
-      return firstName + ' ' + lastName
+    getName(name) {
+      return name || ''
     },
     changePage(page, limit) {
-      console.log('to user lít ')
       this.$emit('changePage', page, limit)
     },
   },
 }
 </script>
+
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
 
@@ -249,11 +286,11 @@ export default {
     }
 
     .gender {
-      width: 13%;
+      width: 8%;
     }
 
     .phone {
-      width: 13%;
+      width: 23%;
     }
 
     .email {

@@ -79,7 +79,7 @@
                         type="button"
                         style="transition: all 0.15s ease 0s"
                         @click="isUpRole = true"
-                        v-if="user.Role !=='seller'"
+                        v-if="user.Role !=='seller' && user.Role !== 'admin'"
                       >
                         Trở thành người bán
                       </button>
@@ -100,7 +100,7 @@
                 <div class="w-full w-4/12 px-4 lg:order-1">
                   <div class="flex justify-center py-4 lg:pt-4 pt-8">
                     <div class="mr-4 p-3 text-center"></div>
-                    <div class="mr-4 p-3 text-center">
+                    <!-- <div class="mr-4 p-3 text-center">
                       <span
                         class="text-xl font-bold block uppercase tracking-wide text-[#fafcfe]"
                         >{{ countPost }}</span
@@ -111,7 +111,7 @@
                         class="text-xl font-bold block uppercase tracking-wide text-[#fafcfe]"
                         >{{ countLikes }}</span
                       ><span class="text-sm text-[#fafcfe]">Likes</span>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
                 <div class="flex flex-wrap justify-center">
@@ -291,7 +291,7 @@ export default {
       this.isEditProfile = false
     },
     save(userProp) {
-      alert('Luu thanh cong:', JSON.stringify(userProp))
+      // alert('Luu thanh cong:', JSON.stringify(userProp))
       console.log(userProp)
       this.isEditProfile = false
     },

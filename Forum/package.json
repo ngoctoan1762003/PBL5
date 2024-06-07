@@ -32,6 +32,7 @@
     "js-cookie": "^3.0.5",
     "laravel-echo": "^1.16.1",
     "net": "^1.0.2",
+    "netlify-cli": "^17.25.0",
     "nuxt": "2.15.8",
     "nuxt-socket-io": "2",
     "nuxt-vue3-google-signin": "^0.0.11",

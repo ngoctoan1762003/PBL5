@@ -63,10 +63,12 @@
           class="absolute z-[10] max-h-[90vh] overflow-y-scroll right-0 top-[40px] bg-[#FFFFFF] px-5 py-3 font-semibold rounded-[20px] text-[#1B3764] shadow-md flex flex-col gap-2"
           v-show="isShowNotify"
         >
+          <div v-if="notifications.length === 0">Không có thông báo nào</div>
           <div
             v-for="noti in notifications"
             :key="noti._id"
             :class="{ 'text-gray-300': noti.isNew === 0 }"
+            v-else
           >
             {{ noti.content }}
             <div class="border-b-[1px] border-gray-500"></div>
@@ -76,11 +78,11 @@
     </div>
 
     <div class="relative top-nav__option items-center">
-      <div class="top-nav__option__element">Trang chủ</div>
-      <div class="top-nav__option__element">Sách</div>
-      <div class="top-nav__option__element">Về chúng tôi</div>
-      <div class="top-nav__option__element">Dịch vụ</div>
-      <div class="top-nav__option__element">Liên hệ</div>
+      <!-- <div class="top-nav__option__element" @click="toBook()">Trang chủ</div> -->
+      <div class="top-nav__option__element" @click="toBook">Sách</div>
+      <div class="top-nav__option__element" @click="toBottom">Về chúng tôi</div>
+      <!-- <div class="top-nav__option__element">Dịch vụ</div>
+      <div class="top-nav__option__element">Liên hệ</div> -->
       <img
         :src="user.image"
         @click="isShowOption = !isShowOption"
@@ -149,6 +151,9 @@ export default {
   },
 
   methods: {
+    toBook() {
+      this.$router.push('/')
+    },
     toUserDetail() {
       this.$router.push('/user/profile')
     },
@@ -200,6 +205,9 @@ export default {
     },
     toMessage() {
       this.$router.push('/chat')
+    },
+    toBottom() {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
     },
   },
 }
