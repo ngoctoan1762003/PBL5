@@ -24,7 +24,12 @@
             :key="conversation.user_id"
             @click="toConversationWith(conversation.user_id)"
             class="cursor-pointer relative flex gap-3 justify-start items-center"
-            :class="[{ 'bg-blue-100': conversation.user_id === recipientId }, { 'rounded-md': conversation.user_id === recipientId }, { 'px-3': conversation.user_id === recipientId }, { 'py-2': conversation.user_id === recipientId }]"
+            :class="[
+              { 'bg-blue-100': conversation.user_id === recipientId },
+              { 'rounded-md': conversation.user_id === recipientId },
+              { 'px-3': conversation.user_id === recipientId },
+              { 'py-2': conversation.user_id === recipientId },
+            ]"
           >
             <img
               :src="conversation.image"
@@ -137,6 +142,7 @@ export default {
       this.recipient = res.data
     })
 
+    const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     axios({
       method: 'post',
       url: `${constant.base_url}/chat/load`,
@@ -153,7 +159,6 @@ export default {
       console.log(this.messages)
     })
 
-    const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     axios({
       method: 'get',
       url: `${constant.base_url}/chat/conversations`,
@@ -161,10 +166,25 @@ export default {
         'ngrok-skip-browser-warning': 'skip-browser-warning',
         Authorization: authorization,
       },
-    }).then((res) => {
-      console.log(res.data)
-      this.conversations = res.data
     })
+      .then((res) => {
+        console.log(res.data)
+        this.conversations = res.data
+        let isHave = false
+        this.conversations.forEach((con) => {
+          console.log('test', con.user_id, id)
+          if (con.user_id === id) isHave = true
+        })
+        if (isHave === false) {
+          this.conversations.push({
+            image: this.recipient.image,
+            name: this.recipient.Name,
+            user_id: this.recipient._id,
+          })
+          console.log(this.conversations)
+        }
+      })
+      .finally(() => {})
 
     this.connection = new WebSocket('ws://localhost:5000')
 
@@ -210,7 +230,7 @@ export default {
       }
     )
 
-    if (!this.conversations.find(c => c.user_id === this.recipientId)){
+    if (!this.conversations.find((c) => c.user_id === this.recipientId)) {
       this.conversations.push({
         user_id: this.recipient._id,
         name: this.recipient.Name,

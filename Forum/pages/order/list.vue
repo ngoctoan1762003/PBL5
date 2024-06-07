@@ -116,7 +116,12 @@
                     </div>
                   </div>
                 </div>
-                <div>{{ item.Price }}</div>
+                <div>{{ getPriceFormat(item.Price * item.Quantity) }}</div>
+              </div>
+              <div class="border-b-[1px] border-darkblue"></div>
+              <div class="flex justify-between">
+                <div class="text-darkblue font-semibold">Thành tiền</div>
+                <div>{{ getPriceFormat(order.Total_price) }}</div>
               </div>
             </div>
           </div>
