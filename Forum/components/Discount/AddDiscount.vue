@@ -154,6 +154,59 @@ export default {
     },
 
     submit() {
+      if (this.discountCode === '') {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng nhập mã giảm giá',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (parseInt(this.discountNumber) === 0) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng nhập số lượng giảm',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (parseInt(this.quantity) === 0) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng nhập số lượng lớn hơn 0',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (
+        this.endDate === '' ||
+        this.endTime === '' ||
+        this.startDate === '' ||
+        this.startTime === ''
+      ) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng nhập đầy đủ thời gian',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      const startDT = new Date(`${this.startDate}T${this.startTime}`)
+      const endDT = new Date(`${this.endDate}T${this.endTime}`)
+
+      if (endDT < startDT) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       const userId = localStorage.getItem('userId')
       const startDateTime = this.formatDateTime(this.startDate, this.startTime)

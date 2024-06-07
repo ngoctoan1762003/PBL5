@@ -54,7 +54,11 @@
     </div>
     <div class="book__component">
       <div class="book__component__label">Tác giả</div>
-      <input type="text" v-model="authorName" class="book__component__content" />
+      <input
+        type="text"
+        v-model="authorName"
+        class="book__component__content"
+      />
     </div>
     <div class="book__component">
       <div class="book__component__label">Miêu tả</div>
@@ -163,6 +167,60 @@ export default {
     },
 
     submit() {
+      if (this.previewImage === '') {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng thêm ảnh',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (this.title === '') {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng thêm tiêu đề',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (this.quantity === 0) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng thêm số lượng',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (this.price === 0) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng thêm giá',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (this.authorName === 0) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng thêm tên tác giả',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      if (this.publisher === 0) {
+        this.$notify({
+          title: 'Thất bại',
+          text: 'Vui lòng thêm nhà xuất bản',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
         method: 'post',
