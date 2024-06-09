@@ -18,35 +18,28 @@
       <div
         class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 1 }"
-        @click="currentOption = 1"
+        @click="toAll()"
       >
         Tất cả
       </div>
       <div
         class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 2 }"
-        @click="currentOption = 2"
+        @click="toPendingOrder()"
       >
-        Chờ thanh toán
+        Đang chờ
       </div>
       <div
         class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 3 }"
-        @click="currentOption = 3"
+        @click="toDoneOrder()"
       >
-        Đã thanh toán
+        Đã xác nhận
       </div>
       <div
         class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 4 }"
-        @click="currentOption = 4"
-      >
-        Hoàn thành
-      </div>
-      <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
-        :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 5 }"
-        @click="currentOption = 5"
+        @click="toAbandonedOrder"
       >
         Đã hủy
       </div>
@@ -66,7 +59,7 @@
         <div>></div>
       </div> -->
       <div class="flex flex-col gap-3">
-        <div v-for="order in orders.order_details" :key="order._id">
+        <div v-for="order in currentOrderSelect" :key="order._id">
           <div class="flex items-center px-5 py-3 bg-[#F5F8FC] text-[#1B3764]">
             <!-- <div class="w-[35%] text-[14px] font-semibold">
               {{ order.OrderId }}
@@ -101,6 +94,7 @@
                     :class="{
                       'text-green-500': order.Status === 'Đã xác nhận',
                       'text-yellow-500': order.Status === 'Đang chờ xác nhận',
+                      'text-red-500': order.Status === 'Đã bị hủy',
                     }"
                   >
                     {{ order.Status }}
@@ -108,7 +102,7 @@
                   <div v-show="order.Status === 'Đang chờ xác nhận'">
                     <button
                       class="bg-red-500 text-white px-3 py-2 rounded-md"
-                      @click="cancelOrder(order.OrderDetailId)"
+                      @click="cancelOrder(order.OrderDetailId, order.ShopId)"
                     >
                       Hủy
                     </button>
@@ -305,9 +299,12 @@ export default {
       selectedDiscountCode: '',
       orders: [],
       currentOption: 1,
+      user: {},
+      currentOrderSelect: [],
     }
   },
   async mounted() {
+    this.user = JSON.parse(localStorage.getItem('user'))
     const userId = localStorage.getItem('userId')
     const authorization = `Bearer ${localStorage.getItem('accessToken')}`
     await axios({
@@ -319,7 +316,8 @@ export default {
       },
     })
       .then((res) => {
-        this.orders = res.data
+        this.orders = res.data.order_details
+        this.currentOrderSelect = this.orders
       })
       .catch((err) => {
         console.log(err.response)
@@ -345,6 +343,29 @@ export default {
     },
   },
   methods: {
+    toAll() {
+      this.currentOrderSelect = this.orders
+      this.currentOption = 1
+    },
+    toDoneOrder() {
+      this.currentOrderSelect = this.orders.filter(
+        (u) => u.Status === 'Đã xác nhận'
+      )
+      this.currentOption = 3
+    },
+    toPendingOrder() {
+      console.log(this.orders)
+      this.currentOrderSelect = this.orders.filter(
+        (u) => u.Status === 'Đang chờ xác nhận'
+      )
+      this.currentOption = 2
+    },
+    toAbandonedOrder() {
+      this.currentOrderSelect = this.orders.filter(
+        (u) => u.Status === 'Đã bị hủy'
+      )
+      this.currentOption = 4
+    },
     getPriceFormat(price) {
       if (price === 0) return '' // Return empty string if book is not defined
       const formattedPrice = price
@@ -366,10 +387,10 @@ export default {
         this.removeAll()
       }
     },
-    cancelOrder(orderId) {
+    cancelOrder(orderId, shopId) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
-        method: 'delete',
+        method: 'put',
         url: `${constant.base_url}/order/order_cancel/${orderId}`,
         headers: {
           Authorization: authorization,
@@ -394,7 +415,28 @@ export default {
             },
           })
             .then((res) => {
-              this.orders = res.data
+              this.orders = res.data.order_details;
+              if (this.currentOption === 1){
+                this.toAll()
+              }
+              else if (this.currentOption === 2){
+                this.toPendingOrder()
+              }
+              else if (this.currentOption === 3){
+                this.toDoneOrder()
+              }
+              else if (this.currentOption === 4){
+                this.toAbandonedOrder()
+              }
+
+              axios({
+                method: 'post',
+                url: `${constant.base_url}/notification/new_notif`,
+                data: {
+                  receiver_id: shopId,
+                  content: `${this.user.Name} đã hủy đơn hàng`,
+                },
+              })
             })
             .catch((err) => {
               console.log(err.response)

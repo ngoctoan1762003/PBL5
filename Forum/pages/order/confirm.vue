@@ -119,7 +119,8 @@
         <div
           class="bg-[#F4F8FF] py-5 px-5 flex flex-col gap-4"
           v-show="
-            shop.selectedDiscount && shop.selectedDiscount?.DiscountCode !== ''
+            shop?.discount &&
+            shop.discount.filter((d) => d.Quantity > 0).length > 0
           "
         >
           <div class="text-[#1B3764] font-semibold text-[20px]">Voucher</div>
@@ -254,6 +255,7 @@ export default {
     }
   },
   async mounted() {
+    this.user = JSON.parse(localStorage.getItem('user'))
     const shopsQuery = this.$route.query.shops
     this.user = JSON.parse(localStorage.getItem('user'))
     this.address = this.user?.Address || ''
@@ -294,8 +296,8 @@ export default {
         })
 
         if (this.shops[i].discount.length > 0) {
-          this.shops[i].discount_id = this.shops[i].discount[0]._id
-          this.shops[i].selectedDiscount = this.shops[i].discount[0]
+          this.shops[i].discount_id = null
+          this.shops[i].selectedDiscount = null
         }
       } catch (error) {
         console.error(
@@ -570,7 +572,7 @@ export default {
           type: 'error',
           group: 'foo',
         })
-        return;
+        return
       }
       if (this.phone === '') {
         this.$notify({
@@ -579,7 +581,7 @@ export default {
           type: 'error',
           group: 'foo',
         })
-        return;
+        return
       }
       this.shops.forEach((shop) =>
         shop.books.forEach((book) => {
@@ -609,6 +611,16 @@ export default {
             text: 'Đặt hàng thành công',
             type: 'success',
             group: 'foo',
+          })
+          this.shops.forEach((shop) => {
+            axios({
+              method: 'post',
+              url: `${constant.base_url}/notification/new_notif`,
+              data: {
+                receiver_id: shop.shop_id,
+                content: `${this.user.Name} đã đặt đơn hàng mới`,
+              },
+            })
           })
           this.$router.push('/order/list')
         })
@@ -651,6 +663,10 @@ export default {
         this.changingShopVoucher.discount.find(
           (discount) => discount.DiscountCode === this.selectedDiscountCode
         )
+      this.changingShopVoucher.discount_id =
+        this.changingShopVoucher.discount.find(
+          (discount) => discount.DiscountCode === this.selectedDiscountCode
+        )._id
     },
   },
 }

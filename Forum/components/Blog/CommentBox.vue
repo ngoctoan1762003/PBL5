@@ -97,6 +97,8 @@ export default {
                 content: `${user.Name} đã bình luận về sách của bạn`,
               },
             })
+
+            this.$emit('send')
           })
           .catch((e) => {
             console.log(e)

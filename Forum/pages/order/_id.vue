@@ -78,14 +78,14 @@
         </div>
       </div>
     </div>
-    <div class="flex justify-center gap-10 pb-32 font-semibold text-[18px]">
+    <!-- <div class="flex justify-center gap-10 pb-32 font-semibold text-[18px]">
       <button class="bg-[#1B3764] py-3 px-5">
         <div class="text-white">Mô tả sản phẩm</div>
       </button>
       <button class="bg-[#F5F8FC] py-3 px-5">
         <div class="text-[#1B3764]">Thông tin thêm</div>
       </button>
-    </div>
+    </div> -->
     <FooterBar />
   </div>
 </template>

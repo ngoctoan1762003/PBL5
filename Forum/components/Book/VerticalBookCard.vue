@@ -3,7 +3,7 @@
     <div class="w-auto p-[20px] bg-[#F5F8FC]">
       <img class="aspect-[3/4] shadow-md" :src="book.image" alt="" />
     </div>
-    <div class="w-auto flex flex-col gap-4">
+    <div class="w-full flex flex-col items-start gap-4">
       <div>
         <button
           class="text-[#1B3764] text-[18px] font-semibold max-h-[30px] overflow-hidden text-ellipsis max-w-[100%]"

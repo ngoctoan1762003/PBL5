@@ -32,7 +32,7 @@
       </div>
       <div
         class="w-[25%] flex justify-center items-center cursor-pointer"
-        @click="toAbandonedOrder"
+        @click="toAbandonedOrder()"
       >
         Đã hủy
       </div>
@@ -55,9 +55,19 @@
         class=""
         :key="user.OrderDetailId"
       >
-        <div class="user-list-row bg-white hover:bg-gray-300">
-          <div class="user-list-row-cell font-semibold text-[#1B3764] title">
-            {{ user.OrderDetailId }}
+        <div class="user-list-row bg-white hover:bg-gray-300 pr-5">
+          <div
+            class="user-list-row-cell font-semibold text-[#1B3764] title flex gap-3 items-center"
+          >
+            <div>
+              {{ user.OrderDetailId }}
+            </div>
+            <div
+              class="bg-[#FFCA42] px-3 py-2 cursor-pointer"
+              @click="goToChat(user.user_id)"
+            >
+              Chat
+            </div>
           </div>
           <div class="user-list-row-cell font-semibold text-[#1B3764] gender">
             {{ user.Items.length }}
@@ -65,8 +75,12 @@
           <div class="user-list-row-cell font-semibold text-[#1B3764] phone">
             {{ getName(user.DiscountCode) }}
           </div>
-          <div class="user-list-row-cell font-semibold text-[#1B3764] email">{{ user.shop_name }}</div>
-          <div class="user-list-row-cell font-semibold text-[#1B3764] birthday">{{ user.Status }}</div>
+          <div class="user-list-row-cell font-semibold text-[#1B3764] email">
+            {{ user.shop_name }}
+          </div>
+          <div class="user-list-row-cell font-semibold text-[#1B3764] birthday">
+            {{ user.Status }}
+          </div>
           <div class="user-list-row-cell font-semibold text-[#1B3764] status">
             {{ getPriceFormat(user.Total_price) }}
           </div>
@@ -77,37 +91,35 @@
             >
               <button
                 class="w-[75px] py-2 rounded-md bg-red-500"
-                @click="cancelOrder(user.OrderDetailId)"
+                @click="cancelOrder(user.OrderDetailId, user.user_id)"
               >
                 Hủy
               </button>
               <button
                 class="w-[75px] py-2 rounded-md bg-green-400"
-                @click="confirmOrder(user.OrderDetailId)"
+                @click="confirmOrder(user.OrderDetailId, user.user_id)"
               >
                 Xác nhận
               </button>
             </div>
           </div>
         </div>
-        <div class="flex flex-col gap-3 bg-blue-500 opacity-70 rounded-md">
+        <div class="flex flex-col gap-3 bg-blue-500 opacity-80 rounded-md">
           <div class="user-list-row user-list-information">
             <div class="user-list-row-cell title flex gap-4 items-center">
               <div>Sách</div>
             </div>
-            <div class="user-list-row-cell gender">
-              Thể loại
-            </div>
-            <div class="user-list-row-cell phone">
-              Giá tiền
-            </div>
+            <div class="user-list-row-cell gender">Thể loại</div>
+            <div class="user-list-row-cell phone">Giá tiền</div>
             <div class="user-list-row-cell email">Số lượng</div>
             <div class="user-list-row-cell birthday"></div>
-            <div class="user-list-row-cell status">
-              Tổng tiền
-            </div>
+            <div class="user-list-row-cell status">Tổng tiền</div>
           </div>
-          <div v-for="book in user.Items" :key="book.BookId"  class="user-list-row user-list-information">
+          <div
+            v-for="book in user.Items"
+            :key="book.BookId"
+            class="user-list-row user-list-information"
+          >
             <div class="user-list-row-cell title flex gap-4 items-center">
               <img :src="book.Image" class="w-[40px]" alt="" />
               <div>{{ book.Title }}</div>
@@ -167,6 +179,21 @@ export default {
   mounted() {
     const userId = localStorage.getItem('userId')
     const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+    axios({
+      method: 'get',
+      url: `${constant.base_url}/user/${userId}`,
+      headers: {
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res.data)
+        this.user = res.data
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+
     axios
       .get(`${constant.base_url}/order/shop/${userId}`, {
         headers: {
@@ -194,7 +221,9 @@ export default {
       )
     },
     toAbandonedOrder() {
-      this.currentOrderSelect = this.users.filter((u) => u.Status === 'Đã hủy')
+      this.currentOrderSelect = this.users.filter(
+        (u) => u.Status === 'Đã bị hủy'
+      )
     },
     toAll() {
       this.currentOrderSelect = this.users
@@ -260,7 +289,7 @@ export default {
     changePage(page, limit) {
       this.$emit('changePage', page, limit)
     },
-    confirmOrder(orderId) {
+    confirmOrder(orderId, userId) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
         method: 'put',
@@ -277,7 +306,32 @@ export default {
             type: 'success',
             group: 'foo',
           })
+
           this.reload()
+          axios({
+            method: 'post',
+            url: `${constant.base_url}/notification/new_notif`,
+            data: {
+              receiver_id: userId,
+              content: `${this.user.Name} đã xác nhận đơn hàng của bạn`,
+            },
+          })
+
+          const currentUserId = localStorage.getItem('userId')
+          const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+          axios
+            .get(`${constant.base_url}/order/shop/${currentUserId}`, {
+              headers: {
+                Authorization: authorization,
+                'ngrok-skip-browser-warning': 'skip-browser-warning',
+              },
+            })
+            .then((res) => {
+              this.users = res.data.order_details
+              console.log(this.users)
+              this.currentOrderSelect = this.users
+            })
+          console.log(this.users)
         })
         .catch((error) => {
           this.$notify({
@@ -288,10 +342,10 @@ export default {
           })
         })
     },
-    cancelOrder(orderId) {
+    cancelOrder(orderId, userId) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
-        method: 'delete',
+        method: 'put',
         url: `${constant.base_url}/order/order_cancel/${orderId}`,
         headers: {
           Authorization: authorization,
@@ -305,7 +359,32 @@ export default {
             type: 'success',
             group: 'foo',
           })
+
           this.reload()
+
+          const currentUserId = localStorage.getItem('userId')
+          const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+          axios
+            .get(`${constant.base_url}/order/shop/${currentUserId}`, {
+              headers: {
+                Authorization: authorization,
+                'ngrok-skip-browser-warning': 'skip-browser-warning',
+              },
+            })
+            .then((res) => {
+              this.users = res.data.order_details
+              console.log(this.users)
+              this.currentOrderSelect = this.users
+            })
+
+          axios({
+            method: 'post',
+            url: `${constant.base_url}/notification/new_notif`,
+            data: {
+              receiver_id: userId,
+              content: `${this.user.Name} đã hủy đơn hàng của bạn`,
+            },
+          })
         })
         .catch((error) => {
           this.$notify({
@@ -315,6 +394,9 @@ export default {
             group: 'foo',
           })
         })
+    },
+    goToChat(userId) {
+      this.$router.push(`/chat/${userId}`)
     },
   },
 }

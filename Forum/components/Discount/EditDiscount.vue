@@ -89,10 +89,10 @@
                   class="book__component__content"
                 />
               </div> -->
-              <div class="book__component">
+              <!-- <div class="book__component">
                 <div class="book__component__label">Miêu tả</div>
                 <textarea class="book__component__content" v-model="EndDay" />
-              </div>
+              </div> -->
               <!-- <div class="book__component">
                 <div class="book__component__label">Thể loại</div>
                 <select
