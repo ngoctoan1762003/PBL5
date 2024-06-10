@@ -16,30 +16,30 @@
 
     <div class="cart__header flex justify-between gap-5 my-2 gap-2">
       <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
+        class="w-[20%] flex justify-center items-center pl-5 cursor-pointer py-3 pr-5 text-[18px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 1 }"
         @click="toAll()"
       >
         Tất cả
       </div>
       <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
+        class="w-[20%] flex justify-center items-center pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 2 }"
         @click="toPendingOrder()"
       >
         Đang chờ
       </div>
       <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
+        class="w-[20%] flex justify-center items-center pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 3 }"
         @click="toDoneOrder()"
       >
         Đã xác nhận
       </div>
       <div
-        class="pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
+        class="w-[20%] flex justify-center items-center pl-5 cursor-pointer py-3 pr-5 text-[16px] text-[#1B3764] font-semibold"
         :class="{ 'border-b-[1px] border-[#1B3764]': currentOption == 4 }"
-        @click="toAbandonedOrder"
+        @click="toAbandonedOrder()"
       >
         Đã hủy
       </div>
@@ -60,7 +60,12 @@
       </div> -->
       <div class="flex flex-col gap-3">
         <div v-for="order in currentOrderSelect" :key="order._id">
-          <div class="flex items-center px-5 py-3 bg-[#F5F8FC] text-[#1B3764]">
+          <div
+            class="flex items-center px-5 py-3 bg-[#F5F8FC] text-[#1B3764]"
+            :class="{
+              'bg-gray-200': order.Status === 'Đã bị hủy',
+            }"
+          >
             <!-- <div class="w-[35%] text-[14px] font-semibold">
               {{ order.OrderId }}
             </div>
@@ -415,17 +420,14 @@ export default {
             },
           })
             .then((res) => {
-              this.orders = res.data.order_details;
-              if (this.currentOption === 1){
+              this.orders = res.data.order_details
+              if (this.currentOption === 1) {
                 this.toAll()
-              }
-              else if (this.currentOption === 2){
+              } else if (this.currentOption === 2) {
                 this.toPendingOrder()
-              }
-              else if (this.currentOption === 3){
+              } else if (this.currentOption === 3) {
                 this.toDoneOrder()
-              }
-              else if (this.currentOption === 4){
+              } else if (this.currentOption === 4) {
                 this.toAbandonedOrder()
               }
 

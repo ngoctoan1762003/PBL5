@@ -111,9 +111,9 @@
             <div class="w-[20%] text-[14px] font-semibold">
               {{ getPriceFormat(book.price * book.quantity) }}
             </div>
-            <button class="w-[5%]">
+            <!-- <button class="w-[5%]">
               <img src="~/assets/icon/bin.svg" alt="" />
-            </button>
+            </button> -->
           </div>
         </div>
         <div
@@ -295,10 +295,8 @@ export default {
           selectedDiscount: '',
         })
 
-        if (this.shops[i].discount.length > 0) {
-          this.shops[i].discount_id = null
-          this.shops[i].selectedDiscount = null
-        }
+        this.shops[i].discount_id = null
+        this.shops[i].selectedDiscount = null
       } catch (error) {
         console.error(
           `Error fetching discount for shop ${this.shops[i].shop_id}:`,

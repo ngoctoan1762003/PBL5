@@ -61,16 +61,27 @@
           </div>
         </div>
       </div>
-      <div v-show="manageOption === 1 && !isLoading" class="w-[100%] flex">
+      <div
+        v-show="manageOption === 1 && !isLoading"
+        class="w-[100%] flex flex-col"
+      >
         <div class="flex h-min-[200px] justify-between gap-5 px-5">
           <div
-            class="bg-[#1B3764] max-h-[200px] flex flex-col gap-2 py-5 px-4 min-w-[300px] max-w-[300px] rounded-[20px]"
+            class="bg-[#1B3764] cursor-pointer max-h-[200px] flex flex-col gap-2 py-5 px-4 min-w-[300px] max-w-[300px] rounded-[20px]"
           >
             <div class="text-white text-[22px] font-semibold">Tổng số sách</div>
             <div class="text-white text-[18px]">{{ allBookCount }} quyển</div>
           </div>
           <div
-            class="bg-[#1B3764] max-h-[200px] flex flex-col gap-2 py-5 px-4 min-w-[300px] max-w-[300px] rounded-[20px]"
+            class="bg-[#1B3764] cursor-pointer max-h-[200px] flex flex-col gap-2 py-5 px-4 min-w-[300px] max-w-[300px] rounded-[20px]"
+          >
+            <div class="text-white text-[22px] font-semibold">
+              Số sách đã bán
+            </div>
+            <div class="text-white text-[18px]">{{ soldBookCount }} quyển</div>
+          </div>
+          <div
+            class="bg-[#1B3764] cursor-pointer max-h-[200px] flex flex-col gap-2 py-5 px-4 min-w-[300px] max-w-[300px] rounded-[20px]"
           >
             <div class="text-white text-[22px] font-semibold">
               Tổng số hóa đơn
@@ -92,8 +103,13 @@
             <div>{{bu class="text-white text-[18px]"yerCount}}</div>
           </div> -->
           <div
-            class="bg-[#1B3764] max-h-[200px] flex flex-col gap-2 py-5 px-4 mi6-w-[300px] max-w-[300px] rounded-[20px] min-w-[45%]"
+            class="relative cursor-pointer bg-[#1B3764] max-h-[200px] flex flex-col gap-2 py-5 px-4 min-w-[300px] max-w-[300px] rounded-[20px]"
+            @click="changeOption(7)"
           >
+            <div
+              class="absolute right-[-10px] top-[-10px] bg-red-500 w-[25px] h-[25px] z-[10] rounded-full animate-jump"
+              v-show="pendingOrderCount > 0"
+            ></div>
             <div class="text-white text-[22px] font-semibold">
               Đơn hàng đang đợi
             </div>
@@ -111,6 +127,20 @@
             :responsiveOptions="responsiveOptions"
           /> -->
           <!-- <div class="ct-chart ct-perfect-fourth"></div> -->
+          <div class="flex justify-center gap-5">
+            <div
+              class="bg-white rounded-md shadow-md p-5 flex flex-col items-center gap-5 font-semibold w-[60%]"
+            >
+              <LineChart class="w-[100%]" :planetChartData="planetChartData" />
+              <label for="">Biểu đồ thông tin kinh doanh</label>
+            </div>
+            <div
+              class="bg-white rounded-md shadow-md p-5 flex flex-col items-center gap-5 font-semibold w-[30%]"
+            >
+              <PieChart class="w-[100%]" :planetChartData="pieChartData" />
+              <label for="">Biểu đồ tỉ lệ thể loại sách</label>
+            </div>
+          </div>
         </div>
       </div>
       <div v-show="manageOption === 2 && !isLoading" class="w-full">
@@ -185,6 +215,8 @@ import DiscountList from '~/components/Discount/DiscountList.vue'
 import AddDiscount from '~/components/Discount/AddDiscount.vue'
 import ChartistChart from '~/components/ChartistChart.vue'
 import OrderList from '~/components/Manage/OrderList.vue'
+import LineChart from '~/components/LineChart.vue'
+import PieChart from '~/components/PieChart.vue'
 
 export default {
   components: {
@@ -199,6 +231,8 @@ export default {
     BarChart,
     ChartistChart,
     OrderList,
+    LineChart,
+    PieChart,
   },
   layout: 'empty',
   data() {
@@ -223,78 +257,133 @@ export default {
       soldBookCount: Number,
       buyerCount: Number,
       booksOfShop: [],
-      bookJan: Number,
-      bookFeb: Number,
-      bookMar: Number,
-      bookApr: Number,
-      bookMay: Number,
-      bookJun: Number,
-      bookJul: Number,
-      bookAug: Number,
-      bookSep: Number,
-      bookOct: Number,
-      bookNov: Number,
-      bookDec: Number,
-      chartData: {
-        // labels: [
-        //   'Jan',
-        //   'Feb',
-        //   'Mar',
-        //   'Apr',
-        //   'Mai',
-        //   'Jun',
-        //   'Jul',
-        //   'Aug',
-        //   'Sep',
-        //   'Oct',
-        //   'Nov',
-        //   'Dec',
-        // ],
-        // series: [
-        //   [
-        //     this.bookQuantityJan,
-        //     this.bookQuantityFeb,
-        //     this.bookQuantityMar,
-        //     this.bookQuantityApr,
-        //     this.bookQuantityMay,
-        //     this.bookQuantityJun,
-        //     this.bookQuantityJul,
-        //     this.bookQuantityAug,
-        //     this.bookQuantitySep,
-        //     this.bookQuantityOct,
-        //     this.bookQuantityNov,
-        //     this.bookQuantityDec,
-        //   ],
-        //   [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
-        // ],
-      },
-      chartOptions: {
-        seriesBarDistance: 15,
-      },
-      responsiveOptions: [
-        [
-          'screen and (min-width: 641px) and (max-width: 1024px)',
-          {
-            seriesBarDistance: 10,
-            axisX: {
-              labelInterpolationFnc: function (value) {
-                return value
+      yearStatistic: [],
+      planetChartData: {
+        type: 'line',
+        data: {
+          labels: [
+            'Tháng 1',
+            'Tháng 2',
+            'Tháng 3',
+            'Tháng 4',
+            'Tháng 5',
+            'Tháng 6',
+            'Tháng 7',
+            'Tháng 8',
+            'Tháng 9',
+            'Tháng 10',
+            'Tháng 11',
+            'Tháng 12',
+          ],
+          datasets: [
+            // {
+            //   label: 'Số sách thêm vào mỗi tháng',
+            //   data: [0, 0, 1, 2, 79, 82, 27, 14, 20, 20, 10, 309],
+            //   backgroundColor: 'rgba(54,73,93,.5)',
+            //   borderColor: '#36495d',
+            //   borderWidth: 3,
+            // },
+            {
+              label: 'Số sách đã bán mỗi tháng',
+              data: [
+                0.166, 2.081, 3.003, 0.323, 954.792, 285.886, 43.662, 51.514,
+                90, 103, 120, 30,
+              ],
+              backgroundColor: 'rgba(71, 183,132,.5)',
+              borderColor: '#47b784',
+              borderWidth: 3,
+            },
+            {
+              label: 'Số đơn đặt hàng mỗi tháng',
+              data: [1, 2, 3, 4, 5, 6, 7, 8, 120, 10, 12, 12],
+              backgroundColor: 'rgba(255, 0, 0,.5)',
+              borderColor: '#ff0000',
+              borderWidth: 3,
+            },
+            {
+              label: 'Số khách hàng mỗi tháng',
+              data: [80, 200, 30, 420, 510, 380, 209, 609, 932, 210, 290, 801],
+              backgroundColor: 'rgba(0, 0, 255,.5)',
+              borderColor: '#0000ff',
+              borderWidth: 3,
+            },
+            {
+              label: 'Doanh thu mỗi tháng (triệu đồng)',
+              data: [800, 20, 300, 42, 51, 38, 29, 609, 20, 180, 320, 30],
+              backgroundColor: 'rgba(255, 255, 0,.5)',
+              borderColor: '#ffff00',
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          lineTension: 1,
+          scales: {
+            yAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                  padding: 25,
+                },
               },
+            ],
+          },
+        },
+      },
+      pieChartData: {
+        type: 'pie',
+        data: {
+          labels: [
+            'Tháng 1',
+            'Tháng 2',
+            'Tháng 3',
+            'Tháng 4',
+            'Tháng 5',
+            'Tháng 6',
+            'Tháng 7',
+            'Tháng 8',
+          ],
+          datasets: [
+            {
+              label: 'Số sách thêm vào mỗi tháng',
+              data: [0, 0, 1, 2, 79, 82, 27, 14],
+              backgroundColor: [
+                'rgba(54,73,93,.5)',
+                'rgba(71, 183,132,.5)',
+                'rgba(255, 0, 0,.5)',
+                'rgba(255, 165, 0,.5)',
+                'rgba(0, 128, 0,.5)',
+                'rgba(0, 0, 255,.5)',
+                'rgba(75, 0, 130,.5)',
+                'rgba(238, 130, 238,.5)',
+              ],
+              borderColor: [
+                '#36495d',
+                '#47b784',
+                '#ff0000',
+                '#ffa500',
+                '#008000',
+                '#0000ff',
+                '#4b0082',
+                '#ee82ee',
+              ],
+              borderWidth: 3,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              enabled: true,
             },
           },
-        ],
-        [
-          'screen and (max-width: 640px)',
-          {
-            seriesBarDistance: 5,
-            axisX: {
-              labelInterpolationFnc: function (value) {
-                return value[0]
-              },
-            },
-          },
-        ],
-      ],
+        },
+      },
     }
   },
   async created() {
@@ -312,6 +401,7 @@ export default {
         allOrderCountRes,
         soldBookCountRes,
         booksOfShopRes,
+        yearStatisticRes,
       ] = await Promise.all([
         axios.get(
           `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
@@ -352,8 +442,20 @@ export default {
             'ngrok-skip-browser-warning': 'skip-browser-warning',
           },
         }),
+        axios.get(`${constant.base_url}/statistical/sales_quantity/${userId}`, {
+          headers: {
+            Authorization: authorization,
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
+          },
+        }),
+        axios.get(`${constant.base_url}/book/shop/${userId}`, {
+          headers: {
+            Authorization: authorization,
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
+          },
+        }),
         axios.get(
-          `${constant.base_url}/statistical/sold_books_count/${userId}`,
+          `${constant.base_url}/statistical/total_amount_of_month/${userId}/2024`,
           {
             headers: {
               Authorization: authorization,
@@ -361,12 +463,6 @@ export default {
             },
           }
         ),
-        axios.get(`${constant.base_url}/book/shop/${userId}`, {
-          headers: {
-            Authorization: authorization,
-            'ngrok-skip-browser-warning': 'skip-browser-warning',
-          },
-        }),
       ])
 
       this.books = booksRes.data.books
@@ -376,8 +472,13 @@ export default {
       this.allBookCount = allBookCountRes.data.books_count
       this.pendingOrderCount = pendingOrderCountRes.data.orders_count
       this.allOrderCount = allOrderCountRes.data.orders_count
-      this.soldBookCount = soldBookCountRes.data
+        this.soldBookCount = soldBookCountRes.data[0].totalBookCount
       this.booksOfShop = booksOfShopRes.data
+      this.yearStatistic = yearStatisticRes.data
+      console.log(this.yearStatistic)
+      console.log(this.booksOfShop)
+      this.assignDataYearStatistic()
+      this.assignPieData()
     } catch (err) {
       console.error(err)
     } finally {
@@ -394,6 +495,83 @@ export default {
     },
   },
   methods: {
+    assignPieData() {
+      axios
+        .get(`${constant.base_url}/book/genre`, {
+          headers: {
+            'ngrok-skip-browser-warning': 'skip-browser-warning',
+          },
+        })
+        .then((res) => {
+          const genres = [...new Set(this.booksOfShop.books.map((book) => book.Genre))]
+
+          // Counting the number of books in each genre
+          const genreCounts = genres.map((genre) => ({
+            genre: genre,
+            count: this.booksOfShop.books.filter((book) => book.Genre === genre).length,
+          }))
+          console.log(genres)
+          console.log(genreCounts)
+          // Preparing the pie chart data
+          this.pieChartData.data = {
+            labels: genreCounts.map((gc) => gc.genre),
+            datasets: [
+              {
+                label: 'Thể loại sách',
+                data: genreCounts.map((gc) => gc.count),
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)',
+                  'rgba(255, 206, 86, 0.2)',
+                  'rgba(75, 192, 192, 0.2)',
+                  'rgba(153, 102, 255, 0.2)',
+                  'rgba(255, 159, 64, 0.2)',
+                  'rgba(99, 255, 132, 0.2)',
+                  'rgba(162, 54, 235, 0.2)',
+                  'rgba(206, 255, 86, 0.2)',
+                  'rgba(192, 75, 192, 0.2)',
+                  'rgba(102, 153, 255, 0.2)',
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)',
+                  'rgba(99, 255, 132, 1)',
+                  'rgba(162, 54, 235, 1)',
+                  'rgba(206, 255, 86, 1)',
+                  'rgba(192, 75, 192, 1)',
+                  'rgba(102, 153, 255, 1)',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          }
+        })
+    },
+    assignDataYearStatistic() {
+      // Initialize the datasets to 0 for all 12 months
+      // const datasetCount = this.planetChartData.data.datasets.length
+      // for (let i = 0; i < datasetCount; i++) {
+      //   this.planetChartData.data.datasets[i].data = Array(12).fill(0)
+      // }
+
+      // Populate the datasets with the input data
+      this.yearStatistic.forEach((data) => {
+        const monthIndex = data.month - 1 // Convert month to zero-based index
+
+        this.planetChartData.data.datasets[3].data[monthIndex] =
+          data.totalAmount / 1000000 // Doanh thu mỗi tháng (nghìn đồng)
+        this.planetChartData.data.datasets[0].data[monthIndex] =
+          data.totalBookCount // Số sách thêm vào mỗi tháng
+        this.planetChartData.data.datasets[1].data[monthIndex] =
+          data.totalOrderDetails // Số đơn đặt hàng mỗi tháng
+        this.planetChartData.data.datasets[2].data[monthIndex] =
+          data.uniqueUserCount // Số khách hàng mỗi tháng
+      })
+    },
     parseDate(dateString) {
       // Define a mapping of month names to their corresponding numbers
       const monthNames = [
@@ -437,6 +615,7 @@ export default {
           allOrderCountRes,
           soldBookCountRes,
           booksOfShopRes,
+          yearStatisticRes,
         ] = await Promise.all([
           axios.get(
             `${constant.base_url}/user/books?page=1&limit=${this.recordsPerPage}`,
@@ -478,7 +657,7 @@ export default {
             },
           }),
           axios.get(
-            `${constant.base_url}/statistical/sold_books_count/${userId}`,
+            `${constant.base_url}/statistical/sales_quantity/${userId}`,
             {
               headers: {
                 Authorization: authorization,
@@ -492,6 +671,15 @@ export default {
               'ngrok-skip-browser-warning': 'skip-browser-warning',
             },
           }),
+          axios.get(
+            `${constant.base_url}/statistical/total_amount_of_month/${userId}/2024`,
+            {
+              headers: {
+                Authorization: authorization,
+                'ngrok-skip-browser-warning': 'skip-browser-warning',
+              },
+            }
+          ),
         ])
 
         this.books = booksRes.data.books
@@ -501,12 +689,14 @@ export default {
         this.allBookCount = allBookCountRes.data.books_count
         this.pendingOrderCount = pendingOrderCountRes.data.orders_count
         this.allOrderCount = allOrderCountRes.data.orders_count
-        this.soldBookCount = soldBookCountRes.data
+        this.soldBookCount = soldBookCountRes.data[0].totalBookCount
         this.booksOfShop = booksOfShopRes.data
+        this.yearStatistic = yearStatisticRes.data
+        this.assignDataYearStatistic()
+        this.assignPieData()
       } catch (err) {
         console.error(err)
       } finally {
-        console.log('done order', this.doneOrders)
         this.isLoading = false
       }
     },
@@ -565,7 +755,6 @@ export default {
   },
 }
 </script>
-
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
 // @import "_my-chartist-settings.scss";

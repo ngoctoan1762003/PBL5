@@ -10,28 +10,32 @@
       />
     </div>
     <div
-      class="w-full bg-[#1B3764] rounded-[16px] text-white font-medium p-5 flex justify-between text-[12px] mb-5"
+      class="w-full bg-[#1B3764] rounded-[16px] text-white font-medium px-5 flex justify-between text-[12px] mb-5"
     >
       <div
-        class="w-[25%] flex justify-center items-center cursor-pointer"
+        class="w-[25%] py-5 flex justify-center items-center cursor-pointer border-blue-500"
+        :class="{ 'border-b-[3px]': currentSelectedOption === 1 }"
         @click="toAll()"
       >
         Tất cả
       </div>
       <div
-        class="w-[25%] flex justify-center items-center cursor-pointer"
+        class="w-[25%] py-5 flex justify-center items-center cursor-pointer border-yellow-500"
+        :class="{ 'border-b-[3px]': currentSelectedOption === 2 }"
         @click="toPendingOrder()"
       >
         Đang chờ
       </div>
       <div
-        class="w-[25%] flex justify-center items-center cursor-pointer"
+        class="w-[25%] py-5 flex justify-center items-center cursor-pointer border-green-500"
+        :class="{ 'border-b-[3px]': currentSelectedOption === 3 }"
         @click="toDoneOrder()"
       >
         Đã xác nhận
       </div>
       <div
-        class="w-[25%] flex justify-center items-center cursor-pointer"
+        class="w-[25%] py-5 flex justify-center items-center cursor-pointer border-red-500"
+        :class="{ 'border-b-[3px]': currentSelectedOption === 4 }"
         @click="toAbandonedOrder()"
       >
         Đã hủy
@@ -54,6 +58,7 @@
         v-for="user in currentOrderSelect"
         class=""
         :key="user.OrderDetailId"
+        @click="toggleItemsVisibility(user.OrderDetailId)"
       >
         <div class="user-list-row bg-white hover:bg-gray-300 pr-5">
           <div
@@ -64,12 +69,14 @@
             </div>
             <div
               class="bg-[#FFCA42] px-3 py-2 cursor-pointer"
-              @click="goToChat(user.user_id)"
+              @click.stop="goToChat(user.user_id)"
             >
               Chat
             </div>
           </div>
-          <div class="user-list-row-cell font-semibold text-[#1B3764] gender">
+          <div
+            class="user-list-row-cell font-semibold text-[#1B3764] gender mr-[9px]"
+          >
             {{ user.Items.length }}
           </div>
           <div class="user-list-row-cell font-semibold text-[#1B3764] phone">
@@ -104,7 +111,10 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col gap-3 bg-blue-500 opacity-80 rounded-md">
+        <div
+          class="flex flex-col gap-3 bg-blue-500 opacity-80 rounded-md"
+          v-if="isItemsVisible(user.OrderDetailId)"
+        >
           <div class="user-list-row user-list-information">
             <div class="user-list-row-cell title flex gap-4 items-center">
               <div>Sách</div>
@@ -174,6 +184,8 @@ export default {
       isEditProfile: false,
       currentOrderSelect: [],
       currentStatus: '',
+      visibleItems: {},
+      currentSelectedOption: 1,
     }
   },
   mounted() {
@@ -210,23 +222,37 @@ export default {
   },
   computed: {},
   methods: {
+    toggleItemsVisibility(orderDetailId) {
+      this.$set(
+        this.visibleItems,
+        orderDetailId,
+        !this.visibleItems[orderDetailId]
+      )
+    },
+    isItemsVisible(orderDetailId) {
+      return !!this.visibleItems[orderDetailId]
+    },
     toDoneOrder() {
       this.currentOrderSelect = this.users.filter(
         (u) => u.Status === 'Đã xác nhận'
       )
+      this.currentSelectedOption = 3
     },
     toPendingOrder() {
       this.currentOrderSelect = this.users.filter(
         (u) => u.Status === 'Đang chờ xác nhận'
       )
+      this.currentSelectedOption = 2
     },
     toAbandonedOrder() {
       this.currentOrderSelect = this.users.filter(
         (u) => u.Status === 'Đã bị hủy'
       )
+      this.currentSelectedOption = 4
     },
     toAll() {
       this.currentOrderSelect = this.users
+      this.currentSelectedOption = 1
     },
     closeAllPopup() {
       this.users.forEach((p) => {

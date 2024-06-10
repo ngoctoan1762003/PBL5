@@ -1,8 +1,10 @@
 <template>
   <div class="top-nav relative">
-    <div class="top-nav__logo" @click="$router.push('/')">
-      <img src="~assets/icon/Logo.svg" alt="" />
-      <div class="name-web">BOOK</div>
+    <div class="top-nav__logo">
+      <div @click="$router.push('/')" class="top-nav__logo">
+        <img src="~assets/icon/Logo.svg" alt="" />
+        <div class="name-web">BOOK</div>
+      </div>
       <div class="top-nav__link ml-2 relative">
         <img
           class="top-nav__link__icon"
