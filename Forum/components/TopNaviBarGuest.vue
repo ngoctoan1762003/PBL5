@@ -23,11 +23,8 @@
     </div>
 
     <div class="top-nav__option">
-      <div class="top-nav__option__element">Trang chủ</div>
-      <div class="top-nav__option__element">Sách</div>
-      <div class="top-nav__option__element">Về chúng tôi</div>
-      <div class="top-nav__option__element">Dịch vụ</div>
-      <div class="top-nav__option__element">Liên hệ</div>
+      <div class="top-nav__option__element" @click="toBook">Sách</div>
+      <div class="top-nav__option__element" @click="toBottom">Về chúng tôi</div>
       <button class="top-nav__button" @click="toLogin">
         <div class="text-[14px] font-[500] text-[#1B3764]">Đăng nhập</div>
       </button>
@@ -41,14 +38,19 @@
 <script>
 export default {
   methods: {
-    toSignup(){
+    toBook() {
+      this.$router.push('/')
+    },
+    toBottom() {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    },
+    toSignup() {
       this.$router.push('/auth/signup')
     },
-    toLogin(){
+    toLogin() {
       this.$router.push('/auth/login')
-      
-    }
-  }
+    },
+  },
 }
 </script>
 
