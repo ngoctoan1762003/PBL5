@@ -19,13 +19,14 @@
             <button
               class="text-[13px] font-semibold text-[#969AA0]"
               @click="likeComment()"
+              :class="{ 'text-blue-500': isLikedByCurrentUser(comment) }"
             >
               Thích
             </button>
             <div
-              class="absolute right-[-15px] top-[5px] text-gray-500 text-[10px] font-semibold bg-blue-500 text-white px-1 py-[1px] rounded-md"
+              class="absolute right-[-18px] top-[5px] text-gray-500 text-[10px] font-semibold bg-blue-500 text-white px-1 py-[1px] rounded-md"
             >
-              {{ comment.like }}
+              {{ comment.like.length }}
             </div>
           </div>
           <button
@@ -34,11 +35,18 @@
           >
             Bình luận
           </button>
+          <button
+            class="text-[13px] font-semibold text-red-500"
+            v-show="currentUserId === user._id"
+            @click="deleteComment()"
+          >
+            Xóa
+          </button>
         </div>
       </div>
     </div>
     <div v-for="c in comment.replies" :key="c._id" class="ml-20">
-      <ReplyCard :comment="c" :user_id="c.user_id" />
+      <ReplyCard :comment="c" :user_id="c.user_id" @send="send"/>
     </div>
     <CommentBox
       @send="send"
@@ -76,7 +84,13 @@ export default {
   data() {
     return {
       user: Object,
+      currentUserId: '',
     }
+  },
+  computed: {
+    isLikedByCurrentUser() {
+      return (comment) => comment.like.includes(this.currentUserId)
+    },
   },
   mounted() {
     axios({
@@ -94,6 +108,7 @@ export default {
       .catch((err) => {
         console.log(err)
       })
+    this.currentUserId = localStorage.getItem('userId')
   },
   methods: {
     GoToDetails(id) {
@@ -107,6 +122,15 @@ export default {
       this.$emit('send')
     },
     likeComment() {
+      if (!localStorage.getItem('accessToken')) {
+        this.$notify({
+          title: 'Lỗi',
+          text: 'Bạn phải đăng nhập để thích',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       axios({
         method: 'put',
@@ -124,6 +148,24 @@ export default {
         })
       })
     },
+    deleteComment(id){
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'delete',
+        url: `${constant.base_url}/comment/${this.comment._id}`,
+        headers: {
+          Authorization: authorization,
+        },
+      }).then((res) => {
+        this.$emit('send')
+        this.$notify({
+          title: 'Thành công',
+          text: 'Xóa thành công',
+          type: 'success',
+          group: 'foo',
+        })
+      })
+    }
   },
 }
 </script>

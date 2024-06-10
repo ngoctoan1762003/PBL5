@@ -1,5 +1,16 @@
 <template>
   <div>
+    <div
+      class="main fixed flex justify-center items-center w-full h-full top-0"
+      v-show="isDeleting"
+    >
+      <div class="absolute bg-gray-500 opacity-50 w-full h-full"></div>
+      <ModalDeleteAlert
+        class="relative z-[1]"
+        @cancel="cancel"
+        @delete="onDelete(deletingId)"
+      />
+    </div>
     <div>
       <EditRole
         v-if="isEditProfile"
@@ -20,7 +31,7 @@
         <div class="user-list-row-cell email">Email</div>
         <div class="user-list-row-cell birthday">Vai trò</div>
         <!-- <div class="user-list-row-cell role">Role</div> -->
-        <div class="user-list-row-cell status">Trạng thái</div>
+        <div class="user-list-row-cell status">Địa chỉ</div>
         <div class="tooltip"></div>
       </div>
       <div
@@ -39,19 +50,13 @@
         <div class="user-list-row-cell email">{{ user.Email }}</div>
         <div class="user-list-row-cell birthday">{{ user.Role }}</div>
         <!-- <div class="user-list-row-cell role">{{ user.roleName }}</div> -->
-        <div
-          class="user-list-row-cell status"
-          :class="{
-            'text-green-500': user.IsActivate === 0,
-            'text-red-500': user.IsActivate !== 0,
-          }"
-        >
-          {{ user.IsActivate == 0 ? 'Đang hoạt động' : 'Dừng hoạt động' }}
+        <div class="user-list-row-cell status">
+          {{ user.Address }}
         </div>
         <div class="tooltip relative">
           <button
             class="hover:bg-red-400 bg-white min-w-[100px] hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-            @click="onDelete(user._id)"
+            @click="deleteAlert(user._id)"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -69,35 +74,6 @@
             </svg>
             Xóa
           </button>
-          <!-- <img src="~/assets/icon/more.svg" @mouseenter="displayTooltip(user._id)" class="cursor-pointer" />
-                    
-                    <div :id="'action-' + user._id" class="hidden absolute top-1 right-0 z-10"
-                        @mouseleave="closeAllPopup()">
-                        <div class="px-1 py-1 bg-white rounded-lg">
-                            <button
-                                class=" hover:bg-gray-500 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                                @click="showPopup(user)">
-                                <svg xmlns="http://www.w3.org/2000/svg" class=" w-5 h-5 mr-2 text-violet-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                    </path>
-                                </svg>
-                                Edit
-                            </button>
-                            <button
-                                class=" hover:bg-red-400 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                                @click="onDelete(user._id)">
-                                <svg xmlns="http://www.w3.org/2000/svg" class=" w-5 h-5 mr-2 text-violet-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                    </path>
-                                </svg>
-                                Xóa
-                            </button>
-                        </div>
-                    </div> -->
         </div>
       </div>
       <div class="w-full h-[1px] bg-gray-500"></div>
@@ -115,6 +91,7 @@
 import axios from 'axios'
 import { format } from 'date-fns'
 import EditRole from '../User/EditRole.vue'
+import ModalDeleteAlert from '../Modal/ModalDeleteAlert.vue'
 import constant from '~/constant'
 import Pagination from '~/components/Pagination.vue'
 
@@ -122,6 +99,7 @@ export default {
   components: {
     EditRole,
     Pagination,
+    ModalDeleteAlert,
   },
   props: {
     users: Array,
@@ -136,6 +114,8 @@ export default {
         default: () => {},
       },
       isEditProfile: false,
+      deletingId: '',
+      isDeleting: false,
     }
   },
   methods: {
@@ -155,6 +135,9 @@ export default {
       const popup = document.querySelector('#action-' + id)
       popup.classList.toggle('hidden')
     },
+    cancel() {
+      this.isDeleting = false
+    },
     cancelSave() {
       this.isEditProfile = false
     },
@@ -166,8 +149,14 @@ export default {
       this.currentUser = user
       this.isEditProfile = true
     },
+    deleteAlert(id) {
+      console.log(id)
+      this.deletingId = id
+      this.isDeleting = true
+    },
     onDelete(id) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      this.isDeleting = false
       axios({
         method: 'delete',
         url: `${constant.base_url}/user/${id}`,
@@ -177,7 +166,7 @@ export default {
       }).then((res) => {
         this.$notify({
           title: 'Thành công',
-          text: 'Đăng bài thành công',
+          text: 'Xóa thành công',
           type: 'success',
           group: 'foo',
         })
@@ -210,7 +199,15 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
-
+.main {
+  position: fixed;
+  inset: 0;
+  background: rgba(71, 79, 98, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
 .user-list-information:hover {
   background-color: $dark-4;
 }

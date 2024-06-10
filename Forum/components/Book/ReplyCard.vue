@@ -13,8 +13,28 @@
         </div>
         <div v-html="comment.content"></div>
       </div>
-      <div class="flex gap-5 pl-3">
-        <button class="text-[13px] font-semibold text-[#969AA0]">Thích</button>
+      <div class="flex gap-6 pl-3">
+        <div class="relative">
+          <button
+            class="text-[13px] font-semibold text-[#969AA0]"
+            @click="likeComment()"
+            :class="{ 'text-blue-500': isLikedByCurrentUser(comment) }"
+          >
+            Thích
+          </button>
+          <div
+            class="absolute right-[-18px] top-[5px] text-gray-500 text-[10px] font-semibold bg-blue-500 text-white px-1 py-[1px] rounded-md"
+          >
+            {{ comment.like.length }}
+          </div>
+        </div>
+        <button
+          class="text-[13px] font-semibold text-red-500"
+          v-show="currentUserId === user._id"
+          @click="deleteComment()"
+        >
+          Xóa
+        </button>
       </div>
     </div>
   </div>
@@ -25,8 +45,7 @@ import axios from 'axios'
 import constant from '~/constant'
 
 export default {
-  components: {
-  },
+  components: {},
   props: {
     comment: {
       type: Object,
@@ -38,7 +57,13 @@ export default {
   data() {
     return {
       user: Object,
+      currentUserId: '',
     }
+  },
+  computed: {
+    isLikedByCurrentUser() {
+      return (comment) => comment.like.includes(this.currentUserId)
+    },
   },
   mounted() {
     axios({
@@ -56,11 +81,57 @@ export default {
       .catch((err) => {
         console.log(err)
       })
+    this.currentUserId = localStorage.getItem('userId')
   },
   methods: {
     submitComment() {},
     GoToDetails(id) {
       this.$router.push(`/user/${id}`)
+    },
+    likeComment() {
+      if (!localStorage.getItem('accessToken')) {
+        this.$notify({
+          title: 'Lỗi',
+          text: 'Bạn phải đăng nhập để thích',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'put',
+        url: `${constant.base_url}/comment/like/${this.comment._id}`,
+        headers: {
+          Authorization: authorization,
+        },
+      }).then((res) => {
+        this.$emit('send')
+        this.$notify({
+          title: 'Thành công',
+          text: 'Like thành công',
+          type: 'success',
+          group: 'foo',
+        })
+      })
+    },
+    deleteComment(id) {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'delete',
+        url: `${constant.base_url}/comment/${this.comment._id}`,
+        headers: {
+          Authorization: authorization,
+        },
+      }).then((res) => {
+        this.$emit('send')
+        this.$notify({
+          title: 'Thành công',
+          text: 'Xóa thành công',
+          type: 'success',
+          group: 'foo',
+        })
+      })
     },
   },
 }

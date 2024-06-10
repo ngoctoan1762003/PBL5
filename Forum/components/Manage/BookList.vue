@@ -1,5 +1,16 @@
 <template>
   <div>
+    <div
+      class="main fixed flex justify-center items-center w-full h-full top-0"
+      v-show="isDeleting"
+    >
+      <div class="absolute bg-gray-500 opacity-50 w-full h-full"></div>
+      <ModalDeleteAlert
+        class="relative z-[1]"
+        @cancel="cancel"
+        @delete="onDelete(deletingId)"
+      />
+    </div>
     <div>
       <EditBook
         v-show="isEditProfile"
@@ -54,7 +65,7 @@
             @mouseleave="closeAllPopup()"
           >
             <div class="px-1 py-1 bg-white rounded-lg">
-              <button
+              <!-- <button
                 class="hover:bg-gray-500 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
                 @click="showPopup(user)"
               >
@@ -73,10 +84,10 @@
                   ></path>
                 </svg>
                 Sửa
-              </button>
+              </button> -->
               <button
                 class="hover:bg-red-400 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                @click="onDelete(user._id)"
+                @click="deleteAlert(user._id)"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -134,6 +145,8 @@ export default {
         default: () => {},
       },
       isEditProfile: false,
+      deletingId: '',
+      isDeleting: false,
     }
   },
   methods: {
@@ -170,8 +183,13 @@ export default {
       this.currentBook = book
       this.isEditProfile = true
     },
+    deleteAlert(id){
+      this.isDeleting = true;
+      this.deletingId = id;
+    },
     onDelete(id) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      this.isDeleting = false;
       axios({
         method: 'delete',
         url: `${constant.base_url}/book/${id}`,
@@ -214,7 +232,15 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
-
+.main {
+  position: fixed;
+  inset: 0;
+  background: rgba(71, 79, 98, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
 .user-list-information:hover {
   background-color: $dark-4;
 }

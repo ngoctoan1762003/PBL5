@@ -46,6 +46,15 @@ export default {
     },
     send() {
       if (this.content === '') return
+      if (!localStorage.getItem('accessToken')){
+        this.$notify({
+          title: 'Lỗi',
+          text: 'Bạn phải đăng nhập để bình luận',
+          type: 'error',
+          group: 'foo',
+        })
+        return
+      }
       const authorization = localStorage.getItem('accessToken')
       const userId = localStorage.getItem('userId')
       const user = JSON.parse(localStorage.getItem('user'))
