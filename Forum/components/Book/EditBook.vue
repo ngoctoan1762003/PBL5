@@ -8,7 +8,7 @@
       <div
         class="relative text-[#1B3764] font-semibold text-[21px] bg-[#FFCA42] py-3 px-5"
       >
-        <div>Giỏ hàng</div>
+        <div>Chỉnh sửa sách</div>
         <img
           class="absolute right-5 top-[30%] w-[20px] h-[20px] cursor-pointer"
           @click="cancel()"

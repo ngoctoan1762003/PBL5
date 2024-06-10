@@ -14,10 +14,20 @@
           </div>
           <div v-html="comment.content"></div>
         </div>
-        <div class="flex gap-5 pl-3">
-          <button class="text-[13px] font-semibold text-[#969AA0]">
-            Thích
-          </button>
+        <div class="flex gap-6 pl-3">
+          <div class="relative">
+            <button
+              class="text-[13px] font-semibold text-[#969AA0]"
+              @click="likeComment()"
+            >
+              Thích
+            </button>
+            <div
+              class="absolute right-[-15px] top-[5px] text-gray-500 text-[10px] font-semibold bg-blue-500 text-white px-1 py-[1px] rounded-md"
+            >
+              {{ comment.like }}
+            </div>
+          </div>
           <button
             class="text-[13px] font-semibold text-[#969AA0]"
             @click="showCommentBox($event)"
@@ -95,6 +105,24 @@ export default {
     },
     send() {
       this.$emit('send')
+    },
+    likeComment() {
+      const authorization = `Bearer ${localStorage.getItem('accessToken')}`
+      axios({
+        method: 'put',
+        url: `${constant.base_url}/comment/like/${this.comment._id}`,
+        headers: {
+          Authorization: authorization,
+        },
+      }).then((res) => {
+        this.$emit('send')
+        this.$notify({
+          title: 'Thành công',
+          text: 'Like thành công',
+          type: 'success',
+          group: 'foo',
+        })
+      })
     },
   },
 }
