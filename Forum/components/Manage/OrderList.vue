@@ -49,9 +49,10 @@
         <div class="user-list-row-cell title">Mã hóa đơn</div>
         <div class="user-list-row-cell gender">Số loại sách</div>
         <div class="user-list-row-cell phone">Mã giảm giá</div>
-        <div class="user-list-row-cell email">Tên shop</div>
+        <div class="user-list-row-cell email">Địa chỉ</div>
         <div class="user-list-row-cell birthday">Trạng thái</div>
         <div class="user-list-row-cell status">Tổng tiền</div>
+        <div class="user-list-row-cell email">Số điện thoại</div>
         <div class="tooltip"></div>
       </div>
       <div
@@ -83,13 +84,23 @@
             {{ getName(user.DiscountCode) }}
           </div>
           <div class="user-list-row-cell font-semibold text-[#1B3764] email">
-            {{ user.shop_name }}
+            {{ user.address }}
           </div>
-          <div class="user-list-row-cell font-semibold text-[#1B3764] birthday">
+          <div
+            class="user-list-row-cell font-semibold text-[#1B3764] birthday"
+            :class="{
+              'text-green-500': user.Status === 'Đã xác nhận',
+              'text-yellow-600': user.Status === 'Đang chờ xác nhận',
+              'text-red-500': user.Status === 'Đã bị hủy',
+            }"
+          >
             {{ user.Status }}
           </div>
           <div class="user-list-row-cell font-semibold text-[#1B3764] status">
             {{ getPriceFormat(user.Total_price) }}
+          </div>
+          <div class="user-list-row-cell font-semibold text-[#1B3764] email">
+            {{ user.phone }}
           </div>
           <div class="tooltip relative">
             <div
@@ -112,7 +123,7 @@
           </div>
         </div>
         <div
-          class="flex flex-col gap-3 bg-blue-500 opacity-80 rounded-md"
+          class="flex flex-col gap-3 bg-[#3573D9] rounded-md"
           v-if="isItemsVisible(user.OrderDetailId)"
         >
           <div class="user-list-row user-list-information">
@@ -138,10 +149,10 @@
               {{ book.Genre }}
             </div>
             <div class="user-list-row-cell phone">
-              {{ book.Price }}
+              {{ getPriceFormat(book.Price) }}
             </div>
             <div class="user-list-row-cell email">{{ book.Quantity }}</div>
-            <div class="user-list-row-cell birthday">{{ user.Status }}</div>
+            <div class="user-list-row-cell birthday"></div>
             <div class="user-list-row-cell status">
               {{ getPriceFormat(book.Price * book.Quantity) }}
             </div>
@@ -466,7 +477,7 @@ export default {
     }
 
     .title {
-      width: 21%;
+      width: 17%;
     }
 
     .last-name {
@@ -478,7 +489,7 @@ export default {
     }
 
     .phone {
-      width: 23%;
+      width: 10%;
     }
 
     .email {
@@ -494,7 +505,7 @@ export default {
     }
 
     .status {
-      width: 15%;
+      width: 10%;
     }
 
     .tooltip {
