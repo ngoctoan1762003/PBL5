@@ -1,11 +1,12 @@
-// nuxt.config.js
 import path from 'path';
 import fs from 'fs';
 const pkg = require('./package');
 
 export default {
-  ssr: false,
+  ssr: false, // Set to false for SPA mode
+
   // Global page headers: https://go.nuxtjs.dev/config-head
+  // Uncomment and configure server for HTTPS if needed
   // server: {
   //   https: {
   //     key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
@@ -21,30 +22,7 @@ export default {
       }
     }
   },
-  mode: 'universal',
 
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
-          },
-        ],
-      },
-      {
-        source: "/auth/login",
-        headers: [
-          {
-            key: "Custom-Header",
-            value: "custom-value",
-          },
-        ],
-      },
-    ];
-  },
   head: {
     title: 'Forum',
     meta: [
@@ -63,8 +41,7 @@ export default {
     '~/assets/css/main.css',
     '~/assets/css/quill.css',
     'quill/dist/quill.snow.css',
-
-    // 'vue3-datepicker/dist/vue3-datepicker.css' // Add this line
+    // 'vue3-datepicker/dist/vue3-datepicker.css' // Uncomment if needed
   ],
 
   loading: { color: '#fff' },
@@ -83,25 +60,35 @@ export default {
     { src: '~plugins/vue-quill-editor.js', ssr: false },
     '~/plugins/vue-notification.js',
     '~/plugins/axios-interceptor.js',
-    '~/plugins/axios-interceptor.js',
     '~/plugins/Behavior/scrollToTop.js',
     // { src: '~/plugins/google-auth.js', ssr: false },
     // { src: '~/plugins/google-signin.js', ssr: false },
-    // '~/plugins/socket.js'
+    // '~/plugins/socket.js',
     // '~/plugins/server.js'
-
   ],
 
   components: true,
 
   build: {
-    transpile: ['chartist']
+    transpile: ['chartist'],
+    extend(config, { isDev, isClient }) {
+      if (isClient) {
+        config.module.rules.push({
+          test: /\.mjs$/,
+          include: /node_modules/,
+          type: 'javascript/auto'
+        });
+      }
+      config.node = {
+        fs: 'empty'
+      }
+    }
   },
 
   buildModules: [
     '@nuxtjs/eslint-module',
     '@nuxtjs/tailwindcss',
-    // 'nuxt-vite'
+    // 'nuxt-vite' // Uncomment if needed
   ],
 
   modules: [
@@ -136,20 +123,5 @@ export default {
         mutations: []
       }
     }]
-  },
-
-  build: {
-    extend(config, { isDev, isClient }) {
-      if (isClient) {
-        config.module.rules.push({
-          test: /\.mjs$/,
-          include: /node_modules/,
-          type: 'javascript/auto'
-        });
-      }
-      config.node = {
-        fs: 'empty'
-      }
-    }
   }
 }
