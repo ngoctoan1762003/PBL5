@@ -205,6 +205,16 @@ export default {
               })
             })
             .catch((err) => {
+              console.log(err.response.data)
+              if (err.response.data.error === 'account has been ban'){
+                this.$notify({
+                  group: 'foo',
+                  title: 'Lỗi',
+                  text: 'Tài khoản đã bị khóa',
+                  type: 'error',
+                })
+                return
+              }
               this.$notify({
                 group: 'foo',
                 title: 'Lỗi',
