@@ -16,7 +16,7 @@ export default {
   devServer: {
     proxy: {
       '/ws': {
-        target: 'ws://localhost:5000',
+        target: 'ws://localhost:7000',
         ws: true,
         changeOrigin: true
       }

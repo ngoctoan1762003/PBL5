@@ -58,6 +58,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-server.listen(5000, () => {
-  console.log('Server running on port 5000');
+server.listen(7000, () => {
+  console.log('Server running on port 7000');
 });
