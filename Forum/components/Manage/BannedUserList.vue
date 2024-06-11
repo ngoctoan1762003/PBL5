@@ -8,13 +8,13 @@
       <ModalDeleteAlert
         class="relative z-[1]"
         @cancel="cancel"
-        @delete="onDelete(deletingId)"
+        @delete=" (deletingId)"
       />
     </div>
     <div>
-      <EditBook
-        v-show="isEditProfile"
-        :book="currentBook"
+      <EditRole
+        v-if="isEditProfile"
+        :user="currentUser"
         @cancel="cancelSave"
         @save="save"
         @reload="reload"
@@ -25,13 +25,13 @@
     >
       <div class="font-semibold user-list-row">
         <div class="user-list-row-cell avatar"></div>
-        <div class="user-list-row-cell title">Tiêu đề</div>
-        <div class="user-list-row-cell gender">Giá</div>
-        <div class="user-list-row-cell phone">Tác giả</div>
-        <div class="user-list-row-cell email">Tên shop</div>
-        <div class="user-list-row-cell birthday">Số lượng</div>
+        <div class="user-list-row-cell first-name">Tên</div>
+        <!-- <div class="user-list-row-cell gender">Gender</div> -->
+        <div class="user-list-row-cell phone">Số ĐT</div>
+        <div class="user-list-row-cell email">Email</div>
+        <div class="user-list-row-cell birthday">Vai trò</div>
         <!-- <div class="user-list-row-cell role">Role</div> -->
-        <div class="user-list-row-cell status">Thể loai</div>
+        <div class="user-list-row-cell status">Địa chỉ</div>
         <div class="tooltip"></div>
       </div>
       <div
@@ -42,71 +42,24 @@
         <div class="avatar">
           <img :src="user.image" class="p-2 rounded-full" />
         </div>
-        <div class="user-list-row-cell title">
-          {{ getName(user.Title) }}
+        <div class="user-list-row-cell first-name">
+          {{ getName(user.Name) }}
         </div>
-        <div class="user-list-row-cell gender">
-          {{ getPriceFormat(user.Price) }}
-        </div>
-        <div class="user-list-row-cell phone">{{ user.PublisherName }}</div>
-        <div class="user-list-row-cell email">{{ user.shop_name }}</div>
-        <div class="user-list-row-cell birthday">{{ user.Quantity }}</div>
+        <!-- <div class="user-list-row-cell gender">{{ user.gender?'Male':'Female' }}</div> -->
+        <div class="user-list-row-cell phone">{{ user.Phone }}</div>
+        <div class="user-list-row-cell email">{{ user.Email }}</div>
+        <div class="user-list-row-cell birthday">{{ user.Role }}</div>
         <!-- <div class="user-list-row-cell role">{{ user.roleName }}</div> -->
-        <div class="user-list-row-cell status">{{ user.Genre }}</div>
+        <div class="user-list-row-cell status">
+          {{ user.Address }}
+        </div>
         <div class="tooltip relative">
-          <img
-            src="~/assets/icon/more.svg"
-            @mouseenter="displayTooltip(user._id)"
-            class="cursor-pointer"
-          />
-          <div
-            :id="'action-' + user._id"
-            class="hidden absolute top-1 right-0 z-10"
-            @mouseleave="closeAllPopup()"
+          <button
+            class="hover:bg-red-400 bg-white min-w-[100px] hover:text-white text-gray-900 group flex rounded-md items-center justify-center w-full px-2 py-2 text-sm"
+            @click="onDelete(user._id)"
           >
-            <div class="px-1 py-1 bg-white rounded-lg">
-              <!-- <button
-                class="hover:bg-gray-500 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                @click="showPopup(user)"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-5 h-5 mr-2 text-violet-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  ></path>
-                </svg>
-                Sửa
-              </button> -->
-              <button
-                class="hover:bg-red-400 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm"
-                @click="deleteAlert(user._id)"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-5 h-5 mr-2 text-violet-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  ></path>
-                </svg>
-                Xóa
-              </button>
-            </div>
-          </div>
+            Mở khóa
+          </button>
         </div>
       </div>
       <div class="w-full h-[1px] bg-gray-500"></div>
@@ -123,14 +76,16 @@
 <script>
 import axios from 'axios'
 import { format } from 'date-fns'
-import EditBook from '../Book/EditBook.vue'
+import EditRole from '../User/EditRole.vue'
+import ModalDeleteAlert from '../Modal/ModalDeleteAlert.vue'
 import constant from '~/constant'
 import Pagination from '~/components/Pagination.vue'
 
 export default {
   components: {
-    EditBook,
+    EditRole,
     Pagination,
+    ModalDeleteAlert,
   },
   props: {
     users: Array,
@@ -140,7 +95,7 @@ export default {
   data() {
     return {
       // users: [],
-      currentBook: {
+      currentUser: {
         type: Object,
         default: () => {},
       },
@@ -161,52 +116,47 @@ export default {
           document.querySelector('#action-' + p._id).classList.add('hidden')
       })
     },
-    getPriceFormat(price) {
-      if (this.amount === 0) return '' // Return empty string if book is not defined
-      const formattedPrice = price
-        .toString()
-        .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-      return `${formattedPrice} VND`
-    },
     displayTooltip(id) {
       this.closeAllPopupExceptIndex(id)
       const popup = document.querySelector('#action-' + id)
       popup.classList.toggle('hidden')
     },
-    cancel(){
+    cancel() {
       this.isDeleting = false
     },
     cancelSave() {
       this.isEditProfile = false
     },
-    save() {
+    save(userProp) {
+      console.log(userProp)
       this.isEditProfile = false
     },
-    showPopup(book) {
-      this.currentBook = book
+    showPopup(user) {
+      this.currentUser = user
       this.isEditProfile = true
     },
-    deleteAlert(id){
-      this.isDeleting = true;
-      this.deletingId = id;
+    deleteAlert(id) {
+      console.log(id)
+      this.deletingId = id
+      this.isDeleting = true
     },
     onDelete(id) {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
-      this.isDeleting = false;
+      this.isDeleting = false
       axios({
-        method: 'delete',
-        url: `${constant.base_url}/book/${id}`,
+        method: 'put',
+        url: `${constant.base_url}/user/unban/${id}`,
         headers: {
           Authorization: authorization,
         },
       }).then((res) => {
-        this.reload()
         this.$notify({
           title: 'Thành công',
-          text: 'Xóa thành công',
+          text: 'Mở khóa thành công',
           type: 'success',
           group: 'foo',
         })
+        this.reload()
       })
     },
     formatBirthday(date) {
@@ -275,8 +225,8 @@ export default {
       }
     }
 
-    .title {
-      width: 21%;
+    .first-name {
+      width: 20%;
     }
 
     .last-name {
@@ -284,15 +234,15 @@ export default {
     }
 
     .gender {
-      width: 13%;
+      width: 8%;
     }
 
     .phone {
-      width: 13%;
+      width: 10%;
     }
 
     .email {
-      width: 18%;
+      width: 23%;
     }
 
     .birthday {

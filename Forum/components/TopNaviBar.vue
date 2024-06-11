@@ -39,6 +39,7 @@
           src="~/assets/icon/cart.svg"
           class="cursor-pointer w-[25px] h-[25px]"
           @click="toCart"
+          v-show="user.Role !== 'admin'"
           alt=""
         />
         <img
@@ -137,6 +138,15 @@ export default {
     }).then((res) => {
       console.log(res.data)
       this.user = res.data
+      if (this.user.Status === 'ban'){
+        this.$notify({
+          title: 'Lỗi',
+          text: 'Bạn đã bị khóa tài khoản',
+          type: 'error',
+          group: 'foo',
+        })
+        this.logout()
+      }
     })
 
     axios({

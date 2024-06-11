@@ -472,7 +472,7 @@ export default {
       this.allBookCount = allBookCountRes.data.books_count
       this.pendingOrderCount = pendingOrderCountRes.data.orders_count
       this.allOrderCount = allOrderCountRes.data.orders_count
-        this.soldBookCount = soldBookCountRes.data[0].totalBookCount
+      this.soldBookCount = soldBookCountRes.data[0].totalBookCount
       this.booksOfShop = booksOfShopRes.data
       this.yearStatistic = yearStatisticRes.data
       console.log(this.yearStatistic)
@@ -483,7 +483,6 @@ export default {
       console.error(err)
     } finally {
       console.log('done order', this.doneOrders)
-      this.isLoading = false
     }
   },
   computed: {
@@ -503,12 +502,15 @@ export default {
           },
         })
         .then((res) => {
-          const genres = [...new Set(this.booksOfShop.books.map((book) => book.Genre))]
+          const genres = [
+            ...new Set(this.booksOfShop.books.map((book) => book.Genre)),
+          ]
 
           // Counting the number of books in each genre
           const genreCounts = genres.map((genre) => ({
             genre: genre,
-            count: this.booksOfShop.books.filter((book) => book.Genre === genre).length,
+            count: this.booksOfShop.books.filter((book) => book.Genre === genre)
+              .length,
           }))
           console.log(genres)
           console.log(genreCounts)
@@ -549,6 +551,9 @@ export default {
               },
             ],
           }
+        })
+        .finally(() => {
+          this.isLoading = false
         })
     },
     assignDataYearStatistic() {

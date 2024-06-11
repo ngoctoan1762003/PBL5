@@ -20,6 +20,12 @@
             </div>
           </div>
           <div class="category__item" @click="changeOption(3)">
+            <img src="~/assets/icon/person.svg" alt="" />
+            <div class="category__item__info">
+              <span class="name">Quản lý tài khoản bị cấm</span>
+            </div>
+          </div>
+          <div class="category__item" @click="changeOption(4)">
             <img src="~/assets/icon/popular.svg" alt="" />
             <div class="category__item__info">
               <span class="name">Quản lý sách</span>
@@ -51,11 +57,20 @@
         :count="sellerCount"
         :recordsPerPage="recordsPerPage"
       />
+      <BannedUserList
+        class="w-full"
+        :users="bannedUserList"
+        @reload="reload"
+        v-show="manageOption === 3 && !isLoading"
+        @changePage="changeSellerPage"
+        :count="sellerCount"
+        :recordsPerPage="recordsPerPage"
+      />
       <BookList
         class="w-full"
         :users="books"
         @reload="reload"
-        v-show="manageOption === 3 && !isLoading"
+        v-show="manageOption === 4 && !isLoading"
         @changePage="changeBookPage"
         :count="bookCount"
         :recordsPerPage="recordsPerPage"
@@ -82,6 +97,7 @@ import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
 import constant from '~/constant'
 import TopNaviBar from '~/components/TopNaviBar.vue'
 import BookList from '~/components/Manage/BookList.vue'
+import BannedUserList from '~/components/Manage/BannedUserList.vue'
 
 export default {
   components: {
@@ -90,6 +106,7 @@ export default {
     // BlogList,
     LoadingSpinner,
     TopNaviBar,
+    BannedUserList,
   },
   layout: 'empty',
   data() {
@@ -101,6 +118,7 @@ export default {
       users: [],
       sellers: [],
       books: [],
+      bannedUserList: [],
       manageOption: 1,
       userCount: Number,
       sellerCount: Number,
@@ -140,6 +158,23 @@ export default {
         console.log(res)
         this.users = res.data.users
         this.userCount = res.data.count
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+
+    axios({
+      method: 'get',
+      withCredentials: false,
+      url: `${constant.base_url}/user/getalluserban`,
+      headers: {
+        Authorization: authorization,
+        'ngrok-skip-browser-warning': 'skip-browser-warning',
+      },
+    })
+      .then((res) => {
+        console.log(res)
+        this.bannedUserList = res.data.users
       })
       .catch((err) => {
         console.error(err)
@@ -216,66 +251,82 @@ export default {
     },
     reload() {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
-    console.log(authorization)
-    axios({
-      method: 'get',
-      withCredentials: false,
-      url: `${constant.base_url}/user/getalluser?page=${this.currentUserPage}&limit=${this.recordsPerPage}`,
-      headers: {
-        Authorization: authorization,
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-      },
-    })
-      .then((res) => {
-        console.log(res)
-        this.users = res.data.users
-        this.userCount = res.data.count
+      console.log(authorization)
+      axios({
+        method: 'get',
+        withCredentials: false,
+        url: `${constant.base_url}/user/getalluser?page=${this.currentUserPage}&limit=${this.recordsPerPage}`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
       })
-      .catch((err) => {
-        console.error(err)
-      })
+        .then((res) => {
+          console.log(res)
+          this.users = res.data.users
+          this.userCount = res.data.count
+        })
+        .catch((err) => {
+          console.error(err)
+        })
 
-    axios({
-      method: 'get',
-      withCredentials: false,
-      url: `${constant.base_url}/user/role/seller?page=${this.currentSellerPage}&limit=${this.recordsPerPage}`,
-      headers: {
-        Authorization: authorization,
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-      },
-    })
-      .then((res) => {
-        console.log(res)
-        this.sellers = res.data.seller
-        this.sellerCount = res.data.count
+      axios({
+        method: 'get',
+        withCredentials: false,
+        url: `${constant.base_url}/user/getalluserban`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
       })
-      .catch((err) => {
-        console.error(err)
+        .then((res) => {
+          console.log(res)
+          this.bannedUserList = res.data.users
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+      axios({
+        method: 'get',
+        withCredentials: false,
+        url: `${constant.base_url}/user/role/seller?page=${this.currentSellerPage}&limit=${this.recordsPerPage}`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
       })
+        .then((res) => {
+          console.log(res)
+          this.sellers = res.data.seller
+          this.sellerCount = res.data.count
+        })
+        .catch((err) => {
+          console.error(err)
+        })
 
-    axios({
-      method: 'get',
-      url: `${constant.base_url}/book/books?page=${this.currentBookPage}&limit=${this.recordsPerPage}`,
-      headers: {
-        Authorization: authorization,
-        'ngrok-skip-browser-warning': 'skip-browser-warning',
-      },
-    })
-      .then((res) => {
-        console.log(res)
-        this.books = res.data.books
-        this.bookCount = res.data.count
-        // this.userCount = res.data.totalDocs
+      axios({
+        method: 'get',
+        url: `${constant.base_url}/book/books?page=${this.currentBookPage}&limit=${this.recordsPerPage}`,
+        headers: {
+          Authorization: authorization,
+          'ngrok-skip-browser-warning': 'skip-browser-warning',
+        },
       })
-      .catch((err) => {
-        console.error(err)
-      })
-    this.isLoading = false
+        .then((res) => {
+          console.log(res)
+          this.books = res.data.books
+          this.bookCount = res.data.count
+          // this.userCount = res.data.totalDocs
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+      this.isLoading = false
     },
     changeUserPage(page, limit) {
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
-      this.currentUserPage = page;
+      this.currentUserPage = page
       this.isLoading = true
       // this.$axios
       //   .get(`/users/?page=${page}&limit=${limit}`)
@@ -306,7 +357,7 @@ export default {
       const authorization = `Bearer ${localStorage.getItem('accessToken')}`
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
-      this.currentSellerPage = page;
+      this.currentSellerPage = page
       this.isLoading = true
       axios({
         method: 'get',
@@ -331,7 +382,7 @@ export default {
       const authorization = localStorage.getItem('accessToken')
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
-      this.currentBookPage = page;
+      this.currentBookPage = page
       this.isLoading = true
       axios({
         method: 'get',
@@ -357,7 +408,7 @@ export default {
     changePendingPage(page, limit) {
       console.log('page: ' + page + ' limit: ' + limit)
       console.log('oke')
-      this.currentOrderPage = page;
+      this.currentOrderPage = page
       this.isLoading = true
       this.$axios
         .get(`/blogs/awaiting-approval/?page=${page}&limit=${limit}`)
