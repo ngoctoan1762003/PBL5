@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[context.production.environment]
+  NUXT_ENV_BASE_URL = "https://68bb-42-112-111-184.ngrok-free.app"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
