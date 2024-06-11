@@ -198,13 +198,12 @@
   </div>
 </template>
 
-<script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
 
 <script>
 import axios from 'axios'
 // import UserList from '~/components/Manage/UserList.vue'
 // import BlogList from '~/components/Manage/BlogList.vue'
-import BarChart from '~/components/BarChart'
+// import BarChart from '~/components/BarChart'
 
 import LoadingSpinner from '~/components/Animation/LoadingSpinner.vue'
 import BookList from '~/components/Manage/BookList.vue'
@@ -213,7 +212,6 @@ import TopNaviBar from '~/components/TopNaviBar.vue'
 import AddBookPanel from '~/components/Book/AddBookPanel.vue'
 import DiscountList from '~/components/Discount/DiscountList.vue'
 import AddDiscount from '~/components/Discount/AddDiscount.vue'
-import ChartistChart from '~/components/ChartistChart.vue'
 import OrderList from '~/components/Manage/OrderList.vue'
 import LineChart from '~/components/LineChart.vue'
 import PieChart from '~/components/PieChart.vue'
@@ -228,8 +226,7 @@ export default {
     AddBookPanel,
     DiscountList,
     AddDiscount,
-    BarChart,
-    ChartistChart,
+    // BarChart,
     OrderList,
     LineChart,
     PieChart,
@@ -508,7 +505,7 @@ export default {
 
           // Counting the number of books in each genre
           const genreCounts = genres.map((genre) => ({
-            genre: genre,
+            genre,
             count: this.booksOfShop.books.filter((book) => book.Genre === genre)
               .length,
           }))
@@ -602,7 +599,7 @@ export default {
       // Convert month name to month number
       const monthNumber = monthNames.indexOf(month)
 
-      return { month: monthNumber, year: year }
+      return { month: monthNumber, year }
     },
 
     async reload() {
@@ -763,7 +760,6 @@ export default {
 <style lang="scss" scoped>
 @import '~/assets/scss/variables.scss';
 // @import "_my-chartist-settings.scss";
-@import 'chartist/dist/scss/chartist.scss';
 
 .default {
   display: flex;

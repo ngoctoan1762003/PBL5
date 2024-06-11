@@ -63,7 +63,6 @@ export default {
     '~/assets/css/main.css',
     '~/assets/css/quill.css',
     'quill/dist/quill.snow.css',
-    'chartist/dist/chartist.min.css'
 
     // 'vue3-datepicker/dist/vue3-datepicker.css' // Add this line
   ],
